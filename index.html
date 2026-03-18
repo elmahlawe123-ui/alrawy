@@ -20,13 +20,7 @@
   --shadow:0 20px 60px rgba(0,0,0,.5);--shadow-sm:0 4px 20px rgba(0,0,0,.3);
   --r:20px;--r-sm:12px;
 }
-body.light-mode{
-  --bg:#f1f5f9;--bg2:#fff;--bg3:#f8fafc;
-  --surface:#fff;--surface2:#f1f5f9;
-  --border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);
-  --text:#0f172a;--text2:#475569;--text3:#94a3b8;
-  --shadow:0 20px 60px rgba(0,0,0,.1);--shadow-sm:0 4px 20px rgba(0,0,0,.08);
-}
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'IBM Plex Sans Arabic','Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s;}
@@ -102,8 +96,6 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 .btn-att-quick::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.15) 50%,transparent 60%);animation:attBtnShine 3s ease-in-out infinite;}
 @keyframes attBtnShine{0%{transform:translateX(-100%) skewX(-15deg);}100%{transform:translateX(200%) skewX(-15deg);}}
 .btn-att-quick:hover{transform:translateY(-1px);box-shadow:0 0 0 1px rgba(201,129,10,.5),0 6px 24px rgba(201,129,10,.4);}
-.theme-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
-.theme-btn:hover{background:var(--bg3);}
 .header-user{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px 12px;cursor:pointer;transition:all .2s;}
 .header-user:hover{border-color:var(--border2);}
 .header-user-avatar{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;}
@@ -116,6 +108,12 @@ nav::-webkit-scrollbar{display:none;}
 nav button{border:none;background:transparent;padding:9px 16px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--text3);border-radius:10px;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:all .2s;}
 nav button:hover{background:var(--surface);color:var(--text2);}
 nav button.active-nav{background:linear-gradient(135deg,rgba(201,129,10,.2),rgba(240,160,48,.1));color:var(--accent2);border:1px solid rgba(201,129,10,.3);}
+nav button span.nav-icon{display:none;}
+@media(max-width:640px){
+  nav{justify-content:flex-start;padding:6px 10px;gap:4px;}
+  nav button{padding:8px 12px;font-size:12px;}
+  .header-date{display:none;}
+}
 
 /* ══ LAYOUT ══ */
 .container{max-width:1100px;margin:24px auto;padding:0 20px 60px;}
@@ -194,8 +192,6 @@ tbody tr.clickable:hover{background:var(--surface2);}
 .btn-red:hover{background:linear-gradient(135deg,#ef4444,#dc2626);transform:translateY(-1px);}
 .btn-outline-red{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.3);}
 .btn-outline-red:hover{background:rgba(239,68,68,.2);}
-.btn-wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;box-shadow:0 4px 14px rgba(37,211,102,.3);}
-.btn-wa:hover{background:linear-gradient(135deg,#20bd5a,#25d366);transform:translateY(-1px);}
 .btn-full{width:100%;}
 .btn-lg{padding:14px 26px;font-size:15px;border-radius:14px;}
 .btn-sm{padding:6px 12px;font-size:11px;border-radius:8px;}
@@ -299,10 +295,6 @@ tbody tr.clickable:hover{background:var(--surface2);}
 .backup-card p{font-size:12px;color:var(--text3);}
 .backup-actions{display:flex;gap:8px;flex-wrap:wrap;}
 
-/* ══ MONTHLY REPORT ══ */
-.monthly-table th{font-size:10px;}
-.monthly-table td{font-size:12px;padding:10px 14px;}
-
 /* ══ SETTINGS ══ */
 .settings-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:14px;}
 .settings-section-title{padding:14px 20px;font-size:12px;font-weight:800;color:var(--text2);background:var(--surface2);border-bottom:1px solid var(--border);letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
@@ -351,6 +343,37 @@ tbody tr.clickable:hover{background:var(--surface2);}
 .pr-net-label{font-size:12px;color:#94a3b8;}
 .pr-net-val{font-size:22px;font-weight:900;font-family:'Tajawal',sans-serif;color:#10b981;}
 .pr-footer{text-align:center;font-size:10px;color:#94a3b8;padding:14px;border-top:1px solid #e2e8f0;margin-top:14px;}
+
+/* ══ ATT EDIT ══ */
+.att-day-wrap{position:relative;display:inline-block;}
+.att-day{cursor:pointer;transition:transform .15s,opacity .15s;}
+.att-day:hover{transform:scale(1.1);opacity:.85;}
+.att-edit-menu{position:absolute;top:110%;right:0;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:6px;z-index:200;display:none;gap:4px;flex-direction:column;min-width:100px;box-shadow:var(--shadow);}
+.att-edit-menu.show{display:flex;}
+.att-edit-menu button{border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:600;padding:6px 10px;border-radius:7px;cursor:pointer;text-align:right;color:var(--text2);transition:background .15s;}
+.att-edit-menu button:hover{background:var(--bg3);color:var(--text);}
+
+/* ══ ID CARD PRINT ══ */
+.id-card-print{display:none;}
+@media print{
+  .id-card-print{display:block!important;}
+  body>*:not(.id-card-print){display:none!important;}
+  .id-card-print{page-break-after:avoid;}
+}
+.id-card{width:85mm;background:linear-gradient(135deg,#0d1a2e,#1a2540);border-radius:14px;padding:20px;color:#fff;font-family:"Tajawal",sans-serif;position:relative;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.id-card::before{content:'';position:absolute;top:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(201,129,10,.15);}
+.id-card-logo{font-size:28px;margin-bottom:8px;}
+.id-card-company{font-size:13px;font-weight:800;color:rgba(255,255,255,.9);margin-bottom:16px;}
+.id-card-avatar{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#c9810a,#b8770a);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:12px;}
+.id-card-name{font-size:18px;font-weight:900;margin-bottom:3px;}
+.id-card-job{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:12px;}
+.id-card-row{display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,.1);padding-top:10px;margin-top:4px;}
+.id-card-field{font-size:10px;color:rgba(255,255,255,.5);margin-bottom:2px;}
+.id-card-val{font-size:13px;font-weight:700;color:#f0a030;}
+
+/* ══ DATA SIZE ══ */
+.data-size-bar{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;margin:8px 0;}
+.data-size-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s ease;}
 
 /* ══ SCROLLBAR ══ */
 ::-webkit-scrollbar{width:5px;}
@@ -417,9 +440,14 @@ tbody tr.clickable:hover{background:var(--surface2);}
 <div class="modal-bg hidden" id="editModal">
   <div class="modal">
     <div class="modal-title">✏️ تعديل بيانات العامل</div>
-    <input id="editName" placeholder="الاسم الكامل">
-    <input id="editJob" placeholder="التخصص المهني">
+    <input id="editName"  placeholder="الاسم الكامل">
+    <input id="editJob"   placeholder="التخصص المهني">
     <input id="editDaily" type="number" placeholder="اليومية (ج.م)">
+    <input id="editPhone" type="tel" placeholder="رقم الهاتف (اختياري)">
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;color:var(--text3);font-weight:700;display:block;margin-bottom:4px">📅 تاريخ بداية العمل</label>
+      <input id="editStartDate" type="date">
+    </div>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="saveEdit()">💾 حفظ</button>
       <button class="btn btn-ghost" onclick="closeModal('editModal')">إلغاء</button>
@@ -429,14 +457,13 @@ tbody tr.clickable:hover{background:var(--surface2);}
 <div class="modal-bg hidden" id="deleteModal">
   <div class="modal">
     <div class="modal-title" style="color:var(--red)">🗑️ تأكيد الحذف</div>
-    <p style="color:var(--text2);font-size:13px;line-height:1.8">هل تريد حذف <strong id="deleteWorkerName" style="color:var(--text)"></strong>؟ سيتم حذف جميع سجلاته.</p>
+    <p style="color:var(--text2);font-size:13px;line-height:1.8">هل تريد حذف <strong id="deleteWorkerName" style="color:var(--text)"></strong>؟<br><span id="deleteModalExtra" style="font-size:12px;color:var(--text3)"></span></p>
     <div class="modal-actions">
       <button class="btn btn-red" onclick="confirmDelete()">🗑️ حذف</button>
       <button class="btn btn-ghost" onclick="closeModal('deleteModal')">إلغاء</button>
     </div>
   </div>
-</div>
-<div class="modal-bg hidden" id="addUserModal">
+</div><div class="modal-bg hidden" id="addUserModal">
   <div class="modal">
     <div class="modal-title">➕ مستخدم جديد</div>
     <input id="newUserDisplay" placeholder="الاسم الظاهر">
@@ -506,7 +533,6 @@ tbody tr.clickable:hover{background:var(--surface2);}
   <div class="header-right">
     <div class="header-date" id="headerDate"></div>
     <button class="btn-att-quick" onclick="showPage('attendance')"><span>📝</span><span class="btn-att-text">التحضير</span></button>
-    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="تغيير المظهر">🌙</button>
     <div class="header-user" onclick="showPage('settings')" id="headerUser">
       <div class="header-user-avatar" id="headerUserAvatar">👤</div>
       <div><div class="header-user-name" id="headerUserName">—</div><div class="header-user-role" id="headerUserRole">—</div></div>
@@ -516,13 +542,12 @@ tbody tr.clickable:hover{background:var(--surface2);}
 
 <!-- NAV -->
 <nav>
-  <button onclick="showPage('dashboard')"  id="nav-dashboard">📊 الإحصائيات</button>
-  <button onclick="showPage('workers')"    id="nav-workers">👷 العمال</button>
-  <button onclick="showPage('attendance')" id="nav-attendance">📝 التحضير</button>
-  <button onclick="showPage('loans')"      id="nav-loans">💰 السلفيات</button>
-  <button onclick="showPage('reports')"    id="nav-reports">📈 التقارير</button>
-  <button onclick="showPage('archive')"    id="nav-archive">📂 الأرشيف</button>
-  <button onclick="showPage('settings')"   id="nav-settings" class="admin-only">⚙️ الإعدادات</button>
+  <button onclick="showPage('dashboard')"  id="nav-dashboard"><span class="nav-icon">📊</span><span>الإحصائيات</span></button>
+  <button onclick="showPage('workers')"    id="nav-workers"><span class="nav-icon">👷</span><span>العمال</span></button>
+  <button onclick="showPage('attendance')" id="nav-attendance"><span class="nav-icon">📝</span><span>التحضير</span></button>
+  <button onclick="showPage('loans')"      id="nav-loans"><span class="nav-icon">💰</span><span>السلفيات</span></button>
+  <button onclick="showPage('archive')"    id="nav-archive"><span class="nav-icon">📂</span><span>الأرشيف</span></button>
+  <button onclick="showPage('settings')"   id="nav-settings" class="admin-only"><span class="nav-icon">⚙️</span><span>الإعدادات</span></button>
 </nav>
 
 <div class="container">
@@ -541,7 +566,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <div class="chart-panel"><div class="chart-panel-title" style="color:var(--red)">❌ أعلى 8 غياباً</div><div id="chartAbsent"></div></div>
   </div>
   <div class="welcome-card">
-    <div><div class="welcome-title" id="welcomeTitle">أهلاً بك في نظام الراوي v5</div><div class="welcome-sub">منصة إدارية متكاملة — تحضير · سلفيات · تقارير · أرشفة</div></div>
+    <div><div class="welcome-title" id="welcomeTitle">أهلاً بك في نظام الراوي v5</div><div class="welcome-sub">منصة إدارية متكاملة — تحضير · مجموعات · سلفيات · تقارير · أرشفة</div></div>
   </div>
 </div>
 
@@ -556,9 +581,11 @@ tbody tr.clickable:hover{background:var(--surface2);}
   <div class="form-card admin-only">
     <h3>➕ إضافة عامل جديد</h3>
     <div class="form-row">
-      <input id="wName" placeholder="الاسم الكامل">
-      <input id="wJob" placeholder="التخصص المهني">
+      <input id="wName"  placeholder="الاسم الكامل">
+      <input id="wJob"   placeholder="التخصص المهني">
       <input id="wDaily" type="number" placeholder="اليومية (ج.م)">
+      <input id="wPhone" type="tel" placeholder="رقم الهاتف (اختياري)">
+      <input id="wStartDate" type="date" title="تاريخ بداية العمل">
     </div>
     <button class="btn btn-primary" onclick="addWorker()">💾 حفظ في السجل</button>
   </div>
@@ -590,7 +617,6 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <div class="section-header">
       <div class="section-title" style="font-size:18px">📋 كشف اليوم</div>
       <div class="section-actions">
-        <button class="btn btn-wa btn-sm no-print" onclick="shareWhatsApp()">📲 واتساب</button>
         <button class="btn btn-ghost btn-sm no-print" onclick="window.print()">🖨️ طباعة</button>
       </div>
     </div>
@@ -617,8 +643,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
   </div>
   <div class="loan-filter-bar">
     <select id="loanFilterWorker" onchange="renderLoans()" style="margin-bottom:0;width:auto"><option value="">كل العمال</option></select>
-    <input id="loanFilterDate" type="month" onchange="renderLoans()" style="margin-bottom:0;width:auto" title="فلترة بالشهر">
-    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('loanFilterWorker').value='';document.getElementById('loanFilterDate').value='';renderLoans()">✕ مسح الفلتر</button>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('loanFilterWorker').value='';renderLoans()">✕ مسح الفلتر</button>
   </div>
   <div id="loanCardsWrap" class="loan-cards-wrap"></div>
 </div>
@@ -632,10 +657,20 @@ tbody tr.clickable:hover{background:var(--surface2);}
         <div>
           <div class="profile-name" id="pName"></div>
           <div class="profile-job" id="pJob"></div>
-          <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span class="worker-code" id="pCode"></span></div>
+          <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+            <span class="worker-code" id="pCode"></span>
+            <span id="pGroupBadge"></span>
+          </div>
+          <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <span id="pPhone" style="font-size:12px;color:var(--text3)"></span>
+            <span id="pStartDate" style="font-size:12px;color:var(--text3)"></span>
+          </div>
         </div>
       </div>
-      <span id="pStatus" class="badge"></span>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <span id="pStatus" class="badge"></span>
+        <a id="pCallBtn" href="#" style="display:none;align-items:center;gap:6px;background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none">📞 اتصال</a>
+      </div>
     </div>
     <div class="profile-body">
       <div class="profile-stats">
@@ -650,7 +685,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
         <div class="profile-actions">
           <button id="pToggleBtn" class="btn btn-lg" onclick="toggleStatus()"></button>
           <button class="btn btn-primary btn-lg" onclick="printWorkerPayslip()">🖨️ كشف الراتب</button>
-          <button class="btn btn-wa btn-lg" onclick="shareWorkerWhatsApp()">📲 واتساب</button>
+          <button class="btn btn-ghost btn-lg" onclick="printIDCard()">🪪 بطاقة هوية</button>
           <button class="btn btn-ghost btn-lg" onclick="openEditModal()">✏️ تعديل</button>
           <button class="btn btn-outline-red btn-lg admin-only" onclick="openDeleteModal()">🗑️ حذف</button>
           <button class="btn btn-ghost btn-lg" onclick="showPage('workers')">← خروج</button>
@@ -660,18 +695,6 @@ tbody tr.clickable:hover{background:var(--surface2);}
   </div>
 </div>
 
-<!-- REPORTS -->
-<div id="reports" class="page">
-  <div class="section-header">
-    <div class="section-title">📈 التقارير الشهرية</div>
-    <div class="section-actions">
-      <input id="reportMonth" type="month" style="margin-bottom:0;width:auto" onchange="renderReports()">
-      <button class="btn btn-primary btn-sm" onclick="printPayroll()">🖨️ طباعة الكشف</button>
-    </div>
-  </div>
-  <div class="table-wrap"><table id="reportTable" class="monthly-table"></table></div>
-  <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap" id="reportSummary"></div>
-</div>
 
 <!-- ARCHIVE -->
 <div id="archive" class="page">
@@ -703,30 +726,24 @@ tbody tr.clickable:hover{background:var(--surface2);}
       </div>
     </div>
   </div>
-  <!-- Project settings — admin -->
-  <div class="settings-section admin-only">
-    <div class="settings-section-title">🏢 إعدادات المشروع</div>
-    <div class="settings-row">
-      <div><div class="settings-row-label">اسم المشروع / الشركة</div><div class="settings-row-sub">يظهر في الهيدر وكشوف الرواتب</div></div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="projectNameInput" placeholder="اسم المشروع" style="margin-bottom:0;width:200px">
-        <button class="btn btn-primary btn-sm" onclick="saveProjectName()">حفظ</button>
-      </div>
-    </div>
-    <div class="settings-row">
-      <div><div class="settings-row-label">تذكير التحضير اليومي</div><div class="settings-row-sub">إشعار يومي إذا لم يكتمل التحضير</div></div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="reminderTime" type="time" value="09:00" style="margin-bottom:0;width:120px">
-        <button class="btn btn-primary btn-sm" onclick="saveReminder()">تفعيل</button>
-      </div>
-    </div>
-  </div>
   <!-- Users — admin -->
   <div class="settings-section admin-only">
     <div class="settings-section-title">👥 إدارة المستخدمين</div>
     <div id="usersListWrap"></div>
     <div style="padding:14px 20px;border-top:1px solid var(--border)">
       <button class="btn btn-primary btn-sm" onclick="openAddUserModal()">➕ إضافة مستخدم</button>
+    </div>
+  </div>
+  <!-- Data size -->
+  <div class="settings-section">
+    <div class="settings-section-title">💾 حجم البيانات المحفوظة</div>
+    <div style="padding:16px 20px" id="dataSizeWrap">
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:4px">
+        <span id="dataSizeLabel">جاري الحساب...</span>
+        <span id="dataSizeKB" style="font-weight:700;color:var(--accent2)"></span>
+      </div>
+      <div class="data-size-bar"><div class="data-size-fill" id="dataSizeFill" style="width:0%"></div></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px" id="dataSizeBreakdown"></div>
     </div>
   </div>
   <!-- Payroll -->
@@ -736,9 +753,6 @@ tbody tr.clickable:hover{background:var(--surface2);}
       <div><div class="settings-row-label">طباعة كشف رواتب جميع العمال</div><div class="settings-row-sub">تقرير مفصّل بالأيام والسلف والصافي</div></div>
       <button class="btn btn-primary btn-sm" onclick="printPayroll()">🖨️ طباعة الكشف</button>
     </div>
-    <div class="settings-row">
-      <div><div class="settings-row-label">مشاركة كشف اليوم عبر واتساب</div><div class="settings-row-sub">ملخص الحضور والغياب</div></div>
-      <button class="btn btn-wa btn-sm" onclick="shareWhatsApp()">📲 مشاركة</button>
     </div>
   </div>
 </div>
@@ -760,14 +774,6 @@ function toast(msg,type='info'){
   setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300);},2800);
 }
 
-/* ══ THEME ══ */
-let darkMode=localStorage.getItem('rawy_theme')!=='light';
-function applyTheme(){
-  document.body.classList.toggle('light-mode',!darkMode);
-  document.getElementById('themeBtn').textContent=darkMode?'🌙':'☀️';
-}
-function toggleTheme(){darkMode=!darkMode;localStorage.setItem('rawy_theme',darkMode?'dark':'light');applyTheme();}
-applyTheme();
 
 /* ══ DATA ══ */
 let workers=JSON.parse(localStorage.getItem("rawy_v3_workers"))||[
@@ -794,13 +800,12 @@ let workers=JSON.parse(localStorage.getItem("rawy_v3_workers"))||[
 ];
 (function migrate(){
   let max=workers.reduce((m,w)=>w.wCode?Math.max(m,parseInt(w.wCode)):m,0),ch=false;
-  workers.forEach(w=>{if(!w.wCode){max++;w.wCode=String(max).padStart(4,'0');ch=true;}});
+  workers.forEach(w=>{if(!w.wCode){max++;w.wCode=String(max).padStart(4,'0');ch=true;}if(w.groupId===undefined){w.groupId=null;ch=true;}});
   if(ch)localStorage.setItem("rawy_v3_workers",JSON.stringify(workers));
 })();
 let attendance=JSON.parse(localStorage.getItem("rawy_v3_att"))||[];
 let loans=JSON.parse(localStorage.getItem("rawy_v3_loans"))||[];
 let archive=JSON.parse(localStorage.getItem("rawy_v3_arch"))||[];
-let groups=JSON.parse(localStorage.getItem("rawy_groups"))||[];
 let projectName=localStorage.getItem('rawy_project_name')||'الراوي الإداري';
 let selID=null,editingUserId=null;
 
@@ -809,7 +814,6 @@ function save(){
   localStorage.setItem("rawy_v3_att",JSON.stringify(attendance));
   localStorage.setItem("rawy_v3_loans",JSON.stringify(loans));
   localStorage.setItem("rawy_v3_arch",JSON.stringify(archive));
-  localStorage.setItem("rawy_groups",JSON.stringify(groups));
 }
 
 /* ══ AUTH ══ */
@@ -837,13 +841,12 @@ function doLogin(){
   document.getElementById('loginScreen').classList.add('hidden');
   applyPermissions();render();showPage('dashboard');
   toast(`مرحباً ${currentUser.displayName} 👋`,'success');
-  scheduleReminder();
 }
 
 function doLogout(){
   currentUser=null;
-  document.getElementById('loginUser').value='';
-  document.getElementById('loginPass').value='';
+  const lu2=document.getElementById('loginUser');if(lu2)lu2.value='';
+  const lp2=document.getElementById('loginPass');if(lp2)lp2.value='';
   document.getElementById('loginError').classList.remove('show');
   document.getElementById('loginScreen').classList.remove('hidden');
 }
@@ -862,57 +865,10 @@ function applyPermissions(){
     if(btn)btn.style.display=(isAdmin||p[perm])?'':'none';
   });
   // project name
-  updateProjectNameDisplay();
 }
 
-function updateProjectNameDisplay(){
-  projectName=localStorage.getItem('rawy_project_name')||'الراوي الإداري';
-  const pn=document.getElementById('headerProjectName');
-  if(pn)pn.innerHTML=`<span style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${projectName}</span>`;
-  const wt=document.getElementById('welcomeTitle');
-  if(wt)wt.textContent=`أهلاً بك في ${projectName}`;
-  const pi=document.getElementById('projectNameInput');
-  if(pi)pi.value=projectName;
-}
 
-function saveProjectName(){
-  const v=document.getElementById('projectNameInput').value.trim();
-  if(!v)return;
-  localStorage.setItem('rawy_project_name',v);
-  projectName=v;updateProjectNameDisplay();
-  toast('✅ تم حفظ اسم المشروع','success');
-}
 
-/* ══ REMINDER ══ */
-let reminderInterval=null;
-function scheduleReminder(){
-  const t=localStorage.getItem('rawy_reminder_time');
-  if(!t)return;
-  if(reminderInterval)clearInterval(reminderInterval);
-  reminderInterval=setInterval(()=>{
-    const now=new Date();
-    const cur=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    if(cur===t){
-      const today=now.toLocaleDateString();
-      const activeW=workers.filter(w=>w.active);
-      const done=attendance.filter(a=>a.date===today&&activeW.some(w=>w.id===a.workerId)).length;
-      if(done<activeW.length){
-        toast(`⏰ تذكير: لم يكتمل التحضير — ${activeW.length-done} عامل متبقي`,'error');
-        if(Notification.permission==='granted'){
-          new Notification('تذكير التحضير 🔨',{body:`${activeW.length-done} عامل لم يُحضَّر بعد`,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🔨</text></svg>'});
-        }
-      }
-    }
-  },60000);
-}
-
-function saveReminder(){
-  const t=document.getElementById('reminderTime').value;
-  localStorage.setItem('rawy_reminder_time',t);
-  if(Notification.permission!=='granted')Notification.requestPermission();
-  scheduleReminder();
-  toast(`⏰ تم تفعيل التذكير عند ${t}`,'success');
-}
 
 /* ══ PASSWORD CHANGE ══ */
 function openChangePwd(){document.getElementById('changePwdModal').classList.remove('hidden');}
@@ -926,7 +882,7 @@ function doChangePwd(){
   const u=appUsers.find(x=>x.id===currentUser.id);
   u.password=n1;currentUser.password=n1;
   saveUsers();closeModal('changePwdModal');
-  ['oldPwd','newPwd','newPwd2'].forEach(id=>document.getElementById(id).value='');
+  ['oldPwd','newPwd','newPwd2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   toast('✅ تم تغيير كلمة المرور','success');
 }
 
@@ -939,7 +895,6 @@ function showPage(id){
   const nb=document.getElementById('nav-'+id);if(nb)nb.classList.add("active-nav");
   render();
   if(id==='settings')renderSettings();
-  if(id==='reports'){const rm=document.getElementById('reportMonth');if(rm&&!rm.value){const n=new Date();rm.value=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;}renderReports();}
 }
 
 /* ══ RENDER ══ */
@@ -947,14 +902,14 @@ function render(){
   if(!currentUser)return;
   const today=new Date().toLocaleDateString();
   const activeW=workers.filter(w=>w.active);
-  document.getElementById("sWorkers").textContent=workers.length;
+  (document.getElementById('sWorkers')||{}).textContent=workers.length;
   const pres=attendance.filter(a=>a.date===today&&a.status==='present').length;
-  document.getElementById("sPresent").textContent=pres;
-  document.getElementById("sAbsent").textContent=attendance.filter(a=>a.date===today&&a.status==='absent').length;
+  (document.getElementById('sPresent')||{}).textContent=pres;
+  (document.getElementById('sAbsent')||{}).textContent=attendance.filter(a=>a.date===today&&a.status==='absent').length;
   const totalL=loans.reduce((s,l)=>s+Number(l.amt),0);
-  document.getElementById("sLoans").textContent=totalL.toLocaleString('ar-EG')+' ج.م';
+  (document.getElementById('sLoans')||{}).textContent=totalL.toLocaleString('ar-EG')+' ج.م';
   const totalEarned=workers.reduce((s,w)=>s+attendance.filter(a=>a.workerId===w.id&&a.status==='present').length*w.daily,0);
-  document.getElementById("sNetSalary").textContent=(totalEarned-totalL).toLocaleString('ar-EG')+' ج.م';
+  (document.getElementById('sNetSalary')||{}).textContent=(totalEarned-totalL).toLocaleString('ar-EG')+' ج.م';
 
   // Charts
   function buildRows(el,data,color,valColor){
@@ -967,13 +922,13 @@ function render(){
   buildRows(document.getElementById('chartPresent'),workers.map(w=>({id:w.id,n:w.name,v:attendance.filter(a=>a.workerId===w.id&&a.status==='present').length})).sort((a,b)=>b.v-a.v).slice(0,8),'linear-gradient(90deg,#059669,#10b981)','var(--green)');
   buildRows(document.getElementById('chartAbsent'),workers.map(w=>({id:w.id,n:w.name,v:attendance.filter(a=>a.workerId===w.id&&a.status==='absent').length})).sort((a,b)=>b.v-a.v).slice(0,8),'linear-gradient(90deg,#b91c1c,#ef4444)','var(--red)');
 
-  renderWorkers();renderGroups();renderAttendance(today,activeW);renderLoans();renderArchive();
-  document.getElementById("loanWSelect").innerHTML=activeW.map(w=>`<option value="${w.id}">[#${w.wCode}] ${w.name}</option>`).join('');
-  document.getElementById("loanFilterWorker").innerHTML='<option value="">كل العمال</option>'+workers.map(w=>`<option value="${w.id}">${w.name}</option>`).join('');
+  renderWorkers();renderAttendance(today,activeW);renderLoans();renderArchive();
+  (document.getElementById('loanWSelect')||{}).innerHTML=activeW.map(w=>`<option value="${w.id}">[#${w.wCode}] ${w.name}</option>`).join('');
+  (document.getElementById('loanFilterWorker')||{}).innerHTML='<option value="">كل العمال</option>'+workers.map(w=>`<option value="${w.id}">${w.name}</option>`).join('');
 }
 
 /* ══ WORKERS ══ */
-const colVis={daily:true,days:true,abs:true,salary:true,group:true};
+const colVis={daily:true,days:true,abs:true,salary:true};
 function toggleCol(col){colVis[col]=!colVis[col];document.getElementById('chip-'+col).classList.toggle('on',colVis[col]);renderWorkers();}
 
 function renderWorkers(){
@@ -994,7 +949,7 @@ function renderWorkers(){
     const abs=attendance.filter(a=>a.workerId===w.id&&a.status==='absent').length;
     const lns=loans.filter(l=>l.workerId===w.id).reduce((s,l)=>s+l.amt,0);
     const salary=days*w.daily-lns;
-      const tr=document.createElement('tr');tr.className='clickable';
+    const tr=document.createElement('tr');tr.className='clickable';
     tr.onclick=e=>{if(!e.target.closest('button'))openP(w.id);};
     let td=`<td><span class="worker-code">#${w.wCode||'----'}</span></td><td class="td-name">${w.name}</td><td>${w.job}</td>`;
     if(colVis.daily)td+=`<td style="color:var(--accent2);font-weight:700">${w.daily.toLocaleString('ar-EG')} ج.م</td>`;
@@ -1011,9 +966,9 @@ function renderWorkers(){
 function renderAttendance(today,activeW){
   const total=activeW.length,done=attendance.filter(a=>a.date===today&&activeW.some(w=>w.id===a.workerId)).length;
   const pct=total?Math.round((done/total)*100):0;
-  document.getElementById('attProgressFill').style.width=pct+'%';
-  document.getElementById('attProgressText').textContent=`تم تحضير ${done} من ${total}`;
-  document.getElementById('attProgressPct').textContent=pct+'%';
+  (document.getElementById('attProgressFill')||{}).style.width=pct+'%';
+  (document.getElementById('attProgressText')||{}).textContent=`تم تحضير ${done} من ${total}`;
+  (document.getElementById('attProgressPct')||{}).textContent=pct+'%';
   const pending=activeW.filter(w=>!attendance.some(a=>a.workerId===w.id&&a.date===today));
   const cur=document.getElementById("currentWName");
   if(pending.length){cur.textContent=pending[0].name;cur.dataset.id=pending[0].id;}
@@ -1034,10 +989,8 @@ function workerTotalLoan(wid){return loans.filter(l=>l.workerId===wid).reduce((s
 function renderLoans(){
   const wrap=document.getElementById("loanCardsWrap");if(!wrap)return;
   const fw=(document.getElementById('loanFilterWorker')||{}).value||'';
-  const fd=(document.getElementById('loanFilterDate')||{}).value||'';
   let list=loans.slice().reverse();
   if(fw)list=list.filter(l=>String(l.workerId)===fw);
-  if(fd)list=list.filter(l=>{const d=l.date.split('/');const ym=`${d[2]||''}-${(d[0]||'').padStart(2,'0')}`;return ym===fd;});
   if(!list.length){wrap.innerHTML=`<div style="text-align:center;color:var(--text3);padding:40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)">لا توجد سلفيات</div>`;return;}
   wrap.innerHTML='';
   list.forEach((l,i)=>{
@@ -1070,59 +1023,71 @@ function renderLoans(){
 
 function deleteLoan(idx){
   if(!confirm('حذف هذه السلفة؟'))return;
-  loans.splice(idx,1);save();render();toast('🗑️ تم حذف السلفة','error');
+  loans.splice(idx,1);save();
+  renderLoans();renderArchive();
+  // Update KPIs
+  const today=new Date().toLocaleDateString();
+  const totalL=loans.reduce((s,l)=>s+Number(l.amt),0);
+  const el=document.getElementById("sLoans");if(el)el.textContent=totalL.toLocaleString('ar-EG')+' ج.م';
+  const totalEarned=workers.reduce((s,w)=>s+attendance.filter(a=>a.workerId===w.id&&a.status==='present').length*w.daily,0);
+  const el2=document.getElementById("sNetSalary");if(el2)el2.textContent=(totalEarned-totalL).toLocaleString('ar-EG')+' ج.م';
+  // Refresh profile if open
+  if(selID){
+    const pla=document.getElementById("pLoansAmt"),pn=document.getElementById("pNet");
+    const w=workers.find(x=>x.id===selID);
+    if(w&&pla&&pn){
+      const days=attendance.filter(a=>a.workerId===selID&&a.status==='present').length;
+      const lns=loans.filter(l=>l.workerId===selID).reduce((s,l)=>s+l.amt,0);
+      pla.textContent=lns.toLocaleString('ar-EG')+' ج.م';
+      pn.textContent=(days*w.daily-lns).toLocaleString('ar-EG')+' ج.م';
+      const lhEl=document.getElementById('pLoansHistory');
+      if(lhEl){
+        const wLoans=loans.filter(l=>l.workerId===selID).slice().reverse();
+        lhEl.innerHTML=wLoans.length
+          ?wLoans.map(l=>`<div class="p-loan-item"><div class="p-loan-row"><span class="p-loan-amt">${Number(l.amt).toLocaleString('ar-EG')} ج.م</span><span class="p-loan-date">🗓️ ${l.date}</span></div>${l.note?`<div class="p-loan-note">💬 ${l.note}</div>`:''}</div>`).join('')
+          :`<div style="color:var(--text3);font-size:12px;padding:8px 0">لا توجد سلفيات</div>`;
+      }
+    }
+  }
+  toast('🗑️ تم حذف السلفة','error');
 }
 
+const MONTHS_AR=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+function archiveLabel(a,idx){
+  if(a.monthLabel)return a.monthLabel;
+  try{const d=new Date(a.date.split('/').reverse().join('-'));return MONTHS_AR[d.getMonth()]+' '+d.getFullYear();}
+  catch{return 'دورة '+(idx+1);}
+}
 function renderArchive(){
   const at=document.getElementById("archiveTable");
-  at.innerHTML=`<thead><tr><th>تاريخ الترحيل</th><th>إجمالي المسحوبات</th></tr></thead><tbody></tbody>`;
+  at.innerHTML=`<thead><tr><th>#</th><th>الشهر</th><th>تاريخ الترحيل</th><th>إجمالي المسحوبات</th></tr></thead><tbody></tbody>`;
   const ab=at.querySelector('tbody');
-  if(!archive.length){ab.innerHTML=`<tr class="empty-row"><td colspan="2">لا يوجد أرشيف</td></tr>`;return;}
-  archive.forEach(a=>{const tr=document.createElement('tr');tr.innerHTML=`<td style="color:var(--text3)">${a.date}</td><td style="font-weight:800;color:var(--accent2)">${Number(a.total).toLocaleString('ar-EG')} ج.م</td>`;ab.appendChild(tr);});
-}
-
-/* ══ MONTHLY REPORTS ══ */
-function renderReports(){
-  const month=document.getElementById('reportMonth')?.value;if(!month)return;
-  const [yr,mo]=month.split('-');
-  const rt=document.getElementById('reportTable');
-  const mAtt=attendance.filter(a=>{const p=a.date.split('/');return p[2]==yr&&p[0].padStart(2,'0')==mo;});
-  const mLoans=loans.filter(l=>{const p=l.date.split('/');return p[2]==yr&&p[0].padStart(2,'0')==mo;});
-  rt.innerHTML=`<thead><tr><th>الكود</th><th>العامل</th><th>اليومية</th><th>حضور</th><th>غياب</th><th>إجمالي الأجر</th><th>السلف</th><th>الصافي</th></tr></thead><tbody></tbody>`;
-  const tb=rt.querySelector('tbody');
-  let totEarned=0,totLoan=0,totDays=0;
-  workers.forEach(w=>{
-    const wAtt=mAtt.filter(a=>a.workerId===w.id);
-    const days=wAtt.filter(a=>a.status==='present').length;
-    const abs=wAtt.filter(a=>a.status==='absent').length;
-    const earned=days*w.daily;
-    const lns=mLoans.filter(l=>l.workerId===w.id).reduce((s,l)=>s+l.amt,0);
-    const net=earned-lns;
-    totEarned+=earned;totLoan+=lns;totDays+=days;
+  if(!archive.length){ab.innerHTML=`<tr class="empty-row"><td colspan="4">لا يوجد أرشيف</td></tr>`;return;}
+  archive.slice().reverse().forEach((a,i)=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td><span class="worker-code">#${w.wCode}</span></td><td class="td-name" style="cursor:pointer" onclick="openP(${w.id})">${w.name}</td><td style="color:var(--accent2)">${w.daily.toLocaleString('ar-EG')}</td><td style="color:var(--green);font-weight:700">${days}</td><td style="color:var(--red);font-weight:700">${abs}</td><td style="font-weight:700">${earned.toLocaleString('ar-EG')} ج.م</td><td style="color:var(--red)">${lns?lns.toLocaleString('ar-EG')+' ج.م':'—'}</td><td style="font-weight:800;color:${net>=0?'var(--green)':'var(--red)'}">${net.toLocaleString('ar-EG')} ج.م</td>`;
-    tb.appendChild(tr);
+    const num=archive.length-i;
+    tr.innerHTML=`<td style="color:var(--text3);font-weight:700">${num}</td><td style="font-weight:800;color:var(--accent2)">${archiveLabel(a,archive.length-1-i)}</td><td style="color:var(--text3);font-size:12px">${a.date}</td><td style="font-weight:800;color:var(--text)">${Number(a.total).toLocaleString('ar-EG')} ج.م</td>`;
+    ab.appendChild(tr);
   });
-  // Summary
-  const sum=document.getElementById('reportSummary');
-  const cards=[['📅 إجمالي أيام الحضور',totDays,'var(--green)'],['💸 إجمالي الأجور',(totEarned).toLocaleString('ar-EG')+' ج.م','var(--accent2)'],['💰 إجمالي السلف',totLoan.toLocaleString('ar-EG')+' ج.م','var(--red)'],['✅ الصافي الكلي',(totEarned-totLoan).toLocaleString('ar-EG')+' ج.م','#a78bfa']];
-  sum.innerHTML=cards.map(([l,v,c])=>`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px;flex:1;min-width:160px"><div style="font-size:11px;color:var(--text3);font-weight:700;margin-bottom:6px">${l}</div><div style="font-size:22px;font-weight:900;font-family:'Tajawal',sans-serif;color:${c}">${v}</div></div>`).join('');
 }
-
 /* ══ LOAN SELECT INFO ══ */
 function updateLoanInfo(){
-  const id=Number(document.getElementById("loanWSelect").value);
-  const newAmt=Number(document.getElementById("loanAmt").value)||0;
+  const selEl=document.getElementById("loanWSelect");
+  const amtEl=document.getElementById("loanAmt");
+  if(!selEl||!amtEl)return;
+  const id=Number(selEl.value);
+  const newAmt=Number(amtEl.value)||0;
   const w=workers.find(x=>x.id===id);
   const box=document.getElementById('loanSelectInfo');
   if(!w){if(box)box.style.display='none';return;}
   const net=workerNet(w),total=workerTotalLoan(w.id),afterNew=total+newAmt;
   const balance=net-afterNew,isOver=afterNew>net&&net>0;
-  document.getElementById('lsiNet').textContent=net.toLocaleString('ar-EG')+' ج.م';
-  document.getElementById('lsiTotal').textContent=total.toLocaleString('ar-EG')+' ج.م';
+  const lsiNet=document.getElementById('lsiNet');
+  const lsiTotal=document.getElementById('lsiTotal');
   const be=document.getElementById('lsiBalance');
-  be.textContent=balance.toLocaleString('ar-EG')+' ج.م';
-  be.style.color=isOver?'var(--red)':balance===0?'var(--text2)':'var(--green)';
+  if(lsiNet)lsiNet.textContent=net.toLocaleString('ar-EG')+' ج.م';
+  if(lsiTotal)lsiTotal.textContent=total.toLocaleString('ar-EG')+' ج.م';
+  if(be){be.textContent=balance.toLocaleString('ar-EG')+' ج.م';be.style.color=isOver?'var(--red)':balance===0?'var(--text2)':'var(--green)';}
   if(box){box.className='loan-select-info'+(isOver?' lsi-warn':'');box.style.display='';}
 }
 
@@ -1131,15 +1096,16 @@ function nextWCode(){return String(workers.reduce((m,w)=>w.wCode?Math.max(m,pars
 
 function addWorker(){
   const n=document.getElementById("wName").value.trim(),j=document.getElementById("wJob").value.trim(),d=document.getElementById("wDaily").value;
-  const gid=Number(document.getElementById("wGroup").value)||null;
+  const ph=(document.getElementById("wPhone")||{value:''}).value.trim();
+  const sd=(document.getElementById("wStartDate")||{value:''}).value;
   if(!n||!d){toast('⚠️ أكمل بيانات العامل','error');return;}
-  workers.push({id:Date.now(),wCode:nextWCode(),name:n,job:j||'غير محدد',daily:Number(d),active:true,groupId:gid});
-  ["wName","wJob","wDaily"].forEach(id=>document.getElementById(id).value="");
+  workers.push({id:Date.now(),wCode:nextWCode(),name:n,job:j||'غير محدد',daily:Number(d),active:true,phone:ph,startDate:sd});
+  ["wName","wJob","wDaily","wPhone","wStartDate"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
   save();render();toast('✅ تم إضافة العامل','success');
 }
 
 function record(stat){
-  const id=document.getElementById("currentWName").dataset.id;if(!id)return;
+  const id=(document.getElementById('currentWName')||{}).dataset.id;if(!id)return;
   attendance.push({workerId:Number(id),status:stat,date:new Date().toLocaleDateString()});
   save();render();
   const w=workers.find(x=>x.id===Number(id));
@@ -1153,15 +1119,19 @@ function resetDay(){
 }
 
 function addLoan(){
-  const id=Number(document.getElementById("loanWSelect").value),amt=Number(document.getElementById("loanAmt").value);
+  const id=Number((document.getElementById('loanWSelect')||{}).value),amt=Number(document.getElementById("loanAmt").value);
   if(!amt){toast('⚠️ أدخل المبلغ','error');return;}
   const w=workers.find(x=>x.id===id),net=w?workerNet(w):0,total=w?workerTotalLoan(w.id):0,afterNew=total+amt;
   if(net>0&&afterNew>net){if(!confirm(`⚠️ السلفة ستتجاوز راتب ${w?.name} بـ ${(afterNew-net).toLocaleString('ar-EG')} ج.م — متابعة؟`))return;}
   const noteVal=(document.getElementById('loanNote')||{value:''}).value.trim();
   loans.push({workerId:id,amt,date:new Date().toLocaleDateString(),note:noteVal});
-  document.getElementById("loanAmt").value="";
+  const amtEl2=document.getElementById("loanAmt");if(amtEl2)amtEl2.value="";
   const noteEl=document.getElementById('loanNote');if(noteEl)noteEl.value='';
-  save();render();updateLoanInfo();
+  save();renderLoans();updateLoanInfo();
+  const totalL2=loans.reduce((s,l)=>s+Number(l.amt),0);
+  const slEl=document.getElementById("sLoans");if(slEl)slEl.textContent=totalL2.toLocaleString('ar-EG')+' ج.م';
+  const totalE2=workers.reduce((s,w)=>s+attendance.filter(a=>a.workerId===w.id&&a.status==='present').length*w.daily,0);
+  const snEl=document.getElementById("sNetSalary");if(snEl)snEl.textContent=(totalE2-totalL2).toLocaleString('ar-EG')+' ج.م';
   toast(`💰 تم الصرف لـ ${w?.name}`,'info');
 }
 
@@ -1178,6 +1148,15 @@ function openP(id){
   document.getElementById("pName").textContent=w.name;
   document.getElementById("pJob").textContent=w.job;
   document.getElementById("pCode").textContent='#'+(w.wCode||'----');
+  const phEl=document.getElementById('pPhone');
+  if(phEl)phEl.innerHTML=w.phone?`📞 ${w.phone}`:'';
+  const callBtn=document.getElementById('pCallBtn');
+  if(callBtn){
+    if(w.phone){callBtn.href='tel:'+w.phone;callBtn.style.display='inline-flex';}
+    else{callBtn.style.display='none';}
+  }
+  const sdEl=document.getElementById('pStartDate');
+  if(sdEl)sdEl.textContent=w.startDate?`📅 منذ ${new Date(w.startDate).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'})}`:'';
   document.getElementById("pDaily").textContent=w.daily.toLocaleString('ar-EG')+' ج.م';
   const days=attendance.filter(a=>a.workerId===id&&a.status==='present').length;
   const lns=loans.filter(l=>l.workerId===id).reduce((s,l)=>s+l.amt,0);
@@ -1190,9 +1169,23 @@ function openP(id){
   const btn=document.getElementById("pToggleBtn");
   btn.textContent=w.active?'🛑 إيقاف':'✅ تفعيل';btn.className='btn btn-lg '+(w.active?'btn-red':'btn-green');
   const recs=attendance.filter(a=>a.workerId===id).sort((a,b)=>new Date(a.date)-new Date(b.date));
-  document.getElementById('pAttCalendar').innerHTML=recs.length
-    ?recs.map(a=>`<div class="att-day ${a.status}"><span style="font-size:12px">${a.status==='present'?'✅':'❌'}</span><span style="font-size:9px">${a.date.split('/').slice(0,2).join('/')}</span></div>`).join('')
-    :`<div style="color:var(--text3);font-size:12px;padding:8px 0">لا توجد سجلات</div>`;
+  const calEl=document.getElementById('pAttCalendar');
+  if(recs.length){
+    calEl.innerHTML=recs.map((a,i)=>`
+      <div class="att-day-wrap">
+        <div class="att-day ${a.status}" onclick="toggleAttEdit(event,${i},${id})">
+          <span style="font-size:12px">${a.status==='present'?'✅':'❌'}</span>
+          <span style="font-size:9px">${a.date.split('/').slice(0,2).join('/')}</span>
+        </div>
+        <div class="att-edit-menu" id="attMenu_${i}_${id}">
+          <button onclick="editAttRecord(${id},'${a.date}','present')">✅ حاضر</button>
+          <button onclick="editAttRecord(${id},'${a.date}','absent')">❌ غائب</button>
+          <button onclick="deleteAttRecord(${id},'${a.date}')" style="color:var(--red)">🗑️ حذف</button>
+        </div>
+      </div>`).join('');
+  } else {
+    calEl.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:8px 0">لا توجد سجلات</div>`;
+  }
   const wLoans=loans.filter(l=>l.workerId===id).slice().reverse();
   const lhEl=document.getElementById('pLoansHistory');
   lhEl.innerHTML=wLoans.length
@@ -1214,7 +1207,9 @@ function openEditModal(){
   document.getElementById('editName').value=w.name;
   document.getElementById('editJob').value=w.job;
   document.getElementById('editDaily').value=w.daily;
-  document.getElementById('editGroup').value=w.groupId||'';
+  const ep=document.getElementById('editPhone');if(ep)ep.value=w.phone||'';
+  const es=document.getElementById('editStartDate');if(es)es.value=w.startDate||'';
+  const egEl=document.getElementById('editGroup');if(egEl)egEl.value=w.groupId||'';
   document.getElementById('editModal').classList.remove('hidden');
 }
 function quickEdit(id){selID=id;openEditModal();}
@@ -1222,12 +1217,21 @@ function saveEdit(){
   const w=workers.find(x=>x.id===selID);
   const n=document.getElementById('editName').value.trim(),j=document.getElementById('editJob').value.trim(),d=Number(document.getElementById('editDaily').value);
   if(!n||!d){toast('⚠️ أكمل البيانات','error');return;}
-  w.name=n;w.job=j||w.job;w.daily=d;w.groupId=gid;
+  w.name=n;w.job=j||w.job;w.daily=d;
+  const ep2=document.getElementById('editPhone');if(ep2)w.phone=ep2.value.trim();
+  const es2=document.getElementById('editStartDate');if(es2)w.startDate=es2.value;
   save();closeModal('editModal');openP(selID);render();toast('✅ تم التحديث','success');
 }
 
 function openDeleteModal(){
-  document.getElementById('deleteWorkerName').textContent=workers.find(x=>x.id===selID)?.name;
+  const w=workers.find(x=>x.id===selID);
+  document.getElementById('deleteWorkerName').textContent=w?.name||'';
+  const extra=document.getElementById('deleteModalExtra');
+  if(extra){
+    const days=attendance.filter(a=>a.workerId===selID).length;
+    const lns=loans.filter(l=>l.workerId===selID).length;
+    extra.textContent=`(${days} سجل حضور · ${lns} سلفة سيتم حذفها)`;
+  }
   document.getElementById('deleteModal').classList.remove('hidden');
 }
 function confirmDelete(){
@@ -1243,7 +1247,7 @@ function renderSettings(){
   if(!currentUser)return;
   document.getElementById('setMyName').textContent=currentUser.displayName+' (@'+currentUser.username+')';
   document.getElementById('setMyRole').textContent=currentUser.role==='admin'?'مدير — صلاحيات كاملة':'مستخدم عادي';
-  updateProjectNameDisplay();
+  renderDataSize();
   const rt=document.getElementById('reminderTime');
   if(rt)rt.value=localStorage.getItem('rawy_reminder_time')||'09:00';
   renderUsersList();
@@ -1279,7 +1283,7 @@ function renderUsersList(){
 }
 
 function openAddUserModal(){
-  ['newUserDisplay','newUserName','newUserPass'].forEach(id=>document.getElementById(id).value='');
+  ['newUserDisplay','newUserName','newUserPass'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('newUserRole').value='viewer';
   document.querySelectorAll('#newUserPerms input').forEach(cb=>cb.checked=cb.value==='att');
   document.getElementById('addUserModal').classList.remove('hidden');
@@ -1333,34 +1337,6 @@ function deleteUser(uid){
   saveUsers();renderUsersList();toast(`🗑️ تم حذف ${u?.displayName}`,'error');
 }
 
-/* ══ WHATSAPP SHARE ══ */
-function shareWhatsApp(){
-  const today=new Date().toLocaleDateString('ar-EG');
-  const todayKey=new Date().toLocaleDateString();
-  const todayAtt=attendance.filter(a=>a.date===todayKey);
-  const presL=todayAtt.filter(a=>a.status==='present').map(a=>workers.find(w=>w.id===a.workerId)).filter(Boolean);
-  const absL=todayAtt.filter(a=>a.status==='absent').map(a=>workers.find(w=>w.id===a.workerId)).filter(Boolean);
-  let msg=`🔨 *كشف الحضور — ${today}*\n\n`;
-  msg+=`✅ *الحاضرون (${presL.length}):*\n${presL.map((w,i)=>`${i+1}. ${w.name}`).join('\n')||'لا يوجد'}\n\n`;
-  msg+=`❌ *الغائبون (${absL.length}):*\n${absL.map((w,i)=>`${i+1}. ${w.name}`).join('\n')||'لا يوجد'}\n\n`;
-  msg+=`_نظام الراوي الإداري_`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
-}
-
-function shareWorkerWhatsApp(){
-  const w=workers.find(x=>x.id===selID);if(!w)return;
-  const days=attendance.filter(a=>a.workerId===selID&&a.status==='present').length;
-  const lns=loans.filter(l=>l.workerId===selID).reduce((s,l)=>s+l.amt,0);
-  const net=days*w.daily-lns;
-  let msg=`🔨 *كشف راتب — ${w.name}*\n`;
-  msg+=`📌 كود: #${w.wCode} | ${w.job}\n\n`;
-  msg+=`📅 أيام الحضور: *${days} يوم*\n`;
-  msg+=`💰 إجمالي الأجر: *${(days*w.daily).toLocaleString('ar-EG')} ج.م*\n`;
-  msg+=`💸 السلف: *${lns.toLocaleString('ar-EG')} ج.م*\n`;
-  msg+=`✅ الصافي المستحق: *${net.toLocaleString('ar-EG')} ج.م*\n\n`;
-  msg+=`_نظام الراوي الإداري_`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
-}
 
 /* ══ PRINT PAYROLL ══ */
 function printPayroll(){
@@ -1435,14 +1411,84 @@ function importData(e){
     try{
       const d=JSON.parse(evt.target.result);if(!d.workers)throw new Error();
       if(!confirm(`استيراد ${d.workers.length} عامل؟`))return;
-      workers=d.workers;attendance=d.attendance||[];loans=d.loans||[];archive=d.archive||[];save();render();toast('⬆️ تم الاستيراد','success');
+      workers=d.workers;attendance=d.attendance||[];loans=d.loans||[];archive=d.archive||[];
+      save();render();toast('⬆️ تم الاستيراد','success');
     }catch{toast('⚠️ ملف غير صالح','error');}
   };
   reader.readAsText(file);e.target.value='';
 }
 
 /* ══ MODAL BACKDROP ══ */
-['editModal','deleteModal','addGroupModal','addUserModal','editUserModal','changePwdModal'].forEach(id=>{
+/* ══ ATT EDIT ══ */
+let openMenuId=null;
+function toggleAttEdit(e,i,wid){
+  e.stopPropagation();
+  const menuId=`attMenu_${i}_${wid}`;
+  if(openMenuId&&openMenuId!==menuId){
+    const old=document.getElementById(openMenuId);if(old)old.classList.remove('show');
+  }
+  const m=document.getElementById(menuId);
+  if(m){m.classList.toggle('show');openMenuId=m.classList.contains('show')?menuId:null;}
+}
+document.addEventListener('click',()=>{
+  if(openMenuId){const m=document.getElementById(openMenuId);if(m)m.classList.remove('show');openMenuId=null;}
+});
+function editAttRecord(wid,date,newStatus){
+  const rec=attendance.find(a=>a.workerId===wid&&a.date===date);
+  if(rec){rec.status=newStatus;save();openP(wid);toast(newStatus==='present'?'✅ تم التعديل إلى حاضر':'❌ تم التعديل إلى غائب','success');}
+}
+function deleteAttRecord(wid,date){
+  attendance=attendance.filter(a=>!(a.workerId===wid&&a.date===date));
+  save();openP(wid);toast('🗑️ تم حذف السجل','info');
+}
+
+/* ══ ID CARD ══ */
+function printIDCard(){
+  const w=workers.find(x=>x.id===selID);if(!w)return;
+  const days=attendance.filter(a=>a.workerId===w.id&&a.status==='present').length;
+  const today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+  const sheet=document.getElementById('idCardPrint');
+  sheet.innerHTML=`
+    <div style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f1f5f9;padding:20px">
+      <div class="id-card">
+        <div class="id-card-logo">🔨</div>
+        <div class="id-card-company">نظام الراوي الإداري</div>
+        <div class="id-card-avatar">👷</div>
+        <div class="id-card-name">${w.name}</div>
+        <div class="id-card-job">${w.job}</div>
+        <div class="id-card-row">
+          <div><div class="id-card-field">كود العامل</div><div class="id-card-val">#${w.wCode}</div></div>
+          <div><div class="id-card-field">اليومية</div><div class="id-card-val">${w.daily.toLocaleString('ar-EG')} ج.م</div></div>
+          <div><div class="id-card-field">أيام الحضور</div><div class="id-card-val">${days}</div></div>
+        </div>
+        ${w.phone?`<div style="margin-top:10px;font-size:11px;color:rgba(255,255,255,.6)">📞 ${w.phone}</div>`:''}
+        ${w.startDate?`<div style="font-size:11px;color:rgba(255,255,255,.5)">منذ ${new Date(w.startDate).toLocaleDateString('ar-EG',{year:'numeric',month:'long'})}</div>`:''}
+        <div style="margin-top:12px;font-size:9px;color:rgba(255,255,255,.3);border-top:1px solid rgba(255,255,255,.1);padding-top:8px">صدر بتاريخ: ${today}</div>
+      </div>
+    </div>`;
+  window.print();
+}
+
+/* ══ DATA SIZE ══ */
+function renderDataSize(){
+  const keys=['rawy_v3_workers','rawy_v3_att','rawy_v3_loans','rawy_v3_arch','rawy_users'];
+  const labels={rawy_v3_workers:'العمال',rawy_v3_att:'الحضور',rawy_v3_loans:'السلفيات',rawy_v3_arch:'الأرشيف',rawy_users:'المستخدمون'};
+  let total=0,breakdown=[];
+  keys.forEach(k=>{const v=localStorage.getItem(k)||'';const sz=new Blob([v]).size;total+=sz;breakdown.push(`${labels[k]}: ${(sz/1024).toFixed(1)} KB`);});
+  const kb=(total/1024).toFixed(1);
+  const maxKB=500;
+  const pct=Math.min((total/1024/maxKB)*100,100);
+  const lb=document.getElementById('dataSizeLabel');
+  const kb2=document.getElementById('dataSizeKB');
+  const fill=document.getElementById('dataSizeFill');
+  const bd=document.getElementById('dataSizeBreakdown');
+  if(lb)lb.textContent=`إجمالي البيانات المحفوظة`;
+  if(kb2)kb2.textContent=`${kb} KB`;
+  if(fill)fill.style.width=pct+'%';
+  if(bd)bd.textContent=breakdown.join(' · ');
+}
+
+["editModal","deleteModal","addUserModal","editUserModal","changePwdModal"].forEach(id=>{
   const el=document.getElementById(id);
   if(el)el.addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal(id);});
 });
@@ -1457,8 +1503,7 @@ window.addEventListener('DOMContentLoaded',()=>{
       currentUser=found;
       document.getElementById('loginScreen').classList.add('hidden');
       applyPermissions();render();showPage('dashboard');
-      toast(`مرحباً ${currentUser.displayName} 👋`,'success');
-      scheduleReminder();return;
+      toast(`مرحباً ${currentUser.displayName} 👋`,'success');;return;
     }
   }
   const lu=document.getElementById('loginUser');
@@ -1470,5 +1515,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(lp)lp.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 });
 </script>
+<div class="id-card-print" id="idCardPrint"></div>
 </body>
 </html>
