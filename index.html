@@ -3,346 +3,703 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>نظام الراوي الإداري</title>
+<title>الراوي الإداري | Al-Rawi Pro</title>
 
 <style>
-:root{
-  --primary: #0f172a; /* كحلي ملكي */
-  --accent: #ca8a04;  /* ذهبي مطفي */
-  --bg: #f8fafc;
-  --card: #ffffff;
-  --text: #1e293b;
-  --success: #16a34a;
-  --danger: #dc2626;
-  --border: #e2e8f0;
+:root {
+    --primary: #0f172a;    /* الكحلي العميق */
+    --accent: #b45309;     /* النحاسي الفخم */
+    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --glass: rgba(255, 255, 255, 0.9);
 }
 
-*{box-sizing:border-box; transition: 0.2s;}
+* { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
-body{
-  margin:0; font-family: 'Segoe UI', Arial, sans-serif;
-  background: var(--bg); color: var(--text); direction: rtl;
+body {
+    margin: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg-gradient); color: #1e293b; min-height: 100vh;
 }
 
-/* الهيدر */
-header{
-  background: var(--primary); color: #fff; padding: 30px; text-align: center;
-  border-bottom: 5px solid var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+/* شاشة التحميل - بألوان تتناسب مع التطبيق */
+.splash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary) 0%, #1e293b 100%);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
 }
-header h1 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: 1px; }
-header p { margin: 8px 0 0 0; opacity: 0.7; font-size: 13px; }
 
-/* التنقل */
-nav{
-  display: flex; flex-wrap: wrap; background: #fff; position: sticky; top: 0; z-index: 1000;
-  border-bottom: 1px solid var(--border);
+.splash-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
 }
-nav button{
-  flex: 1 1 100px; border: none; background: none; padding: 16px 5px;
-  font-size: 14px; font-weight: 700; cursor: pointer; color: var(--primary);
+
+.splash-screen {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    text-align: center;
+    animation: fadeIn 1s ease-in;
 }
-nav button:hover{ background: #f1f5f9; }
-nav button.active-nav{ border-bottom: 3px solid var(--accent); background: #f8fafc; }
 
-/* الصفحات */
-.page{ display: none; padding: 20px; max-width: 1000px; margin: auto; animation: fadeIn 0.4s; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.active{ display: block; }
-
-/* البطاقات والإحصائيات */
-.grid{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-.card{ background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-.stat { text-align: center; border-top: 4px solid var(--primary); }
-.stat div { font-size: 28px; font-weight: 800; margin: 5px 0; color: var(--primary); }
-
-/* الجداول */
-.table-wrap{ overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
-table{ width: 100%; border-collapse: collapse; background: #fff; }
-th{ background: #f1f5f9; padding: 12px; font-size: 13px; border-bottom: 2px solid var(--border); }
-td{ padding: 12px; text-align: center; border-bottom: 1px solid var(--border); font-size: 14px; }
-tr.clickable:hover{ background: #fefce8; cursor: pointer; }
-
-/* الأزرار والمدخلات */
-.btn{
-  padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+.logo-container {
+    margin-bottom: 40px;
+    position: relative;
 }
-.btn-primary{ background: var(--primary); color: #fff; }
-.btn-success{ background: var(--success); color: #fff; }
-.btn-danger{ background: var(--danger); color: #fff; }
-.btn-warning{ background: var(--accent); color: #fff; }
-.btn-block { width: 100%; margin-top: 10px; }
 
-input, select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; font-size: 14px; }
+.logo {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    background: linear-gradient(145deg, var(--accent), #d97706);
+    border-radius: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(180, 83, 9, 0.3);
+    animation: float 3s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+}
 
-.badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-.badge-ok { background: #dcfce7; color: #166534; }
-.badge-no { background: #fee2e2; color: #991b1b; }
+.logo::before {
+    content: '';
+    position: absolute;
+    width: 150%;
+    height: 150%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
 
-@media print { nav, .no-print { display: none !important; } .page { display: block !important; } }
+.logo-icon {
+    font-size: 60px;
+    color: var(--primary);
+    font-weight: bold;
+    position: relative;
+    z-index: 1;
+}
+
+.app-name {
+    font-size: 42px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+.app-name span {
+    color: var(--accent);
+}
+
+.app-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+.loader-container {
+    margin: 40px 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    border: 1px solid rgba(180, 83, 9, 0.2);
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #d97706);
+    border-radius: 10px;
+    animation: loading 2.5s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(180, 83, 9, 0.5);
+}
+
+.loading-text {
+    color: #fff;
+    font-size: 16px;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
+.loading-percentage {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-top: 5px;
+    text-shadow: 0 0 10px rgba(180, 83, 9, 0.3);
+}
+
+.construction-icons {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin: 30px 0;
+}
+
+.icon-item {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: var(--accent);
+    animation: bounce 2s ease-in-out infinite;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(180, 83, 9, 0.3);
+}
+
+.icon-item:nth-child(2) { animation-delay: 0.3s; }
+.icon-item:nth-child(3) { animation-delay: 0.6s; }
+.icon-item:nth-child(4) { animation-delay: 0.9s; }
+
+.building-message {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    margin-top: 30px;
+    padding: 15px;
+    border-top: 1px solid rgba(180, 83, 9, 0.3);
+    font-weight: 600;
+}
+
+.building-message i {
+    color: var(--accent);
+    margin: 0 5px;
+    font-style: normal;
+    font-size: 18px;
+}
+
+.tools {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.tool {
+    position: absolute;
+    font-size: 20px;
+    color: rgba(180, 83, 9, 0.2);
+    animation: rotate 10s linear infinite;
+}
+
+.tool-1 { top: 10%; left: 10%; animation-delay: 0s; }
+.tool-2 { bottom: 20%; right: 15%; animation-delay: 2s; }
+.tool-3 { top: 30%; right: 25%; animation-delay: 4s; }
+.tool-4 { bottom: 40%; left: 20%; animation-delay: 6s; }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes shine {
+    0% { left: -100%; top: -100%; }
+    100% { left: 100%; top: 100%; }
+}
+
+@keyframes loading {
+    0% { width: 0%; }
+    20% { width: 30%; }
+    50% { width: 60%; }
+    70% { width: 80%; }
+    100% { width: 100%; }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.background-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle at 20% 30%, rgba(180, 83, 9, 0.1) 0%, transparent 30%);
+    z-index: -1;
+}
+
+/* الهيدر الاحترافي */
+header {
+    background: var(--primary); color: white;
+    padding: 40px 20px; text-align: center;
+    position: relative; overflow: hidden;
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+}
+
+header::after {
+    content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(180,83,9,0.1) 0%, transparent 70%);
+}
+
+header h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 2px; }
+header p { margin: 10px 0 0; font-weight: 300; letter-spacing: 5px; text-transform: uppercase; color: #94a3b8; }
+
+/* القائمة الجانبية أو العلوية المطورة */
+nav {
+    display: flex; justify-content: center; gap: 10px; padding: 15px;
+    background: var(--glass); backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+nav button {
+    border: none; background: transparent; padding: 12px 20px;
+    font-size: 15px; font-weight: 600; cursor: pointer; color: var(--primary);
+    border-radius: 12px; display: flex; align-items: center; gap: 8px;
+}
+
+nav button:hover { background: rgba(15, 23, 42, 0.05); transform: translateY(-2px); }
+nav button.active-nav { background: var(--primary); color: white; box-shadow: var(--card-shadow); }
+
+/* الحاويات الرئيسية */
+.container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+.page { display: none; animation: slideIn 0.5s ease; }
+.active { display: block; }
+
+@keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* تصميم الكروت المستوحى من التطبيقات العالمية */
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; }
+
+.stat-card {
+    background: var(--glass); border-radius: 24px; padding: 30px;
+    text-align: center; border: 1px solid white; box-shadow: var(--card-shadow);
+    position: relative; overflow: hidden;
+}
+
+.stat-card::before {
+    content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: var(--accent);
+}
+
+.stat-card small { font-size: 14px; color: #64748b; font-weight: 700; text-transform: uppercase; }
+.stat-card div { font-size: 36px; font-weight: 900; color: var(--primary); margin-top: 10px; }
+
+/* الجداول بشكل عصري */
+.table-container {
+    background: white; border-radius: 24px; overflow: hidden;
+    box-shadow: var(--card-shadow); border: 1px solid rgba(0,0,0,0.05);
+}
+
+table { width: 100%; border-collapse: collapse; }
+th { background: #f8fafc; padding: 20px; text-align: right; color: #64748b; font-size: 13px; font-weight: 800; }
+td { padding: 20px; border-bottom: 1px solid #f1f5f9; font-size: 15px; }
+tr:last-child td { border: none; }
+tr.clickable:hover { background: #fcfcfc; cursor: pointer; }
+
+/* الأزرار الفخمة */
+.btn {
+    padding: 14px 28px; border-radius: 16px; border: none; font-weight: 700;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.btn-main { background: var(--primary); color: white; }
+.btn-main:hover { background: #1e293b; box-shadow: 0 10px 15px -3px rgba(15,23,42,0.3); }
+
+.btn-danger { background: #fef2f2; color: #dc2626; }
+.btn-danger:hover { background: #dc2626; color: white; }
+
+/* الشارات (Badges) */
+.badge {
+    padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;
+}
+.badge-active { background: #dcfce7; color: #15803d; }
+.badge-inactive { background: #fee2e2; color: #b91c1c; }
+
+/* المدخلات */
+input, select {
+    width: 100%; padding: 15px; border-radius: 16px; border: 2px solid #e2e8f0;
+    background: #f8fafc; margin-bottom: 15px; outline: none; font-size: 15px;
+}
+input:focus { border-color: var(--accent); background: white; }
+
+/* الملف الشخصي المطور */
+.profile-header {
+    background: linear-gradient(to right, #0f172a, #334155);
+    padding: 40px; border-radius: 24px 24px 0 0; color: white;
+}
+
+@media (max-width: 768px) {
+    nav { flex-wrap: wrap; }
+    nav button { flex: 1; padding: 10px; font-size: 12px; }
+    .logo { width: 100px; height: 100px; }
+    .logo-icon { font-size: 50px; }
+    .app-name { font-size: 36px; }
+    .app-subtitle { font-size: 16px; }
+    .icon-item { width: 40px; height: 40px; font-size: 20px; }
+}
 </style>
 </head>
 <body>
 
+<!-- شاشة التحميل - بألوان متطابقة مع التطبيق -->
+<div class="splash-overlay" id="splashOverlay">
+    <div class="splash-screen">
+        <div class="tools">
+            <div class="tool tool-1">🔨</div>
+            <div class="tool tool-2">🔧</div>
+            <div class="tool tool-3">⚙️</div>
+            <div class="tool tool-4">📐</div>
+        </div>
+
+        <div class="logo-container">
+            <div class="logo">
+                <div class="logo-icon">🔨</div>
+            </div>
+            <h1 class="app-name">ال<span>راوي</span></h1>
+            <div class="app-subtitle">لمقاولات البناء والتشييد</div>
+        </div>
+
+        <div class="construction-icons">
+            <div class="icon-item">🏗️</div>
+            <div class="icon-item">🏢</div>
+            <div class="icon-item">🛠️</div>
+            <div class="icon-item">📋</div>
+        </div>
+
+        <div class="loader-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="loading-text">جاري تحميل التطبيق...</div>
+            <div class="loading-percentage" id="percentage">0%</div>
+        </div>
+
+        <div class="building-message">
+            <i>✦</i> وحيد المحلاوى <i>✦</i>
+        </div>
+    </div>
+    <div class="background-pattern"></div>
+</div>
+
 <header>
-  <h1>🏗️ نظام الراوي الإداري</h1>
-  <p>للمقاولات العامة والتوريدات</p>
+    <h1>الراوي للإدارة</h1>
+    <p>AL-RAWI ADMINISTRATION SYSTEM</p>
 </header>
 
-<nav>
-  <button onclick="showPage('dashboard')" id="nav-dashboard">🏠 الرئيسية</button>
-  <button onclick="showPage('workers')" id="nav-workers">👷 العمال</button>
-  <button onclick="showPage('attendance')" id="nav-attendance">📝 التحضير</button>
-  <button onclick="showPage('daily')" id="nav-daily">📅 اليومية</button>
-  <button onclick="showPage('loans')" id="nav-loans">💰 السلف</button>
-  <button onclick="showPage('archive')" id="nav-archive">📂 الأرشيف</button>
+<nav id="mainNav">
+    <button onclick="showPage('dashboard')" id="nav-dashboard">📊 الإحصائيات</button>
+    <button onclick="showPage('workers')" id="nav-workers">👷 العمال</button>
+    <button onclick="showPage('attendance')" id="nav-attendance">📝 التحضير</button>
+    <button onclick="showPage('loans')" id="nav-loans">💰 السلفيات</button>
+    <button onclick="showPage('archive')" id="nav-archive">📂 الأرشيف</button>
 </nav>
 
-<div id="dashboard" class="page active">
-  <div class="grid">
-    <div class="card stat"> <small>إجمالي الطاقم</small> <div id="sWorkers">0</div> </div>
-    <div class="card stat" style="border-top-color: var(--success)"> <small>حضور اليوم</small> <div id="sPresent">0</div> </div>
-    <div class="card stat" style="border-top-color: var(--danger)"> <small>غياب اليوم</small> <div id="sAbsent">0</div> </div>
-    <div class="card stat" style="border-top-color: var(--accent)"> <small>إجمالي السلف</small> <div id="sLoans">0</div> </div>
-  </div>
-  <div class="card no-print" style="text-align:center;">
-    <h3>مرحباً بك في لوحة تحكم الراوي</h3>
-    <p>النظام محدث بتاريخ اليوم: <b id="todayDisplay"></b></p>
-  </div>
-</div>
-
-<div id="workers" class="page">
-  <div class="card no-print">
-    <h3>➕ تسجيل فرد جديد</h3>
-    <div style="display:flex; gap:10px; flex-wrap:wrap">
-      <input id="wName" style="flex:2" placeholder="الاسم الكامل">
-      <input id="wJob" style="flex:1" placeholder="المهنة">
-      <input id="wDaily" style="flex:1" type="number" placeholder="اليومية">
+<div class="container">
+    
+    <div id="dashboard" class="page active">
+        <div class="dashboard-grid">
+            <div class="stat-card"> <small>القوة الإجمالية</small> <div id="sWorkers">0</div> </div>
+            <div class="stat-card" style="border-left: 6px solid #22c55e"> <small>الموجودين بالموقع</small> <div id="sPresent">0</div> </div>
+            <div class="stat-card" style="border-left: 6px solid #ef4444"> <small>إجمالي الغياب</small> <div id="sAbsent">0</div> </div>
+            <div class="stat-card" style="border-left: 6px solid #f59e0b"> <small>مسحوبات السلف</small> <div id="sLoans">0</div> </div>
+        </div>
+        <div class="table-container" style="margin-top: 30px; padding: 30px; text-align: center;">
+            <h2 style="margin-top:0">نظام الراوي v3.0</h2>
+            <p style="color: #64748b">تم التنسيق لتجربة مستخدم احترافية. يمكنك البدء بتحضير العمال أو مراجعة السلفيات.</p>
+        </div>
     </div>
-    <button class="btn btn-primary btn-block" onclick="addWorker()">إضافة للطاقم</button>
-  </div>
-  <div class="table-wrap"><table id="workersTable"></table></div>
-</div>
 
-<div id="attendance" class="page">
-  <div class="card" style="text-align:center; max-width:500px; margin:auto; border:2px solid var(--primary)">
-    <h3 style="color:var(--secondary)">دفتر الحضور والغياب</h3>
-    <div id="currentWName" style="font-size:32px; font-weight:900; margin:25px 0; color:var(--primary)">—</div>
-    <div style="display:flex; gap:10px">
-      <button class="btn btn-success btn-block" onclick="record('present')">حضور ✅</button>
-      <button class="btn btn-danger btn-block" onclick="record('absent')">غياب ❌</button>
+    <div id="workers" class="page">
+        <div class="stat-card" style="margin-bottom: 30px; text-align: right;">
+            <h3 style="margin-top:0">➕ إضافة عضو جديد للطاقم</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <input id="wName" placeholder="الاسم الكامل للعامـل">
+                <input id="wJob" placeholder="التخصص المهني">
+                <input id="wDaily" type="number" placeholder="اليومية بالجنيه">
+            </div>
+            <button class="btn btn-main" onclick="addWorker()">حفظ البيانات في السجل</button>
+        </div>
+        <div class="table-container">
+            <table id="workersTable"></table>
+        </div>
     </div>
-  </div>
-</div>
 
-<div id="daily" class="page">
-  <div class="card" style="display:flex; justify-content:space-between; align-items:center">
-    <h3 style="margin:0">كشف يومية الموقع</h3>
-    <button class="btn btn-danger no-print" onclick="resetDay()">🗑️ مسح كشف اليوم</button>
-  </div>
-  <div class="table-wrap"><table id="dailyTable"></table></div>
-</div>
+    <div id="attendance" class="page">
+        <div class="stat-card" style="max-width: 600px; margin: 40px auto; padding: 50px;">
+            <small>جاري تحضير</small>
+            <div id="currentWName" style="font-size: 42px; margin: 20px 0;">—</div>
+            <div style="display: flex; gap: 20px;">
+                <button class="btn btn-main btn-block" style="background:#15803d" onclick="record('present')">إثبات حضور ✅</button>
+                <button class="btn btn-main btn-block" style="background:#b91c1c" onclick="record('absent')">تسجيل غياب ❌</button>
+            </div>
+            <button class="btn btn-danger" style="margin-top:30px; width:100%" onclick="resetDay()">🗑️ تصفير كشف اليوم بالكامل</button>
+        </div>
+    </div>
 
-<div id="loans" class="page">
-  <div class="card no-print">
-    <h3>💵 صرف عهدة / سلفة</h3>
-    <div style="display:flex; gap:10px">
-      <select id="loanWSelect" style="flex:2"></select>
-      <input id="loanAmt" style="flex:1" type="number" placeholder="المبلغ">
+    <div id="loans" class="page">
+        <div class="stat-card" style="margin-bottom: 30px; text-align: right;">
+            <h3 style="margin-top:0">💵 تسجيل صرف مالي</h3>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+                <select id="loanWSelect"></select>
+                <input id="loanAmt" type="number" placeholder="المبلغ">
+            </div>
+            <button class="btn btn-main" onclick="addLoan()">تأكيد عملية الصرف</button>
+        </div>
+        <div class="table-container"><table id="loanTable"></table></div>
     </div>
-    <button class="btn btn-warning btn-block" onclick="addLoan()">تأكيد الصرف</button>
-  </div>
-  <div class="table-wrap"><table id="loanTable"></table></div>
-</div>
 
-<div id="archive" class="page">
-  <div class="card">
-    <h3>إغلاق الحسابات</h3>
-    <button class="btn btn-primary" onclick="doArchive()">📂 ترحيل الشهر الحالي للأرشيف</button>
-  </div>
-  <div class="table-wrap" style="margin-top:20px"><table id="archiveTable"></table></div>
-</div>
+    <div id="profile" class="page">
+        <div class="table-container">
+            <div class="profile-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h1 id="pName" style="margin:0; font-size: 36px;"></h1>
+                        <p id="pJob" style="opacity: 0.8; font-size: 18px;"></p>
+                    </div>
+                    <span id="pStatus" class="badge"></span>
+                </div>
+            </div>
+            <div style="padding: 40px;">
+                <div class="dashboard-grid">
+                    <div class="stat-card"> <small>أيام العمل</small> <div id="pDays">0</div> </div>
+                    <div class="stat-card"> <small>إجمالي المسحوبات</small> <div id="pLoansAmt" style="color:#dc2626">0</div> </div>
+                    <div class="stat-card" style="background:#f8fafc; border-left: 6px solid #15803d"> <small>الرصيد المستحق</small> <div id="pNet" style="color:#15803d">0</div> </div>
+                </div>
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button id="pToggleBtn" class="btn btn-main" style="flex:2" onclick="toggleStatus()"></button>
+                    <button class="btn btn-danger" style="flex:1" onclick="showPage('workers')">خروج</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div id="profile" class="page">
-  <div class="card" style="border-top: 6px solid var(--accent)">
-    <div style="display:flex; justify-content:space-between; align-items:center">
-      <h2 id="pName" style="margin:0"></h2>
-      <span id="pStatus" class="badge"></span>
+    <div id="archive" class="page">
+        <div class="stat-card" style="border-left: 6px solid var(--primary); text-align: right; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="margin:0">ترحيل الشهر الحالي</h3>
+                <p style="color:#64748b; margin:5px 0 0">يؤدي هذا الإجراء إلى تصفير السلف وأيام العمل لبدء دورة جديدة.</p>
+            </div>
+            <button class="btn btn-main" onclick="doArchive()">📂 ترحيل الآن</button>
+        </div>
+        <div class="table-container" style="margin-top:20px"><table id="archiveTable"></table></div>
     </div>
-    <p id="pJob" style="color:var(--secondary); font-weight:bold"></p>
-    <div class="grid">
-      <div class="card stat"> <small>أيام الحضور</small> <div id="pDays">0</div> </div>
-      <div class="card stat"> <small>إجمالي السلف</small> <div id="pLoansAmt">0</div> </div>
-      <div class="card stat" style="background:#f0fdf4"> <small>الصافي المستحق</small> <div id="pNet" style="color:var(--success)">0</div> </div>
-    </div>
-    <div style="display:flex; gap:10px" class="no-print">
-      <button id="pToggleBtn" class="btn btn-block" onclick="toggleStatus()"></button>
-      <button class="btn btn-primary btn-block" onclick="showPage('workers')">عودة</button>
-    </div>
-  </div>
+
 </div>
 
 <script>
-/* البيانات الأساسية */
-let workers = JSON.parse(localStorage.getItem("rawy_workers")) || [
-  {id:1, name:"أحمد محمود علي", job:"معلم بنا", daily:250, active:true},
-  {id:2, name:"إبراهيم حسن سعد", job:"نجار مسلح", daily:300, active:true},
-  {id:3, name:"محمود الصاوي", job:"حداد مسلح", daily:280, active:true},
-  {id:4, name:"سيد جاد الحق", job:"عامل عادي", daily:150, active:true},
-  {id:5, name:"عبدالله الشربيني", job:"كهربائي", daily:350, active:true},
-  {id:6, name:"مصطفى قاسم", job:"سباك", daily:320, active:true},
-  {id:7, name:"ياسر عبد ربه", job:"نقاش", daily:220, active:true},
-  {id:8, name:"كرم جابر", job:"عامل سيراميك", daily:270, active:true},
-  {id:9, name:"شريف الهواري", job:"سائق لودر", daily:400, active:true},
-  {id:10, name:"خالد مرسي", job:"نجار مسلح", daily:300, active:true},
-  {id:11, name:"رمضان صبحي", job:"عامل عادي", daily:150, active:true},
-  {id:12, name:"محمد أبو العلا", job:"فني تكييف", daily:380, active:true},
-  {id:13, name:"علاء حسني", job:"مبيض محارة", daily:240, active:true},
-  {id:14, name:"تامر يحيى", job:"مقاول أنفار", daily:500, active:true},
-  {id:15, name:"حسن شاكوش", job:"فني ألوميتال", daily:290, active:true},
-  {id:16, name:"وائل كفوري", job:"عامل بناء", daily:250, active:true},
-  {id:17, name:"هاني رمزي", job:"سائق نقل", daily:350, active:true},
-  {id:18, name:"منصور الرشيدي", job:"حداد مسلح", daily:280, active:true},
-  {id:19, name:"إيهاب توفيق", job:"فني رخام", daily:330, active:true},
-  {id:20, name:"فتحي سرور", job:"حارس موقع", daily:120, active:true}
+/* إدارة شاشة التحميل */
+let percentage = 0;
+const percentageElement = document.getElementById('percentage');
+const progressFill = document.getElementById('progressFill');
+const splashOverlay = document.getElementById('splashOverlay');
+
+function updatePercentage() {
+    if (percentage < 100) {
+        percentage += Math.floor(Math.random() * 10) + 5;
+        if (percentage > 100) percentage = 100;
+        percentageElement.textContent = percentage + '%';
+        progressFill.style.width = percentage + '%';
+        
+        if (percentage < 100) {
+            setTimeout(updatePercentage, 200);
+        } else {
+            setTimeout(() => {
+                splashOverlay.classList.add('hidden');
+            }, 500);
+        }
+    }
+}
+
+// بدء التحميل فوراً
+percentage = 0;
+percentageElement.textContent = '0%';
+progressFill.style.width = '0%';
+setTimeout(updatePercentage, 1000);
+
+/* نفس المنطق البرمجي القوي مع تحسين استدعاء البيانات */
+let workers = JSON.parse(localStorage.getItem("rawy_v3_workers")) || [
+    {id:1, name:"أحمد محمود علي", job:"معلم بنا", daily:250, active:true},
+    {id:2, name:"إبراهيم حسن سعد", job:"نجار مسلح", daily:300, active:true},
+    {id:3, name:"محمود الصاوي", job:"حداد مسلح", daily:280, active:true},
+    {id:4, name:"سيد جاد الحق", job:"عامل عادي", daily:150, active:true},
+    {id:5, name:"عبدالله الشربيني", job:"كهربائي", daily:350, active:true},
+    {id:6, name:"مصطفى قاسم", job:"سباك", daily:320, active:true},
+    {id:7, name:"ياسر عبد ربه", job:"نقاش", daily:220, active:true},
+    {id:8, name:"كرم جابر", job:"عامل سيراميك", daily:270, active:true},
+    {id:9, name:"شريف الهواري", job:"سائق لودر", daily:400, active:true},
+    {id:10, name:"خالد مرسي", job:"نجار مسلح", daily:300, active:true},
+    {id:11, name:"رمضان صبحي", job:"عامل عادي", daily:150, active:true},
+    {id:12, name:"محمد أبو العلا", job:"فني تكييف", daily:380, active:true},
+    {id:13, name:"علاء حسني", job:"مبيض محارة", daily:240, active:true},
+    {id:14, name:"تامر يحيى", job:"مقاول أنفار", daily:500, active:true},
+    {id:15, name:"حسن شاكوش", job:"فني ألوميتال", daily:290, active:true},
+    {id:16, name:"وائل كفوري", job:"عامل بناء", daily:250, active:true},
+    {id:17, name:"هاني رمزي", job:"سائق نقل", daily:350, active:true},
+    {id:18, name:"منصور الرشيدي", job:"حداد مسلح", daily:280, active:true},
+    {id:19, name:"إيهاب توفيق", job:"فني رخام", daily:330, active:true},
+    {id:20, name:"فتحي سرور", job:"حارس موقع", daily:120, active:true}
 ];
-let attendance = JSON.parse(localStorage.getItem("rawy_att")) || [];
-let loans = JSON.parse(localStorage.getItem("rawy_loans")) || [];
-let archive = JSON.parse(localStorage.getItem("rawy_arch")) || [];
+let attendance = JSON.parse(localStorage.getItem("rawy_v3_att")) || [];
+let loans = JSON.parse(localStorage.getItem("rawy_v3_loans")) || [];
+let archive = JSON.parse(localStorage.getItem("rawy_v3_arch")) || [];
 let selID = null;
 
 function save(){
-  localStorage.setItem("rawy_workers", JSON.stringify(workers));
-  localStorage.setItem("rawy_att", JSON.stringify(attendance));
-  localStorage.setItem("rawy_loans", JSON.stringify(loans));
-  localStorage.setItem("rawy_arch", JSON.stringify(archive));
+    localStorage.setItem("rawy_v3_workers", JSON.stringify(workers));
+    localStorage.setItem("rawy_v3_att", JSON.stringify(attendance));
+    localStorage.setItem("rawy_v3_loans", JSON.stringify(loans));
+    localStorage.setItem("rawy_v3_arch", JSON.stringify(archive));
 }
 
 function showPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active-nav"));
-  document.getElementById(id).classList.add("active");
-  if(document.getElementById('nav-'+id)) document.getElementById('nav-'+id).classList.add("active-nav");
-  render();
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active-nav"));
+    document.getElementById(id).classList.add("active");
+    if(document.getElementById('nav-'+id)) document.getElementById('nav-'+id).classList.add("active-nav");
+    render();
 }
 
 function render(){
-  const today = new Date().toLocaleDateString();
-  document.getElementById("todayDisplay").innerText = today;
+    const today = new Date().toLocaleDateString();
+    
+    // إحصائيات
+    document.getElementById("sWorkers").innerText = workers.length;
+    document.getElementById("sPresent").innerText = attendance.filter(a=>a.date===today && a.status==='present').length;
+    document.getElementById("sAbsent").innerText = attendance.filter(a=>a.date===today && a.status==='absent').length;
+    document.getElementById("sLoans").innerText = loans.reduce((s,l)=>s+Number(l.amt),0) + " ج.م";
 
-  // إحصائيات
-  document.getElementById("sWorkers").innerText = workers.length;
-  document.getElementById("sPresent").innerText = attendance.filter(a=>a.date===today && a.status==='present').length;
-  document.getElementById("sAbsent").innerText = attendance.filter(a=>a.date===today && a.status==='absent').length;
-  document.getElementById("sLoans").innerText = loans.reduce((s,l)=>s+Number(l.amt),0) + " ج.م";
+    // جدول العمال
+    const wt = document.getElementById("workersTable");
+    wt.innerHTML = `<tr><th>العامـل</th><th>المهنة</th><th>اليومية</th><th>الحالة</th></tr>`;
+    workers.forEach(w=>{
+        wt.innerHTML += `<tr class="clickable" onclick="openP(${w.id})">
+            <td style="font-weight:700; color:var(--primary)">${w.name}</td><td>${w.job}</td><td>${w.daily} ج.م</td>
+            <td><span class="badge ${w.active?'badge-active':'badge-inactive'}">${w.active?'نشط':'موقف'}</span></td></tr>`;
+    });
 
-  // جدول العمال
-  const wt = document.getElementById("workersTable");
-  wt.innerHTML = `<tr><th>الاسم</th><th>المهنة</th><th>اليومية</th><th>الحالة</th></tr>`;
-  workers.forEach(w=>{
-    wt.innerHTML += `<tr class="clickable" onclick="openP(${w.id})">
-      <td style="text-align:right; font-weight:bold">${w.name}</td><td>${w.job}</td><td>${w.daily}</td>
-      <td><span class="badge ${w.active?'badge-ok':'badge-no'}">${w.active?'نشط':'موقف'}</span></td></tr>`;
-  });
+    // التحضير
+    const pending = workers.filter(w=>w.active && !attendance.some(a=>a.workerId===w.id && a.date===today));
+    const cur = document.getElementById("currentWName");
+    if(pending.length > 0){ cur.innerText = pending[0].name; cur.dataset.id = pending[0].id; }
+    else { cur.innerText = "اكتمل التحضير ✅"; cur.dataset.id = ""; }
 
-  // التحضير المتسلسل
-  const pending = workers.filter(w=>w.active && !attendance.some(a=>a.workerId===w.id && a.date===today));
-  const cur = document.getElementById("currentWName");
-  if(pending.length > 0){ cur.innerText = pending[0].name; cur.dataset.id = pending[0].id; }
-  else { cur.innerText = "✅ اكتمل التحضير"; cur.dataset.id = ""; }
+    // السلف
+    const lt = document.getElementById("loanTable");
+    lt.innerHTML = `<tr><th>العامل</th><th>المبلغ</th><th>التاريخ</th></tr>`;
+    loans.forEach(l=>{
+        const w = workers.find(x=>x.id===l.workerId);
+        lt.innerHTML += `<tr><td style="font-weight:700">${w?w.name:'--'}</td><td style="color:#dc2626; font-weight:800">${l.amt} ج.م</td><td>${l.date}</td></tr>`;
+    });
 
-  // كشف اليوم
-  const dt = document.getElementById("dailyTable");
-  dt.innerHTML = `<tr><th>العامل</th><th>الحالة</th></tr>`;
-  attendance.filter(a=>a.date===today).forEach(a=>{
-    const w = workers.find(x=>x.id===a.workerId);
-    dt.innerHTML += `<tr><td style="text-align:right">${w?w.name:'--'}</td><td><span class="badge ${a.status==='present'?'badge-ok':'badge-no'}">${a.status==='present'?'حضور':'غياب'}</span></td></tr>`;
-  });
+    // الأرشيف
+    const art = document.getElementById("archiveTable");
+    art.innerHTML = `<tr><th>تاريخ الترحيل</th><th>إجمالي المسحوبات</th></tr>`;
+    archive.forEach(a=>{ art.innerHTML += `<tr><td>${a.date}</td><td style="font-weight:bold">${a.total} ج.م</td></tr>`; });
 
-  // السلف
-  const lt = document.getElementById("loanTable");
-  lt.innerHTML = `<tr><th>العامل</th><th>المبلغ</th><th>التاريخ</th></tr>`;
-  loans.forEach(l=>{
-    const w = workers.find(x=>x.id===l.workerId);
-    lt.innerHTML += `<tr><td style="text-align:right">${w?w.name:'--'}</td><td style="color:var(--danger); font-weight:bold">${l.amt}</td><td>${l.date}</td></tr>`;
-  });
-
-  // الأرشيف
-  const art = document.getElementById("archiveTable");
-  art.innerHTML = `<tr><th>التاريخ</th><th>إجمالي السلف</th></tr>`;
-  archive.forEach(a=>{ art.innerHTML += `<tr><td>${a.date}</td><td>${a.total} ج.م</td></tr>`; });
-
-  // قوائم الاختيار
-  const sel = document.getElementById("loanWSelect");
-  sel.innerHTML = workers.filter(w=>w.active).map(w=>`<option value="${w.id}">${w.name}</option>`).join("");
+    // القوائم
+    document.getElementById("loanWSelect").innerHTML = workers.filter(w=>w.active).map(w=>`<option value="${w.id}">${w.name}</option>`).join("");
 }
 
 function addWorker(){
-  const n = document.getElementById("wName").value;
-  const j = document.getElementById("wJob").value;
-  const d = document.getElementById("wDaily").value;
-  if(!n || !d) return alert("أكمل البيانات");
-  workers.push({id:Date.now(), name:n, job:j, daily:Number(d), active:true});
-  save(); render();
+    const n = document.getElementById("wName").value;
+    const j = document.getElementById("wJob").value;
+    const d = document.getElementById("wDaily").value;
+    if(!n || !d) return alert("أكمل البيانات");
+    workers.push({id:Date.now(), name:n, job:j, daily:Number(d), active:true});
+    document.getElementById("wName").value = "";
+    document.getElementById("wJob").value = "";
+    document.getElementById("wDaily").value = "";
+    save(); render();
 }
 
 function record(stat){
-  const id = document.getElementById("currentWName").dataset.id;
-  if(!id) return;
-  attendance.push({workerId:Number(id), status:stat, date:new Date().toLocaleDateString()});
-  save(); render();
-}
-
-function addLoan(){
-  const id = Number(document.getElementById("loanWSelect").value);
-  const amt = Number(document.getElementById("loanAmt").value);
-  if(!amt) return;
-  loans.push({workerId:id, amt:amt, date:new Date().toLocaleDateString()});
-  document.getElementById("loanAmt").value = "";
-  save(); render();
+    const id = document.getElementById("currentWName").dataset.id;
+    if(!id) return;
+    attendance.push({workerId:Number(id), status:stat, date:new Date().toLocaleDateString()});
+    save(); render();
 }
 
 function resetDay(){
-  if(confirm("مسح كشف اليوم؟")){
-    attendance = attendance.filter(a=>a.date !== new Date().toLocaleDateString());
+    if(confirm("هل تريد مسح سجل حضور اليوم للبدء من جديد؟")){
+        attendance = attendance.filter(a=>a.date !== new Date().toLocaleDateString());
+        save(); render();
+    }
+}
+
+function addLoan(){
+    const id = Number(document.getElementById("loanWSelect").value);
+    const amt = Number(document.getElementById("loanAmt").value);
+    if(!amt) return;
+    loans.push({workerId:id, amt:amt, date:new Date().toLocaleDateString()});
+    document.getElementById("loanAmt").value = "";
     save(); render();
-  }
 }
 
 function openP(id){
-  selID = id;
-  const w = workers.find(x=>x.id===id);
-  showPage("profile");
-  document.getElementById("pName").innerText = w.name;
-  document.getElementById("pJob").innerText = w.job;
-  const days = attendance.filter(a=>a.workerId===id && a.status==='present').length;
-  const lns = loans.filter(l=>l.workerId===id).reduce((s,l)=>s+l.amt,0);
-  document.getElementById("pDays").innerText = days;
-  document.getElementById("pLoansAmt").innerText = lns + " ج.م";
-  document.getElementById("pNet").innerText = (days * w.daily) - lns + " ج.م";
-  
-  const b = document.getElementById("pStatus");
-  b.innerText = w.active ? "نشط" : "موقف";
-  b.className = "badge " + (w.active?"badge-ok":"badge-no");
+    selID = id;
+    const w = workers.find(x=>x.id===id);
+    showPage("profile");
+    document.getElementById("pName").innerText = w.name;
+    document.getElementById("pJob").innerText = w.job;
+    const days = attendance.filter(a=>a.workerId===id && a.status==='present').length;
+    const lns = loans.filter(l=>l.workerId===id).reduce((s,l)=>s+l.amt,0);
+    document.getElementById("pDays").innerText = days;
+    document.getElementById("pLoansAmt").innerText = lns + " ج.م";
+    document.getElementById("pNet").innerText = (days * w.daily) - lns + " ج.م";
+    
+    const b = document.getElementById("pStatus");
+    b.innerText = w.active ? "عامل نشط" : "عامل موقوف";
+    b.className = "badge " + (w.active?"badge-active":"badge-inactive");
 
-  const btn = document.getElementById("pToggleBtn");
-  btn.innerText = w.active ? "إيقاف العامل 🛑" : "تفعيل العامل ✅";
-  btn.className = "btn btn-block " + (w.active?"btn-danger":"btn-success");
+    const btn = document.getElementById("pToggleBtn");
+    btn.innerText = w.active ? "إيقاف العامل عن العمل 🛑" : "إعادة تفعيل العامل ✅";
+    btn.className = "btn btn-main " + (w.active?"btn-danger":"");
 }
 
 function toggleStatus(){
-  const w = workers.find(x=>x.id===selID);
-  w.active = !w.active;
-  save(); openP(selID);
+    const w = workers.find(x=>x.id===selID);
+    w.active = !w.active;
+    save(); openP(selID);
 }
 
 function doArchive(){
-  if(confirm("ترحيل الشهر للأرشيف وتصفير الحسابات؟")){
-    archive.push({date: new Date().toLocaleDateString(), total: loans.reduce((s,l)=>s+l.amt,0)});
-    attendance = []; loans = [];
-    save(); render();
-  }
+    if(confirm("سيتم تصفير السلف وأيام العمل وترحيل البيانات للأرشيف. هل أنت متأكد؟")){
+        archive.push({date: new Date().toLocaleDateString(), total: loans.reduce((s,l)=>s+l.amt,0)});
+        attendance = []; loans = [];
+        save(); render();
+        showPage('dashboard');
+    }
 }
+
+// منع التفاعل مع الصفحة أثناء ظهور شاشة التحميل
+splashOverlay.addEventListener('click', (e) => {
+    e.stopPropagation();
+});
 
 render();
 </script>
