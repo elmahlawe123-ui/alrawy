@@ -3,335 +3,348 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>نظام إدارة العمال v2.2</title>
+<title>نظام الراوي الإداري</title>
 
 <style>
 :root{
-  --primary: #2563eb; --secondary: #64748b; --success: #22c55e;
-  --danger: #ef4444; --warning: #f59e0b; --background: #f8fafc;
-  --card-bg: #ffffff; --text-main: #1e293b; --border: #e2e8f0;
+  --primary: #0f172a; /* كحلي ملكي */
+  --accent: #ca8a04;  /* ذهبي مطفي */
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #1e293b;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --border: #e2e8f0;
 }
-*{box-sizing:border-box; transition: all 0.2s ease;}
+
+*{box-sizing:border-box; transition: 0.2s;}
+
 body{
-  margin:0; font-family: 'Segoe UI', Tahoma, sans-serif;
-  background: var(--background); color: var(--text-main); line-height: 1.6;
+  margin:0; font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--bg); color: var(--text); direction: rtl;
 }
+
+/* الهيدر */
 header{
-  background: linear-gradient(135deg, #1e40af, #2563eb);
-  color: #fff; padding: 20px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  background: var(--primary); color: #fff; padding: 30px; text-align: center;
+  border-bottom: 5px solid var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
+header h1 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: 1px; }
+header p { margin: 8px 0 0 0; opacity: 0.7; font-size: 13px; }
+
+/* التنقل */
 nav{
   display: flex; flex-wrap: wrap; background: #fff; position: sticky; top: 0; z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 nav button{
-  flex: 1 1 100px; border: none; background: none; padding: 15px 10px;
-  font-size: 14px; font-weight: 600; cursor: pointer; color: var(--secondary);
+  flex: 1 1 100px; border: none; background: none; padding: 16px 5px;
+  font-size: 14px; font-weight: 700; cursor: pointer; color: var(--primary);
 }
-nav button.active-nav{ border-bottom: 3px solid var(--primary); color: var(--primary); }
-.page{ display: none; padding: 20px; max-width: 1100px; margin: auto; animation: slideUp 0.3s ease-out; }
-@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+nav button:hover{ background: #f1f5f9; }
+nav button.active-nav{ border-bottom: 3px solid var(--accent); background: #f8fafc; }
+
+/* الصفحات */
+.page{ display: none; padding: 20px; max-width: 1000px; margin: auto; animation: fadeIn 0.4s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .active{ display: block; }
+
+/* البطاقات والإحصائيات */
 .grid{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-.card{
-  background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
-  padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px;
-}
-.stat{ text-align: center; border-top: 4px solid var(--primary); }
-.stat div{ font-size: 26px; font-weight: 800; color: var(--text-main); }
-.table-wrap{ overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); background: #fff; }
-table{ width: 100%; border-collapse: collapse; }
-th{ background: #f8fafc; padding: 12px; font-size: 13px; color: var(--secondary); border-bottom: 2px solid var(--border); }
+.card{ background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.stat { text-align: center; border-top: 4px solid var(--primary); }
+.stat div { font-size: 28px; font-weight: 800; margin: 5px 0; color: var(--primary); }
+
+/* الجداول */
+.table-wrap{ overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+table{ width: 100%; border-collapse: collapse; background: #fff; }
+th{ background: #f1f5f9; padding: 12px; font-size: 13px; border-bottom: 2px solid var(--border); }
 td{ padding: 12px; text-align: center; border-bottom: 1px solid var(--border); font-size: 14px; }
-.badge{ padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-.badge.ok{ background: #dcfce7; color: #166534; }
-.badge.off{ background: #fee2e2; color: #991b1b; }
+tr.clickable:hover{ background: #fefce8; cursor: pointer; }
+
+/* الأزرار والمدخلات */
 .btn{
-  padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer;
-  font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
 .btn-primary{ background: var(--primary); color: #fff; }
-.btn-danger{ background: var(--danger); color: #fff; }
 .btn-success{ background: var(--success); color: #fff; }
-.btn-block{ width: 100%; }
-input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; }
-@media print { nav, .no-print, .btn { display: none !important; } .page { display: block !important; } }
+.btn-danger{ background: var(--danger); color: #fff; }
+.btn-warning{ background: var(--accent); color: #fff; }
+.btn-block { width: 100%; margin-top: 10px; }
+
+input, select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; font-size: 14px; }
+
+.badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.badge-ok { background: #dcfce7; color: #166534; }
+.badge-no { background: #fee2e2; color: #991b1b; }
+
+@media print { nav, .no-print { display: none !important; } .page { display: block !important; } }
 </style>
 </head>
 <body>
 
-<header><h1>🏗️ إدارة مشروع المقاولات</h1></header>
+<header>
+  <h1>🏗️ نظام الراوي الإداري</h1>
+  <p>للمقاولات العامة والتوريدات</p>
+</header>
 
-<nav id="mainNav">
-  <button onclick="showPage('dashboard')" id="nav-dashboard">📊 الرئيسية</button>
+<nav>
+  <button onclick="showPage('dashboard')" id="nav-dashboard">🏠 الرئيسية</button>
   <button onclick="showPage('workers')" id="nav-workers">👷 العمال</button>
   <button onclick="showPage('attendance')" id="nav-attendance">📝 التحضير</button>
-  <button onclick="showPage('daily')" id="nav-daily">📅 كشف اليوم</button>
+  <button onclick="showPage('daily')" id="nav-daily">📅 اليومية</button>
   <button onclick="showPage('loans')" id="nav-loans">💰 السلف</button>
   <button onclick="showPage('archive')" id="nav-archive">📂 الأرشيف</button>
 </nav>
 
 <div id="dashboard" class="page active">
   <div class="grid">
-    <div class="card stat"><small>إجمالي العمال</small><div id="statWorkers">0</div></div>
-    <div class="card stat" style="border-top-color: var(--success)"><small>حضور اليوم</small><div id="statPresent">0</div></div>
-    <div class="card stat" style="border-top-color: var(--danger)"><small>غياب اليوم</small><div id="statAbsent">0</div></div>
-    <div class="card stat" style="border-top-color: var(--warning)"><small>إجمالي السلف</small><div id="statLoans">0</div></div>
+    <div class="card stat"> <small>إجمالي الطاقم</small> <div id="sWorkers">0</div> </div>
+    <div class="card stat" style="border-top-color: var(--success)"> <small>حضور اليوم</small> <div id="sPresent">0</div> </div>
+    <div class="card stat" style="border-top-color: var(--danger)"> <small>غياب اليوم</small> <div id="sAbsent">0</div> </div>
+    <div class="card stat" style="border-top-color: var(--accent)"> <small>إجمالي السلف</small> <div id="sLoans">0</div> </div>
+  </div>
+  <div class="card no-print" style="text-align:center;">
+    <h3>مرحباً بك في لوحة تحكم الراوي</h3>
+    <p>النظام محدث بتاريخ اليوم: <b id="todayDisplay"></b></p>
   </div>
 </div>
 
 <div id="workers" class="page">
   <div class="card no-print">
-    <h3>إضافة عامل جديد</h3>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-      <input id="workerName" style="flex:2" placeholder="الاسم">
-      <input id="workerJob" style="flex:1" placeholder="المهنة">
-      <input id="workerDaily" style="flex:1" type="number" placeholder="اليومية">
+    <h3>➕ تسجيل فرد جديد</h3>
+    <div style="display:flex; gap:10px; flex-wrap:wrap">
+      <input id="wName" style="flex:2" placeholder="الاسم الكامل">
+      <input id="wJob" style="flex:1" placeholder="المهنة">
+      <input id="wDaily" style="flex:1" type="number" placeholder="اليومية">
     </div>
-    <button class="btn btn-primary btn-block" onclick="addWorker()">حفظ</button>
+    <button class="btn btn-primary btn-block" onclick="addWorker()">إضافة للطاقم</button>
   </div>
   <div class="table-wrap"><table id="workersTable"></table></div>
 </div>
 
 <div id="attendance" class="page">
-  <div class="card" style="text-align: center; max-width: 500px; margin: auto;">
-    <h3 style="color: var(--secondary)">التحضير المتسلسل</h3>
-    <div id="currentWorkerName" style="font-size: 28px; font-weight: 800; margin: 25px 0; color: var(--primary);">—</div>
-    <div style="display: flex; gap: 10px;">
-      <button class="btn btn-success btn-block" onclick="recordAttendance('present')">حضور</button>
-      <button class="btn btn-danger btn-block" onclick="recordAttendance('absent')">غياب</button>
+  <div class="card" style="text-align:center; max-width:500px; margin:auto; border:2px solid var(--primary)">
+    <h3 style="color:var(--secondary)">دفتر الحضور والغياب</h3>
+    <div id="currentWName" style="font-size:32px; font-weight:900; margin:25px 0; color:var(--primary)">—</div>
+    <div style="display:flex; gap:10px">
+      <button class="btn btn-success btn-block" onclick="record('present')">حضور ✅</button>
+      <button class="btn btn-danger btn-block" onclick="record('absent')">غياب ❌</button>
     </div>
   </div>
 </div>
 
 <div id="daily" class="page">
-  <div class="card" style="display: flex; justify-content: space-between; align-items: center; border-right: 5px solid var(--warning);">
-    <div><h3 style="margin:0">تحضير اليوم</h3></div>
-    <button class="btn btn-danger no-print" onclick="clearTodayAttendance()">🗑️ مسح تحضير اليوم</button>
+  <div class="card" style="display:flex; justify-content:space-between; align-items:center">
+    <h3 style="margin:0">كشف يومية الموقع</h3>
+    <button class="btn btn-danger no-print" onclick="resetDay()">🗑️ مسح كشف اليوم</button>
   </div>
   <div class="table-wrap"><table id="dailyTable"></table></div>
 </div>
 
 <div id="loans" class="page">
   <div class="card no-print">
-    <h3>تسجيل سلفة</h3>
-    <div style="display: flex; gap: 10px;">
-      <select id="loanWorkerSelect" style="flex:2"></select>
-      <input id="loanAmountInput" style="flex:1" type="number" placeholder="المبلغ">
+    <h3>💵 صرف عهدة / سلفة</h3>
+    <div style="display:flex; gap:10px">
+      <select id="loanWSelect" style="flex:2"></select>
+      <input id="loanAmt" style="flex:1" type="number" placeholder="المبلغ">
     </div>
-    <button class="btn btn-warning btn-block" style="color:#fff" onclick="addLoan()">تسجيل سلفة</button>
+    <button class="btn btn-warning btn-block" onclick="addLoan()">تأكيد الصرف</button>
   </div>
   <div class="table-wrap"><table id="loanTable"></table></div>
 </div>
 
 <div id="archive" class="page">
-    <div class="card">
-        <h3>نهاية الشهر</h3>
-        <button class="btn btn-primary" onclick="archiveMonth()">📁 ترحيل للأرشيف</button>
-    </div>
-    <div class="table-wrap"><table id="archiveTable"></table></div>
+  <div class="card">
+    <h3>إغلاق الحسابات</h3>
+    <button class="btn btn-primary" onclick="doArchive()">📂 ترحيل الشهر الحالي للأرشيف</button>
+  </div>
+  <div class="table-wrap" style="margin-top:20px"><table id="archiveTable"></table></div>
 </div>
 
 <div id="profile" class="page">
-  <div class="card">
-    <div style="display:flex; justify-content: space-between; align-items: center;">
-      <h2 id="pName" style="color: var(--primary); margin:0"></h2>
-      <span id="pStatusBadge" class="badge"></span>
+  <div class="card" style="border-top: 6px solid var(--accent)">
+    <div style="display:flex; justify-content:space-between; align-items:center">
+      <h2 id="pName" style="margin:0"></h2>
+      <span id="pStatus" class="badge"></span>
     </div>
-    <p id="pJobInfo" style="color: var(--secondary)"></p>
+    <p id="pJob" style="color:var(--secondary); font-weight:bold"></p>
     <div class="grid">
-      <div class="card stat"> <small>أيام العمل</small> <div id="pDays">0</div> </div>
-      <div class="card stat"> <small>إجمالي السلف</small> <div id="pLoans">0</div> </div>
-      <div class="card stat" style="background: #f0fdf4"> <small>الصافي</small> <div id="pSalary">0</div> </div>
+      <div class="card stat"> <small>أيام الحضور</small> <div id="pDays">0</div> </div>
+      <div class="card stat"> <small>إجمالي السلف</small> <div id="pLoansAmt">0</div> </div>
+      <div class="card stat" style="background:#f0fdf4"> <small>الصافي المستحق</small> <div id="pNet" style="color:var(--success)">0</div> </div>
     </div>
-    
-    <div style="display: flex; gap: 10px; margin-top: 15px;" class="no-print">
-      <button id="toggleStatusBtn" class="btn btn-block" onclick="changeWorkerStatus()"></button>
-      <button class="btn btn-secondary btn-block" onclick="showPage('workers')">إغلاق</button>
+    <div style="display:flex; gap:10px" class="no-print">
+      <button id="pToggleBtn" class="btn btn-block" onclick="toggleStatus()"></button>
+      <button class="btn btn-primary btn-block" onclick="showPage('workers')">عودة</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ===================== البيانات ===================== */
-let workers = JSON.parse(localStorage.getItem("workers")) || [
-  {id: 1, name: "أحمد محمود علي", job: "معلم بنا", daily: 250, active: true},
-  {id: 2, name: "إبراهيم حسن سعد", job: "نجار مسلح", daily: 300, active: true},
-  {id: 3, name: "محمود الصاوي", job: "حداد مسلح", daily: 280, active: true},
-  {id: 4, name: "سيد جاد الحق", job: "عامل عادي", daily: 150, active: true},
-  {id: 5, name: "عبدالله الشربيني", job: "كهربائي", daily: 350, active: true},
-  {id: 6, name: "مصطفى قاسم", job: "سباك", daily: 320, active: true},
-  {id: 7, name: "ياسر عبد ربه", job: "نقاش", daily: 220, active: true},
-  {id: 8, name: "كرم جابر", job: "عامل سيراميك", daily: 270, active: true},
-  {id: 9, name: "شريف الهواري", job: "سائق لودر", daily: 400, active: true},
-  {id: 10, name: "خالد مرسي", job: "نجار مسلح", daily: 300, active: true},
-  {id: 11, name: "رمضان صبحي", job: "عامل عادي", daily: 150, active: true},
-  {id: 12, name: "محمد أبو العلا", job: "فني تكييف", daily: 380, active: true},
-  {id: 13, name: "علاء حسني", job: "مبيض محارة", daily: 240, active: true},
-  {id: 14, name: "تامر يحيى", job: "مقاول أنفار", daily: 500, active: true},
-  {id: 15, name: "حسن شاكوش", job: "فني ألوميتال", daily: 290, active: true},
-  {id: 16, name: "وائل كفوري", job: "عامل بناء", daily: 250, active: true},
-  {id: 17, name: "هاني رمزي", job: "سائق نقل", daily: 350, active: true},
-  {id: 18, name: "منصور الرشيدي", job: "حداد مسلح", daily: 280, active: true},
-  {id: 19, name: "إيهاب توفيق", job: "فني رخام", daily: 330, active: true},
-  {id: 20, name: "فتحي سرور", job: "حارس موقع", daily: 120, active: true}
+/* البيانات الأساسية */
+let workers = JSON.parse(localStorage.getItem("rawy_workers")) || [
+  {id:1, name:"أحمد محمود علي", job:"معلم بنا", daily:250, active:true},
+  {id:2, name:"إبراهيم حسن سعد", job:"نجار مسلح", daily:300, active:true},
+  {id:3, name:"محمود الصاوي", job:"حداد مسلح", daily:280, active:true},
+  {id:4, name:"سيد جاد الحق", job:"عامل عادي", daily:150, active:true},
+  {id:5, name:"عبدالله الشربيني", job:"كهربائي", daily:350, active:true},
+  {id:6, name:"مصطفى قاسم", job:"سباك", daily:320, active:true},
+  {id:7, name:"ياسر عبد ربه", job:"نقاش", daily:220, active:true},
+  {id:8, name:"كرم جابر", job:"عامل سيراميك", daily:270, active:true},
+  {id:9, name:"شريف الهواري", job:"سائق لودر", daily:400, active:true},
+  {id:10, name:"خالد مرسي", job:"نجار مسلح", daily:300, active:true},
+  {id:11, name:"رمضان صبحي", job:"عامل عادي", daily:150, active:true},
+  {id:12, name:"محمد أبو العلا", job:"فني تكييف", daily:380, active:true},
+  {id:13, name:"علاء حسني", job:"مبيض محارة", daily:240, active:true},
+  {id:14, name:"تامر يحيى", job:"مقاول أنفار", daily:500, active:true},
+  {id:15, name:"حسن شاكوش", job:"فني ألوميتال", daily:290, active:true},
+  {id:16, name:"وائل كفوري", job:"عامل بناء", daily:250, active:true},
+  {id:17, name:"هاني رمزي", job:"سائق نقل", daily:350, active:true},
+  {id:18, name:"منصور الرشيدي", job:"حداد مسلح", daily:280, active:true},
+  {id:19, name:"إيهاب توفيق", job:"فني رخام", daily:330, active:true},
+  {id:20, name:"فتحي سرور", job:"حارس موقع", daily:120, active:true}
 ];
+let attendance = JSON.parse(localStorage.getItem("rawy_att")) || [];
+let loans = JSON.parse(localStorage.getItem("rawy_loans")) || [];
+let archive = JSON.parse(localStorage.getItem("rawy_arch")) || [];
+let selID = null;
 
-let attendance = JSON.parse(localStorage.getItem("attendance")) || [];
-let loans = JSON.parse(localStorage.getItem("loans")) || [];
-let archive = JSON.parse(localStorage.getItem("archive")) || [];
-let selectedWorkerId = null;
-
-function save() {
-  localStorage.setItem("workers", JSON.stringify(workers));
-  localStorage.setItem("attendance", JSON.stringify(attendance));
-  localStorage.setItem("loans", JSON.stringify(loans));
-  localStorage.setItem("archive", JSON.stringify(archive));
+function save(){
+  localStorage.setItem("rawy_workers", JSON.stringify(workers));
+  localStorage.setItem("rawy_att", JSON.stringify(attendance));
+  localStorage.setItem("rawy_loans", JSON.stringify(loans));
+  localStorage.setItem("rawy_arch", JSON.stringify(archive));
 }
 
-/* ===================== الوظائف ===================== */
-function showPage(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active-nav"));
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active-nav"));
   document.getElementById(id).classList.add("active");
   if(document.getElementById('nav-'+id)) document.getElementById('nav-'+id).classList.add("active-nav");
-  updateUI();
+  render();
 }
 
-function updateUI() {
-  renderWorkers(); renderDaily(); renderLoans(); loadSelects(); updateStats(); updateAttendanceCard(); renderArchive();
-}
-
-function updateStats() {
+function render(){
   const today = new Date().toLocaleDateString();
-  const tAtt = attendance.filter(a => a.date === today);
-  document.getElementById("statWorkers").innerText = workers.length;
-  document.getElementById("statPresent").innerText = tAtt.filter(a => a.status === 'present').length;
-  document.getElementById("statAbsent").innerText = tAtt.filter(a => a.status === 'absent').length;
-  document.getElementById("statLoans").innerText = loans.reduce((s,l) => s + Number(l.amount), 0);
-}
+  document.getElementById("todayDisplay").innerText = today;
 
-function addWorker() {
-  const name = workerName.value; const job = workerJob.value; const daily = workerDaily.value;
-  if(!name || !daily) return alert("اكمل البيانات");
-  workers.push({id: Date.now(), name, job, daily: Number(daily), active: true});
-  workerName.value = ""; workerJob.value = ""; workerDaily.value = "";
-  save(); updateUI();
-}
+  // إحصائيات
+  document.getElementById("sWorkers").innerText = workers.length;
+  document.getElementById("sPresent").innerText = attendance.filter(a=>a.date===today && a.status==='present').length;
+  document.getElementById("sAbsent").innerText = attendance.filter(a=>a.date===today && a.status==='absent').length;
+  document.getElementById("sLoans").innerText = loans.reduce((s,l)=>s+Number(l.amt),0) + " ج.م";
 
-function renderWorkers() {
-  const t = document.getElementById("workersTable");
-  t.innerHTML = `<tr><th>الاسم</th><th>المهنة</th><th>اليومية</th><th>الحالة</th></tr>`;
-  workers.forEach(w => {
-    t.innerHTML += `<tr class="clickable" onclick="openProfile(${w.id})">
-      <td style="text-align:right; font-weight:600">${w.name}</td><td>${w.job}</td><td>${w.daily}</td>
-      <td><span class="badge ${w.active?'ok':'off'}">${w.active?'نشط':'موقوف'}</span></td></tr>`;
+  // جدول العمال
+  const wt = document.getElementById("workersTable");
+  wt.innerHTML = `<tr><th>الاسم</th><th>المهنة</th><th>اليومية</th><th>الحالة</th></tr>`;
+  workers.forEach(w=>{
+    wt.innerHTML += `<tr class="clickable" onclick="openP(${w.id})">
+      <td style="text-align:right; font-weight:bold">${w.name}</td><td>${w.job}</td><td>${w.daily}</td>
+      <td><span class="badge ${w.active?'badge-ok':'badge-no'}">${w.active?'نشط':'موقف'}</span></td></tr>`;
   });
+
+  // التحضير المتسلسل
+  const pending = workers.filter(w=>w.active && !attendance.some(a=>a.workerId===w.id && a.date===today));
+  const cur = document.getElementById("currentWName");
+  if(pending.length > 0){ cur.innerText = pending[0].name; cur.dataset.id = pending[0].id; }
+  else { cur.innerText = "✅ اكتمل التحضير"; cur.dataset.id = ""; }
+
+  // كشف اليوم
+  const dt = document.getElementById("dailyTable");
+  dt.innerHTML = `<tr><th>العامل</th><th>الحالة</th></tr>`;
+  attendance.filter(a=>a.date===today).forEach(a=>{
+    const w = workers.find(x=>x.id===a.workerId);
+    dt.innerHTML += `<tr><td style="text-align:right">${w?w.name:'--'}</td><td><span class="badge ${a.status==='present'?'badge-ok':'badge-no'}">${a.status==='present'?'حضور':'غياب'}</span></td></tr>`;
+  });
+
+  // السلف
+  const lt = document.getElementById("loanTable");
+  lt.innerHTML = `<tr><th>العامل</th><th>المبلغ</th><th>التاريخ</th></tr>`;
+  loans.forEach(l=>{
+    const w = workers.find(x=>x.id===l.workerId);
+    lt.innerHTML += `<tr><td style="text-align:right">${w?w.name:'--'}</td><td style="color:var(--danger); font-weight:bold">${l.amt}</td><td>${l.date}</td></tr>`;
+  });
+
+  // الأرشيف
+  const art = document.getElementById("archiveTable");
+  art.innerHTML = `<tr><th>التاريخ</th><th>إجمالي السلف</th></tr>`;
+  archive.forEach(a=>{ art.innerHTML += `<tr><td>${a.date}</td><td>${a.total} ج.م</td></tr>`; });
+
+  // قوائم الاختيار
+  const sel = document.getElementById("loanWSelect");
+  sel.innerHTML = workers.filter(w=>w.active).map(w=>`<option value="${w.id}">${w.name}</option>`).join("");
 }
 
-function updateAttendanceCard() {
-  const today = new Date().toLocaleDateString();
-  const pending = workers.filter(w => w.active && !attendance.some(a => a.workerId === w.id && a.date === today));
-  const el = document.getElementById("currentWorkerName");
-  if(pending.length > 0) {
-    el.innerText = pending[0].name; el.dataset.id = pending[0].id;
-  } else {
-    el.innerText = "✅ اكتمل التحضير"; el.dataset.id = "";
+function addWorker(){
+  const n = document.getElementById("wName").value;
+  const j = document.getElementById("wJob").value;
+  const d = document.getElementById("wDaily").value;
+  if(!n || !d) return alert("أكمل البيانات");
+  workers.push({id:Date.now(), name:n, job:j, daily:Number(d), active:true});
+  save(); render();
+}
+
+function record(stat){
+  const id = document.getElementById("currentWName").dataset.id;
+  if(!id) return;
+  attendance.push({workerId:Number(id), status:stat, date:new Date().toLocaleDateString()});
+  save(); render();
+}
+
+function addLoan(){
+  const id = Number(document.getElementById("loanWSelect").value);
+  const amt = Number(document.getElementById("loanAmt").value);
+  if(!amt) return;
+  loans.push({workerId:id, amt:amt, date:new Date().toLocaleDateString()});
+  document.getElementById("loanAmt").value = "";
+  save(); render();
+}
+
+function resetDay(){
+  if(confirm("مسح كشف اليوم؟")){
+    attendance = attendance.filter(a=>a.date !== new Date().toLocaleDateString());
+    save(); render();
   }
 }
 
-function recordAttendance(status) {
-  const id = document.getElementById("currentWorkerName").dataset.id;
-  if(!id) return;
-  attendance.push({workerId: Number(id), status, date: new Date().toLocaleDateString()});
-  save(); updateUI();
-}
-
-function renderDaily() {
-  const today = new Date().toLocaleDateString();
-  const t = document.getElementById("dailyTable");
-  t.innerHTML = `<tr><th>العامل</th><th>الحالة</th></tr>`;
-  attendance.filter(a => a.date === today).forEach(a => {
-    const w = workers.find(x => x.id === a.workerId);
-    t.innerHTML += `<tr><td>${w?w.name:'--'}</td><td><span class="badge ${a.status==='present'?'ok':'off'}">${a.status==='present'?'حضور':'غياب'}</span></td></tr>`;
-  });
-}
-
-function clearTodayAttendance() {
-    if(confirm(`مسح كشف اليوم؟`)) {
-        attendance = attendance.filter(a => a.date !== new Date().toLocaleDateString());
-        save(); updateUI();
-    }
-}
-
-function loadSelects() {
-  const sel = document.getElementById("loanWorkerSelect");
-  sel.innerHTML = workers.filter(w=>w.active).map(w => `<option value="${w.id}">${w.name}</option>`).join("");
-}
-
-function addLoan() {
-  const id = Number(loanWorkerSelect.value); const amt = Number(loanAmountInput.value);
-  if(!amt) return;
-  loans.push({workerId: id, amount: amt, date: new Date().toLocaleDateString()});
-  loanAmountInput.value = ""; save(); updateUI();
-}
-
-function renderLoans() {
-  const t = document.getElementById("loanTable");
-  t.innerHTML = `<tr><th>العامل</th><th>المبلغ</th><th>التاريخ</th></tr>`;
-  loans.forEach(l => {
-    const w = workers.find(x => x.id === l.workerId);
-    t.innerHTML += `<tr><td>${w?w.name:'--'}</td><td>${l.amount}</td><td>${l.date}</td></tr>`;
-  });
-}
-
-function openProfile(id) {
-  selectedWorkerId = id;
-  const w = workers.find(x => x.id === id);
+function openP(id){
+  selID = id;
+  const w = workers.find(x=>x.id===id);
   showPage("profile");
   document.getElementById("pName").innerText = w.name;
-  document.getElementById("pJobInfo").innerText = `${w.job} | اليومية: ${w.daily}`;
+  document.getElementById("pJob").innerText = w.job;
+  const days = attendance.filter(a=>a.workerId===id && a.status==='present').length;
+  const lns = loans.filter(l=>l.workerId===id).reduce((s,l)=>s+l.amt,0);
+  document.getElementById("pDays").innerText = days;
+  document.getElementById("pLoansAmt").innerText = lns + " ج.م";
+  document.getElementById("pNet").innerText = (days * w.daily) - lns + " ج.م";
   
-  const wAtt = attendance.filter(a => a.workerId === id && a.status === 'present').length;
-  const wLoans = loans.filter(l => l.workerId === id).reduce((s,l) => s + l.amount, 0);
-  document.getElementById("pDays").innerText = wAtt;
-  document.getElementById("pLoans").innerText = wLoans;
-  document.getElementById("pSalary").innerText = (wAtt * w.daily) - wLoans;
+  const b = document.getElementById("pStatus");
+  b.innerText = w.active ? "نشط" : "موقف";
+  b.className = "badge " + (w.active?"badge-ok":"badge-no");
 
-  // تحديث حالة الشارة والزر
-  const badge = document.getElementById("pStatusBadge");
-  badge.innerText = w.active ? "نشط" : "موقوف";
-  badge.className = "badge " + (w.active ? "ok" : "off");
-
-  const btn = document.getElementById("toggleStatusBtn");
+  const btn = document.getElementById("pToggleBtn");
   btn.innerText = w.active ? "إيقاف العامل 🛑" : "تفعيل العامل ✅";
-  btn.className = "btn btn-block " + (w.active ? "btn-danger" : "btn-success");
+  btn.className = "btn btn-block " + (w.active?"btn-danger":"btn-success");
 }
 
-/* الميزة الجديدة: تغيير حالة العامل */
-function changeWorkerStatus() {
-  const w = workers.find(x => x.id === selectedWorkerId);
-  const action = w.active ? "إيقاف" : "تنشيط";
-  if(confirm(`هل أنت متأكد من ${action} العامل ${w.name}؟`)) {
-    w.active = !w.active;
-    save();
-    openProfile(selectedWorkerId); // تحديث العرض
+function toggleStatus(){
+  const w = workers.find(x=>x.id===selID);
+  w.active = !w.active;
+  save(); openP(selID);
+}
+
+function doArchive(){
+  if(confirm("ترحيل الشهر للأرشيف وتصفير الحسابات؟")){
+    archive.push({date: new Date().toLocaleDateString(), total: loans.reduce((s,l)=>s+l.amt,0)});
+    attendance = []; loans = [];
+    save(); render();
   }
 }
 
-function archiveMonth() {
-    if(!confirm("ترحيل للأرشيف؟")) return;
-    archive.push({date: new Date().toLocaleDateString(), total: loans.reduce((s,l)=>s+l.amount,0)});
-    attendance = []; loans = []; save(); updateUI();
-}
-
-function renderArchive() {
-    const t = document.getElementById("archiveTable");
-    t.innerHTML = `<tr><th>التاريخ</th><th>إجمالي السلف</th></tr>`;
-    archive.forEach(a => { t.innerHTML += `<tr><td>${a.date}</td><td>${a.total}</td></tr>`; });
-}
-
-updateUI();
+render();
 </script>
 </body>
 </html>
