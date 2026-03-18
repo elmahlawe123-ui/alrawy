@@ -4,636 +4,1010 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>الراوي الإداري | Al-Rawi Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 
 <style>
 :root {
-    --primary: #0f172a;    /* الكحلي العميق */
-    --accent: #b45309;     /* النحاسي الفخم */
-    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    --glass: rgba(255, 255, 255, 0.9);
+    --bg:        #080c14;
+    --bg2:       #0d1220;
+    --bg3:       #111827;
+    --surface:   #141d2e;
+    --surface2:  #1a2540;
+    --border:    rgba(255,255,255,0.06);
+    --border2:   rgba(255,255,255,0.12);
+    --accent:    #c9810a;
+    --accent2:   #f0a030;
+    --accent-glow: rgba(201,129,10,0.25);
+    --green:     #10b981;
+    --green-bg:  rgba(16,185,129,0.12);
+    --red:       #ef4444;
+    --red-bg:    rgba(239,68,68,0.12);
+    --blue:      #3b82f6;
+    --blue-bg:   rgba(59,130,246,0.12);
+    --text:      #e2e8f0;
+    --text2:     #94a3b8;
+    --text3:     #475569;
+    --shadow:    0 20px 60px rgba(0,0,0,0.5);
+    --shadow-sm: 0 4px 20px rgba(0,0,0,0.3);
+    --r:         20px;
+    --r-sm:      12px;
 }
 
-* { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
 
 body {
-    margin: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--bg-gradient); color: #1e293b; min-height: 100vh;
+    font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-/* شاشة التحميل - بألوان تتناسب مع التطبيق */
+/* ═══════════════════════════════════════
+   SPLASH SCREEN
+═══════════════════════════════════════ */
 .splash-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, var(--primary) 0%, #1e293b 100%);
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, #1a2540 0%, #080c14 70%);
     z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.8s ease, visibility 0.8s ease;
+    display: flex; justify-content: center; align-items: center;
+    transition: opacity 0.9s ease, visibility 0.9s ease;
 }
-
-.splash-overlay.hidden {
-    opacity: 0;
-    visibility: hidden;
-}
+.splash-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
 .splash-screen {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
     text-align: center;
-    animation: fadeIn 1s ease-in;
-}
-
-.logo-container {
-    margin-bottom: 40px;
+    padding: 40px 20px;
     position: relative;
+    z-index: 2;
 }
 
-.logo {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 20px;
-    background: linear-gradient(145deg, var(--accent), #d97706);
-    border-radius: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 10px 30px rgba(180, 83, 9, 0.3);
-    animation: float 3s ease-in-out infinite;
+/* Floating orbs in background */
+.splash-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    animation: orbFloat 6s ease-in-out infinite;
+}
+.splash-orb-1 { width: 400px; height: 400px; background: rgba(201,129,10,0.08); top: -100px; left: -100px; }
+.splash-orb-2 { width: 300px; height: 300px; background: rgba(59,130,246,0.06); bottom: -50px; right: -50px; animation-delay: 3s; }
+
+@keyframes orbFloat {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(20px,-20px) scale(1.05); }
+}
+
+.splash-logo {
+    width: 110px; height: 110px;
+    margin: 0 auto 30px;
+    border-radius: 28px;
+    background: linear-gradient(145deg, #1a2540, #0d1220);
+    border: 1px solid rgba(201,129,10,0.4);
+    display: flex; justify-content: center; align-items: center;
+    font-size: 52px;
+    box-shadow: 0 0 0 1px rgba(201,129,10,0.15), 0 0 40px rgba(201,129,10,0.2), 0 20px 60px rgba(0,0,0,0.6);
+    animation: logoPulse 3s ease-in-out infinite;
     position: relative;
     overflow: hidden;
 }
-
-.logo::before {
+.splash-logo::after {
     content: '';
-    position: absolute;
-    width: 150%;
-    height: 150%;
-    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
-    transform: rotate(45deg);
-    animation: shine 3s infinite;
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(201,129,10,0.15) 50%, transparent 60%);
+    animation: logoShine 3s ease-in-out infinite;
+}
+@keyframes logoPulse {
+    0%,100% { transform: translateY(0); box-shadow: 0 0 0 1px rgba(201,129,10,0.15), 0 0 40px rgba(201,129,10,0.2), 0 20px 60px rgba(0,0,0,0.6); }
+    50% { transform: translateY(-8px); box-shadow: 0 0 0 1px rgba(201,129,10,0.3), 0 0 60px rgba(201,129,10,0.35), 0 30px 80px rgba(0,0,0,0.6); }
+}
+@keyframes logoShine {
+    0% { transform: translateX(-100%) skewX(-15deg); }
+    100% { transform: translateX(200%) skewX(-15deg); }
 }
 
-.logo-icon {
-    font-size: 60px;
-    color: var(--primary);
-    font-weight: bold;
-    position: relative;
-    z-index: 1;
+.splash-title {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 52px; font-weight: 900;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+}
+.splash-title em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
-.app-name {
-    font-size: 42px;
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    margin-bottom: 10px;
-    letter-spacing: 2px;
+.splash-sub {
+    color: var(--text3);
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 50px;
+    font-weight: 500;
 }
 
-.app-name span {
-    color: var(--accent);
+.splash-icons {
+    display: flex; justify-content: center; gap: 16px; margin-bottom: 50px;
+}
+.splash-icon {
+    width: 52px; height: 52px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 22px;
+    animation: iconBounce 2.4s ease-in-out infinite;
+}
+.splash-icon:nth-child(2) { animation-delay: 0.2s; }
+.splash-icon:nth-child(3) { animation-delay: 0.4s; }
+.splash-icon:nth-child(4) { animation-delay: 0.6s; }
+@keyframes iconBounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
 }
 
-.app-subtitle {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 18px;
-    font-weight: 400;
-    margin-bottom: 30px;
+.splash-progress-wrap {
+    width: 280px; margin: 0 auto 16px;
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+}
+.splash-progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    box-shadow: 0 0 10px var(--accent-glow);
+    transition: width 0.2s ease;
+}
+
+.splash-percent {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 4px;
+}
+.splash-loading-text { color: var(--text3); font-size: 13px; }
+
+.splash-tagline {
+    margin-top: 40px;
+    color: var(--text3);
+    font-size: 14px;
     letter-spacing: 1px;
 }
+.splash-tagline span { color: var(--accent); }
 
-.loader-container {
-    margin: 40px 0;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 15px;
-    border: 1px solid rgba(180, 83, 9, 0.2);
-}
-
-.progress-fill {
-    width: 0%;
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), #d97706);
-    border-radius: 10px;
-    animation: loading 2.5s ease-in-out infinite;
-    box-shadow: 0 0 10px rgba(180, 83, 9, 0.5);
-}
-
-.loading-text {
-    color: #fff;
-    font-size: 16px;
-    margin-top: 10px;
-    opacity: 0.9;
-}
-
-.loading-percentage {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--accent);
-    margin-top: 5px;
-    text-shadow: 0 0 10px rgba(180, 83, 9, 0.3);
-}
-
-.construction-icons {
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 30px;
     display: flex;
-    justify-content: center;
-    gap: 25px;
-    margin: 30px 0;
-}
-
-.icon-item {
-    width: 50px;
-    height: 50px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    display: flex;
-    justify-content: center;
     align-items: center;
-    font-size: 24px;
-    color: var(--accent);
-    animation: bounce 2s ease-in-out infinite;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(180, 83, 9, 0.3);
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px);
 }
 
-.icon-item:nth-child(2) { animation-delay: 0.3s; }
-.icon-item:nth-child(3) { animation-delay: 0.6s; }
-.icon-item:nth-child(4) { animation-delay: 0.9s; }
+.header-brand {
+    display: flex; align-items: center; gap: 14px;
+}
+.header-logo {
+    width: 44px; height: 44px;
+    background: linear-gradient(145deg, var(--surface2), var(--surface));
+    border: 1px solid rgba(201,129,10,0.3);
+    border-radius: 12px;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 22px;
+    box-shadow: 0 0 20px rgba(201,129,10,0.15);
+}
+.header-title {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 20px; font-weight: 800;
+    color: var(--text);
+}
+.header-title span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.header-sub { font-size: 11px; color: var(--text3); letter-spacing: 2px; font-weight: 500; }
 
-.building-message {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 16px;
-    margin-top: 30px;
-    padding: 15px;
-    border-top: 1px solid rgba(180, 83, 9, 0.3);
-    font-weight: 600;
+.header-date {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 8px 16px;
+    font-size: 13px; color: var(--text2);
 }
 
-.building-message i {
-    color: var(--accent);
-    margin: 0 5px;
-    font-style: normal;
-    font-size: 18px;
+/* ═══════════════════════════════════════
+   NAV
+═══════════════════════════════════════ */
+nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 20px;
+    position: sticky; top: 81px; z-index: 99;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+nav::-webkit-scrollbar { display: none; }
+
+nav button {
+    border: none;
+    background: transparent;
+    padding: 10px 18px;
+    font-size: 14px; font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--text3);
+    border-radius: 10px;
+    display: flex; align-items: center; gap: 7px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+nav button:hover { background: var(--surface); color: var(--text2); }
+nav button.active-nav {
+    background: linear-gradient(135deg, rgba(201,129,10,0.2), rgba(240,160,48,0.1));
+    color: var(--accent2);
+    border: 1px solid rgba(201,129,10,0.3);
+    box-shadow: 0 0 20px rgba(201,129,10,0.1);
 }
 
-.tools {
+/* ═══════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════ */
+.container { max-width: 1100px; margin: 30px auto; padding: 0 20px 60px; }
+.page { display: none; animation: pageIn 0.4s cubic-bezier(0.4,0,0.2,1); }
+.page.active { display: block; }
+@keyframes pageIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════
+   DASHBOARD STATS
+═══════════════════════════════════════ */
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 26px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); border-color: var(--border2); box-shadow: var(--shadow-sm); }
+
+.stat-card::before {
+    content: '';
     position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    transform: translate(20px, -20px);
     pointer-events: none;
 }
 
-.tool {
+.stat-label { font-size: 12px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+.stat-val { font-size: 38px; font-weight: 900; font-family: 'Tajawal', sans-serif; color: var(--text); line-height: 1; }
+.stat-icon { position: absolute; top: 20px; left: 20px; font-size: 28px; opacity: 0.15; }
+
+.stat-card.green  { --accent-glow: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.2); }
+.stat-card.green .stat-val { color: var(--green); }
+.stat-card.red    { --accent-glow: rgba(239,68,68,0.2);  border-color: rgba(239,68,68,0.2); }
+.stat-card.red  .stat-val  { color: var(--red); }
+.stat-card.blue   { --accent-glow: rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.2); }
+.stat-card.blue .stat-val  { color: var(--blue); }
+
+/* Welcome card */
+.welcome-card {
+    background: linear-gradient(135deg, var(--surface2) 0%, var(--surface) 100%);
+    border: 1px solid rgba(201,129,10,0.2);
+    border-radius: var(--r);
+    padding: 30px 36px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.welcome-card::after {
+    content: '🏗️';
     position: absolute;
-    font-size: 20px;
-    color: rgba(180, 83, 9, 0.2);
-    animation: rotate 10s linear infinite;
+    left: 30px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 80px;
+    opacity: 0.06;
+}
+.welcome-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+.welcome-sub { color: var(--text2); font-size: 14px; line-height: 1.6; }
+
+/* ═══════════════════════════════════════
+   SECTION HEADER
+═══════════════════════════════════════ */
+.section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+}
+.section-title {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 22px; font-weight: 800;
+    display: flex; align-items: center; gap: 10px;
+}
+.section-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-weight: 600;
 }
 
-.tool-1 { top: 10%; left: 10%; animation-delay: 0s; }
-.tool-2 { bottom: 20%; right: 15%; animation-delay: 2s; }
-.tool-3 { top: 30%; right: 25%; animation-delay: 4s; }
-.tool-4 { bottom: 40%; left: 20%; animation-delay: 6s; }
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+/* ═══════════════════════════════════════
+   FORM CARD
+═══════════════════════════════════════ */
+.form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 28px;
+    margin-bottom: 20px;
+}
+.form-card h3 {
+    font-size: 16px; font-weight: 700; color: var(--text2);
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
+.form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
 
-@keyframes shine {
-    0% { left: -100%; top: -100%; }
-    100% { left: 100%; top: 100%; }
-}
-
-@keyframes loading {
-    0% { width: 0%; }
-    20% { width: 30%; }
-    50% { width: 60%; }
-    70% { width: 80%; }
-    100% { width: 100%; }
-}
-
-@keyframes bounce {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.background-pattern {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: radial-gradient(circle at 20% 30%, rgba(180, 83, 9, 0.1) 0%, transparent 30%);
-    z-index: -1;
-}
-
-/* الهيدر الاحترافي */
-header {
-    background: var(--primary); color: white;
-    padding: 40px 20px; text-align: center;
-    position: relative; overflow: hidden;
-    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-}
-
-header::after {
-    content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle, rgba(180,83,9,0.1) 0%, transparent 70%);
-}
-
-header h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 2px; }
-header p { margin: 10px 0 0; font-weight: 300; letter-spacing: 5px; text-transform: uppercase; color: #94a3b8; }
-
-/* القائمة الجانبية أو العلوية المطورة */
-nav {
-    display: flex; justify-content: center; gap: 10px; padding: 15px;
-    background: var(--glass); backdrop-filter: blur(10px);
-    position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05);
-}
-
-nav button {
-    border: none; background: transparent; padding: 12px 20px;
-    font-size: 15px; font-weight: 600; cursor: pointer; color: var(--primary);
-    border-radius: 12px; display: flex; align-items: center; gap: 8px;
-}
-
-nav button:hover { background: rgba(15, 23, 42, 0.05); transform: translateY(-2px); }
-nav button.active-nav { background: var(--primary); color: white; box-shadow: var(--card-shadow); }
-
-/* الحاويات الرئيسية */
-.container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
-.page { display: none; animation: slideIn 0.5s ease; }
-.active { display: block; }
-
-@keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-/* تصميم الكروت المستوحى من التطبيقات العالمية */
-.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; }
-
-.stat-card {
-    background: var(--glass); border-radius: 24px; padding: 30px;
-    text-align: center; border: 1px solid white; box-shadow: var(--card-shadow);
-    position: relative; overflow: hidden;
-}
-
-.stat-card::before {
-    content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: var(--accent);
-}
-
-.stat-card small { font-size: 14px; color: #64748b; font-weight: 700; text-transform: uppercase; }
-.stat-card div { font-size: 36px; font-weight: 900; color: var(--primary); margin-top: 10px; }
-
-/* الجداول بشكل عصري */
-.table-container {
-    background: white; border-radius: 24px; overflow: hidden;
-    box-shadow: var(--card-shadow); border: 1px solid rgba(0,0,0,0.05);
-}
-
-table { width: 100%; border-collapse: collapse; }
-th { background: #f8fafc; padding: 20px; text-align: right; color: #64748b; font-size: 13px; font-weight: 800; }
-td { padding: 20px; border-bottom: 1px solid #f1f5f9; font-size: 15px; }
-tr:last-child td { border: none; }
-tr.clickable:hover { background: #fcfcfc; cursor: pointer; }
-
-/* الأزرار الفخمة */
-.btn {
-    padding: 14px 28px; border-radius: 16px; border: none; font-weight: 700;
-    cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-}
-
-.btn-main { background: var(--primary); color: white; }
-.btn-main:hover { background: #1e293b; box-shadow: 0 10px 15px -3px rgba(15,23,42,0.3); }
-
-.btn-danger { background: #fef2f2; color: #dc2626; }
-.btn-danger:hover { background: #dc2626; color: white; }
-
-/* الشارات (Badges) */
-.badge {
-    padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;
-}
-.badge-active { background: #dcfce7; color: #15803d; }
-.badge-inactive { background: #fee2e2; color: #b91c1c; }
-
-/* المدخلات */
 input, select {
-    width: 100%; padding: 15px; border-radius: 16px; border: 2px solid #e2e8f0;
-    background: #f8fafc; margin-bottom: 15px; outline: none; font-size: 15px;
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--border2);
+    background: var(--bg3);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
-input:focus { border-color: var(--accent); background: white; }
+input::placeholder { color: var(--text3); }
+input:focus, select:focus {
+    border-color: rgba(201,129,10,0.5);
+    box-shadow: 0 0 0 3px rgba(201,129,10,0.1);
+    background: var(--surface);
+}
+select option { background: var(--bg3); }
 
-/* الملف الشخصي المطور */
+/* ═══════════════════════════════════════
+   TABLE
+═══════════════════════════════════════ */
+.table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--surface2); }
+th {
+    padding: 14px 20px;
+    text-align: right;
+    font-size: 11px; color: var(--text3);
+    font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+}
+td {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr.clickable {
+    cursor: pointer;
+    transition: background 0.15s;
+}
+tbody tr.clickable:hover { background: var(--surface2); }
+.td-name { font-weight: 700; color: var(--text); font-size: 15px; }
+
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 22px;
+    border-radius: var(--r-sm);
+    border: none;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent), #b8770a);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(201,129,10,0.3);
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    box-shadow: 0 6px 30px rgba(201,129,10,0.45);
+    transform: translateY(-1px);
+}
+
+.btn-ghost {
+    background: var(--surface2);
+    color: var(--text2);
+    border: 1px solid var(--border2);
+}
+.btn-ghost:hover { background: var(--bg3); color: var(--text); }
+
+.btn-green {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(5,150,105,0.3);
+}
+.btn-green:hover { background: linear-gradient(135deg, #10b981, #059669); transform: translateY(-1px); }
+
+.btn-red {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(220,38,38,0.3);
+}
+.btn-red:hover { background: linear-gradient(135deg, #ef4444, #dc2626); transform: translateY(-1px); }
+
+.btn-outline-red {
+    background: var(--red-bg);
+    color: var(--red);
+    border: 1px solid rgba(239,68,68,0.3);
+}
+.btn-outline-red:hover { background: rgba(239,68,68,0.2); }
+
+.btn-full { width: 100%; }
+.btn-lg { padding: 15px 28px; font-size: 16px; border-radius: 14px; }
+
+/* ═══════════════════════════════════════
+   BADGE
+═══════════════════════════════════════ */
+.badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 12px; font-weight: 700;
+}
+.worker-code {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    color: var(--accent2);
+    background: rgba(201,129,10,0.1);
+    border: 1px solid rgba(201,129,10,0.25);
+    border-radius: 6px;
+    padding: 3px 10px;
+}
+.badge-active   { background: var(--green-bg); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+.badge-inactive { background: var(--red-bg);   color: var(--red);   border: 1px solid rgba(239,68,68,0.3); }
+
+/* ═══════════════════════════════════════
+   ATTENDANCE CARD
+═══════════════════════════════════════ */
+.attendance-card {
+    max-width: 560px; margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 50px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.attendance-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 200px; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.att-label { font-size: 12px; color: var(--text3); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+.att-name {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 36px; font-weight: 900;
+    color: var(--text);
+    min-height: 50px;
+    margin-bottom: 36px;
+    line-height: 1.2;
+}
+.att-btns { display: flex; gap: 14px; margin-bottom: 20px; }
+.att-btns .btn { flex: 1; padding: 16px; font-size: 16px; border-radius: 14px; }
+.att-divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+/* ═══════════════════════════════════════
+   PROFILE PAGE
+═══════════════════════════════════════ */
+.profile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+}
 .profile-header {
-    background: linear-gradient(to right, #0f172a, #334155);
-    padding: 40px; border-radius: 24px 24px 0 0; color: white;
+    background: linear-gradient(135deg, #0d1a2e 0%, #1a2540 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 36px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
 }
+.profile-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,129,10,0.4), transparent);
+}
+.profile-avatar {
+    width: 70px; height: 70px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--accent), #b8770a);
+    display: flex; justify-content: center; align-items: center;
+    font-size: 32px;
+    flex-shrink: 0;
+    box-shadow: 0 0 30px rgba(201,129,10,0.3);
+}
+.profile-name {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 28px; font-weight: 800;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+.profile-job { color: var(--text3); font-size: 14px; }
 
+.profile-body { padding: 32px; }
+.profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+.profile-stat {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 16px;
+    text-align: center;
+}
+.profile-stat-label { font-size: 11px; color: var(--text3); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+.profile-stat-val { font-size: 24px; font-weight: 900; font-family: 'Tajawal', sans-serif; color: var(--text); }
+.profile-actions { display: flex; gap: 12px; }
+.profile-actions .btn { flex: 1; }
+
+/* ═══════════════════════════════════════
+   ARCHIVE
+═══════════════════════════════════════ */
+.archive-alert {
+    background: linear-gradient(135deg, rgba(201,129,10,0.08), rgba(201,129,10,0.04));
+    border: 1px solid rgba(201,129,10,0.25);
+    border-radius: var(--r);
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.archive-alert h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.archive-alert p  { font-size: 13px; color: var(--text3); }
+
+/* ═══════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════ */
+.divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+/* ═══════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
 @media (max-width: 768px) {
-    nav { flex-wrap: wrap; }
-    nav button { flex: 1; padding: 10px; font-size: 12px; }
-    .logo { width: 100px; height: 100px; }
-    .logo-icon { font-size: 50px; }
-    .app-name { font-size: 36px; }
-    .app-subtitle { font-size: 16px; }
-    .icon-item { width: 40px; height: 40px; font-size: 20px; }
+    header { padding: 14px 18px; }
+    .header-date { display: none; }
+    nav { padding: 8px 12px; justify-content: flex-start; gap: 4px; }
+    nav button { padding: 8px 12px; font-size: 13px; }
+    .container { padding: 0 14px 50px; margin-top: 20px; }
+    .splash-title { font-size: 38px; }
+    .attendance-card { padding: 36px 24px; }
+    .att-name { font-size: 28px; }
+    .profile-stats { grid-template-columns: 1fr 1fr; }
+    .profile-actions { flex-direction: column; }
+    .profile-header { flex-wrap: wrap; }
+    .welcome-card { flex-direction: column; text-align: center; }
+    .archive-alert { flex-direction: column; text-align: center; }
 }
 </style>
 </head>
 <body>
 
-<!-- شاشة التحميل - بألوان متطابقة مع التطبيق -->
+<!-- ══════════════ SPLASH ══════════════ -->
 <div class="splash-overlay" id="splashOverlay">
+    <div class="splash-orb splash-orb-1"></div>
+    <div class="splash-orb splash-orb-2"></div>
     <div class="splash-screen">
-        <div class="tools">
-            <div class="tool tool-1">🔨</div>
-            <div class="tool tool-2">🔧</div>
-            <div class="tool tool-3">⚙️</div>
-            <div class="tool tool-4">📐</div>
+        <div class="splash-logo">🔨</div>
+
+        <div class="splash-title">ال<em>راوي</em></div>
+        <div class="splash-sub">AL-RAWI ADMINISTRATION SYSTEM</div>
+
+        <div class="splash-icons">
+            <div class="splash-icon">🏗️</div>
+            <div class="splash-icon">🏢</div>
+            <div class="splash-icon">🛠️</div>
+            <div class="splash-icon">📋</div>
         </div>
 
-        <div class="logo-container">
-            <div class="logo">
-                <div class="logo-icon">🔨</div>
-            </div>
-            <h1 class="app-name">ال<span>راوي</span></h1>
-            <div class="app-subtitle">لمقاولات البناء والتشييد</div>
+        <div class="splash-percent" id="percentage">0%</div>
+        <div class="splash-progress-wrap">
+            <div class="splash-progress-bar" id="progressFill"></div>
         </div>
+        <div class="splash-loading-text" style="margin-top:10px">جاري تحضير النظام...</div>
 
-        <div class="construction-icons">
-            <div class="icon-item">🏗️</div>
-            <div class="icon-item">🏢</div>
-            <div class="icon-item">🛠️</div>
-            <div class="icon-item">📋</div>
-        </div>
-
-        <div class="loader-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="loading-text">جاري تحميل التطبيق...</div>
-            <div class="loading-percentage" id="percentage">0%</div>
-        </div>
-
-        <div class="building-message">
-            <i>✦</i> معا نبنى المستقبل <i>✦</i>
-        </div>
+        <div class="splash-tagline">✦ <span>معاً نبني المستقبل</span> ✦</div>
     </div>
-    <div class="background-pattern"></div>
 </div>
 
+<!-- ══════════════ HEADER ══════════════ -->
 <header>
-    <h1>الراوي للإدارة</h1>
-    <p>AL-RAWI ADMINISTRATION SYSTEM</p>
+    <div class="header-brand">
+        <div class="header-logo">🔨</div>
+        <div>
+            <div class="header-title">ال<span>راوي</span> الإداري</div>
+            <div class="header-sub">Al-Rawi Pro v3.0</div>
+        </div>
+    </div>
+    <div class="header-date" id="headerDate"></div>
 </header>
 
+<!-- ══════════════ NAV ══════════════ -->
 <nav id="mainNav">
     <button onclick="showPage('dashboard')" id="nav-dashboard">📊 الإحصائيات</button>
-    <button onclick="showPage('workers')" id="nav-workers">👷 العمال</button>
+    <button onclick="showPage('workers')"    id="nav-workers">👷 العمال</button>
     <button onclick="showPage('attendance')" id="nav-attendance">📝 التحضير</button>
-    <button onclick="showPage('loans')" id="nav-loans">💰 السلفيات</button>
-    <button onclick="showPage('archive')" id="nav-archive">📂 الأرشيف</button>
+    <button onclick="showPage('loans')"      id="nav-loans">💰 السلفيات</button>
+    <button onclick="showPage('archive')"    id="nav-archive">📂 الأرشيف</button>
 </nav>
 
+<!-- ══════════════ MAIN ══════════════ -->
 <div class="container">
-    
+
+    <!-- DASHBOARD -->
     <div id="dashboard" class="page active">
         <div class="dashboard-grid">
-            <div class="stat-card"> <small>القوة الإجمالية</small> <div id="sWorkers">0</div> </div>
-            <div class="stat-card" style="border-left: 6px solid #22c55e"> <small>الموجودين بالموقع</small> <div id="sPresent">0</div> </div>
-            <div class="stat-card" style="border-left: 6px solid #ef4444"> <small>إجمالي الغياب</small> <div id="sAbsent">0</div> </div>
-            <div class="stat-card" style="border-left: 6px solid #f59e0b"> <small>مسحوبات السلف</small> <div id="sLoans">0</div> </div>
+            <div class="stat-card">
+                <div class="stat-icon">👷</div>
+                <div class="stat-label">القوة الإجمالية</div>
+                <div class="stat-val" id="sWorkers">0</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-icon">✅</div>
+                <div class="stat-label">الموجودون بالموقع</div>
+                <div class="stat-val" id="sPresent">0</div>
+            </div>
+            <div class="stat-card red">
+                <div class="stat-icon">❌</div>
+                <div class="stat-label">إجمالي الغياب</div>
+                <div class="stat-val" id="sAbsent">0</div>
+            </div>
+            <div class="stat-card blue">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">مسحوبات السلف</div>
+                <div class="stat-val" id="sLoans" style="font-size:24px">0</div>
+            </div>
         </div>
-        <div class="table-container" style="margin-top: 30px; padding: 30px; text-align: center;">
-            <h2 style="margin-top:0">نظام الراوي v3.0</h2>
-            <p style="color: #64748b">تم التنسيق لتجربة مستخدم احترافية. يمكنك البدء بتحضير العمال أو مراجعة السلفيات.</p>
+
+        <div class="welcome-card" style="margin-top:20px">
+            <div>
+                <div class="welcome-title">أهلاً بك في نظام الراوي</div>
+                <div class="welcome-sub">منصة إدارية متكاملة لمقاولات البناء والتشييد.<br>تحضير العمال · إدارة السلف · الأرشفة الشهرية</div>
+            </div>
+            <button class="btn btn-primary" onclick="showPage('attendance')">🚀 ابدأ التحضير</button>
         </div>
     </div>
 
+    <!-- WORKERS -->
     <div id="workers" class="page">
-        <div class="stat-card" style="margin-bottom: 30px; text-align: right;">
-            <h3 style="margin-top:0">➕ إضافة عضو جديد للطاقم</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                <input id="wName" placeholder="الاسم الكامل للعامـل">
-                <input id="wJob" placeholder="التخصص المهني">
-                <input id="wDaily" type="number" placeholder="اليومية بالجنيه">
-            </div>
-            <button class="btn btn-main" onclick="addWorker()">حفظ البيانات في السجل</button>
+        <div class="section-header">
+            <div class="section-title">👷 إدارة الطاقم</div>
         </div>
-        <div class="table-container">
+
+        <div class="form-card">
+            <h3>➕ إضافة عضو جديد</h3>
+            <div class="form-row">
+                <input id="wName"  placeholder="الاسم الكامل للعامل">
+                <input id="wJob"   placeholder="التخصص المهني">
+                <input id="wDaily" type="number" placeholder="اليومية (ج.م)">
+            </div>
+            <button class="btn btn-primary" onclick="addWorker()">💾 حفظ في السجل</button>
+        </div>
+
+        <div class="table-wrap">
             <table id="workersTable"></table>
         </div>
     </div>
 
+    <!-- ATTENDANCE -->
     <div id="attendance" class="page">
-        <div class="stat-card" style="max-width: 600px; margin: 40px auto; padding: 50px;">
-            <small>جاري تحضير</small>
-            <div id="currentWName" style="font-size: 42px; margin: 20px 0;">—</div>
-            <div style="display: flex; gap: 20px;">
-                <button class="btn btn-main btn-block" style="background:#15803d" onclick="record('present')">إثبات حضور ✅</button>
-                <button class="btn btn-main btn-block" style="background:#b91c1c" onclick="record('absent')">تسجيل غياب ❌</button>
+        <div class="attendance-card">
+            <div class="att-label">جاري تحضير</div>
+            <div class="att-name" id="currentWName">—</div>
+            <div class="att-btns">
+                <button class="btn btn-green" onclick="record('present')">✅ حاضر</button>
+                <button class="btn btn-red"   onclick="record('absent')">❌ غائب</button>
             </div>
-            <button class="btn btn-danger" style="margin-top:30px; width:100%" onclick="resetDay()">🗑️ تصفير كشف اليوم بالكامل</button>
+            <div class="att-divider"></div>
+            <button class="btn btn-outline-red btn-full" onclick="resetDay()">🗑️ تصفير كشف اليوم</button>
         </div>
     </div>
 
+    <!-- LOANS -->
     <div id="loans" class="page">
-        <div class="stat-card" style="margin-bottom: 30px; text-align: right;">
-            <h3 style="margin-top:0">💵 تسجيل صرف مالي</h3>
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+        <div class="section-header">
+            <div class="section-title">💰 السلفيات</div>
+        </div>
+
+        <div class="form-card">
+            <h3>💵 تسجيل صرف جديد</h3>
+            <div class="form-row" style="grid-template-columns: 2fr 1fr;">
                 <select id="loanWSelect"></select>
-                <input id="loanAmt" type="number" placeholder="المبلغ">
+                <input id="loanAmt" type="number" placeholder="المبلغ (ج.م)">
             </div>
-            <button class="btn btn-main" onclick="addLoan()">تأكيد عملية الصرف</button>
+            <button class="btn btn-primary" onclick="addLoan()">✔ تأكيد الصرف</button>
         </div>
-        <div class="table-container"><table id="loanTable"></table></div>
+
+        <div class="table-wrap">
+            <table id="loanTable"></table>
+        </div>
     </div>
 
+    <!-- PROFILE -->
     <div id="profile" class="page">
-        <div class="table-container">
+        <div class="profile-card">
             <div class="profile-header">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="display:flex; align-items:center; gap:18px;">
+                    <div class="profile-avatar">👷</div>
                     <div>
-                        <h1 id="pName" style="margin:0; font-size: 36px;"></h1>
-                        <p id="pJob" style="opacity: 0.8; font-size: 18px;"></p>
+                        <div class="profile-name" id="pName"></div>
+                        <div class="profile-job" id="pJob"></div>
+                        <div style="margin-top:8px"><span class="worker-code" id="pCode"></span></div>
                     </div>
-                    <span id="pStatus" class="badge"></span>
                 </div>
+                <span id="pStatus" class="badge"></span>
             </div>
-            <div style="padding: 40px;">
-                <div class="dashboard-grid">
-                    <div class="stat-card"> <small>أيام العمل</small> <div id="pDays">0</div> </div>
-                    <div class="stat-card"> <small>إجمالي المسحوبات</small> <div id="pLoansAmt" style="color:#dc2626">0</div> </div>
-                    <div class="stat-card" style="background:#f8fafc; border-left: 6px solid #15803d"> <small>الرصيد المستحق</small> <div id="pNet" style="color:#15803d">0</div> </div>
+            <div class="profile-body">
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="profile-stat-label">أيام الحضور</div>
+                        <div class="profile-stat-val" id="pDays">0</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-label">المسحوبات</div>
+                        <div class="profile-stat-val" id="pLoansAmt" style="color:var(--red); font-size:18px">0</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-label">الصافي المستحق</div>
+                        <div class="profile-stat-val" id="pNet" style="color:var(--green); font-size:18px">0</div>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 15px; margin-top: 30px;">
-                    <button id="pToggleBtn" class="btn btn-main" style="flex:2" onclick="toggleStatus()"></button>
-                    <button class="btn btn-danger" style="flex:1" onclick="showPage('workers')">خروج</button>
+                <div class="profile-actions">
+                    <button id="pToggleBtn" class="btn btn-lg" onclick="toggleStatus()"></button>
+                    <button class="btn btn-ghost btn-lg" onclick="showPage('workers')">← خروج</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ARCHIVE -->
     <div id="archive" class="page">
-        <div class="stat-card" style="border-left: 6px solid var(--primary); text-align: right; display: flex; justify-content: space-between; align-items: center;">
+        <div class="archive-alert">
             <div>
-                <h3 style="margin:0">ترحيل الشهر الحالي</h3>
-                <p style="color:#64748b; margin:5px 0 0">يؤدي هذا الإجراء إلى تصفير السلف وأيام العمل لبدء دورة جديدة.</p>
+                <h3>📂 ترحيل الشهر الحالي</h3>
+                <p>يؤدي هذا إلى تصفير السلف وأيام العمل وبدء دورة جديدة.</p>
             </div>
-            <button class="btn btn-main" onclick="doArchive()">📂 ترحيل الآن</button>
+            <button class="btn btn-primary" onclick="doArchive()">ترحيل الآن</button>
         </div>
-        <div class="table-container" style="margin-top:20px"><table id="archiveTable"></table></div>
+        <div class="table-wrap">
+            <table id="archiveTable"></table>
+        </div>
     </div>
 
 </div>
 
 <script>
-/* إدارة شاشة التحميل */
-let percentage = 0;
-const percentageElement = document.getElementById('percentage');
-const progressFill = document.getElementById('progressFill');
-const splashOverlay = document.getElementById('splashOverlay');
+/* ══════════════════════════════════════
+   SPLASH
+══════════════════════════════════════ */
+let pct = 0;
+const percentEl   = document.getElementById('percentage');
+const progressBar = document.getElementById('progressFill');
+const splash      = document.getElementById('splashOverlay');
 
-function updatePercentage() {
-    if (percentage < 100) {
-        percentage += Math.floor(Math.random() * 10) + 5;
-        if (percentage > 100) percentage = 100;
-        percentageElement.textContent = percentage + '%';
-        progressFill.style.width = percentage + '%';
-        
-        if (percentage < 100) {
-            setTimeout(updatePercentage, 200);
-        } else {
-            setTimeout(() => {
-                splashOverlay.classList.add('hidden');
-            }, 500);
-        }
+function tickLoader() {
+    if (pct < 100) {
+        pct += Math.floor(Math.random() * 12) + 4;
+        if (pct > 100) pct = 100;
+        percentEl.textContent = pct + '%';
+        progressBar.style.width = pct + '%';
+        if (pct < 100) setTimeout(tickLoader, 180);
+        else setTimeout(() => splash.classList.add('hidden'), 400);
     }
 }
+setTimeout(tickLoader, 800);
 
-// بدء التحميل فوراً
-percentage = 0;
-percentageElement.textContent = '0%';
-progressFill.style.width = '0%';
-setTimeout(updatePercentage, 1000);
+/* ══════════════════════════════════════
+   HEADER DATE
+══════════════════════════════════════ */
+document.getElementById('headerDate').textContent =
+    new Date().toLocaleDateString('ar-EG', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-/* نفس المنطق البرمجي القوي مع تحسين استدعاء البيانات */
+/* ══════════════════════════════════════
+   DATA
+══════════════════════════════════════ */
 let workers = JSON.parse(localStorage.getItem("rawy_v3_workers")) || [
-    {id:1, name:"أحمد محمود علي", job:"معلم بنا", daily:250, active:true},
-    {id:2, name:"إبراهيم حسن سعد", job:"نجار مسلح", daily:300, active:true},
-    {id:3, name:"محمود الصاوي", job:"حداد مسلح", daily:280, active:true},
-    {id:4, name:"سيد جاد الحق", job:"عامل عادي", daily:150, active:true},
-    {id:5, name:"عبدالله الشربيني", job:"كهربائي", daily:350, active:true},
-    {id:6, name:"مصطفى قاسم", job:"سباك", daily:320, active:true},
-    {id:7, name:"ياسر عبد ربه", job:"نقاش", daily:220, active:true},
-    {id:8, name:"كرم جابر", job:"عامل سيراميك", daily:270, active:true},
-    {id:9, name:"شريف الهواري", job:"سائق لودر", daily:400, active:true},
-    {id:10, name:"خالد مرسي", job:"نجار مسلح", daily:300, active:true},
-    {id:11, name:"رمضان صبحي", job:"عامل عادي", daily:150, active:true},
-    {id:12, name:"محمد أبو العلا", job:"فني تكييف", daily:380, active:true},
-    {id:13, name:"علاء حسني", job:"مبيض محارة", daily:240, active:true},
-    {id:14, name:"تامر يحيى", job:"مقاول أنفار", daily:500, active:true},
-    {id:15, name:"حسن شاكوش", job:"فني ألوميتال", daily:290, active:true},
-    {id:16, name:"وائل كفوري", job:"عامل بناء", daily:250, active:true},
-    {id:17, name:"هاني رمزي", job:"سائق نقل", daily:350, active:true},
-    {id:18, name:"منصور الرشيدي", job:"حداد مسلح", daily:280, active:true},
-    {id:19, name:"إيهاب توفيق", job:"فني رخام", daily:330, active:true},
-    {id:20, name:"فتحي سرور", job:"حارس موقع", daily:120, active:true}
+    {id:1,  wCode:"0001", name:"أحمد محمود علي",    job:"معلم بنا",      daily:250, active:true},
+    {id:2,  wCode:"0002", name:"إبراهيم حسن سعد",   job:"نجار مسلح",    daily:300, active:true},
+    {id:3,  wCode:"0003", name:"محمود الصاوي",       job:"حداد مسلح",    daily:280, active:true},
+    {id:4,  wCode:"0004", name:"سيد جاد الحق",       job:"عامل عادي",    daily:150, active:true},
+    {id:5,  wCode:"0005", name:"عبدالله الشربيني",   job:"كهربائي",      daily:350, active:true},
+    {id:6,  wCode:"0006", name:"مصطفى قاسم",         job:"سباك",         daily:320, active:true},
+    {id:7,  wCode:"0007", name:"ياسر عبد ربه",       job:"نقاش",         daily:220, active:true},
+    {id:8,  wCode:"0008", name:"كرم جابر",           job:"عامل سيراميك", daily:270, active:true},
+    {id:9,  wCode:"0009", name:"شريف الهواري",       job:"سائق لودر",    daily:400, active:true},
+    {id:10, wCode:"0010", name:"خالد مرسي",          job:"نجار مسلح",    daily:300, active:true},
+    {id:11, wCode:"0011", name:"رمضان صبحي",         job:"عامل عادي",    daily:150, active:true},
+    {id:12, wCode:"0012", name:"محمد أبو العلا",     job:"فني تكييف",    daily:380, active:true},
+    {id:13, wCode:"0013", name:"علاء حسني",          job:"مبيض محارة",   daily:240, active:true},
+    {id:14, wCode:"0014", name:"تامر يحيى",          job:"مقاول أنفار",  daily:500, active:true},
+    {id:15, wCode:"0015", name:"حسن شاكوش",          job:"فني ألوميتال", daily:290, active:true},
+    {id:16, wCode:"0016", name:"وائل كفوري",         job:"عامل بناء",    daily:250, active:true},
+    {id:17, wCode:"0017", name:"هاني رمزي",          job:"سائق نقل",     daily:350, active:true},
+    {id:18, wCode:"0018", name:"منصور الرشيدي",      job:"حداد مسلح",    daily:280, active:true},
+    {id:19, wCode:"0019", name:"إيهاب توفيق",        job:"فني رخام",     daily:330, active:true},
+    {id:20, wCode:"0020", name:"فتحي سرور",          job:"حارس موقع",    daily:120, active:true}
 ];
-let attendance = JSON.parse(localStorage.getItem("rawy_v3_att")) || [];
-let loans = JSON.parse(localStorage.getItem("rawy_v3_loans")) || [];
-let archive = JSON.parse(localStorage.getItem("rawy_v3_arch")) || [];
+
+/* توليد كود ثابت للعمال القدامى الذين ليس لديهم wCode */
+(function migrateWCodes(){
+    let maxCode = workers.reduce((m,w) => w.wCode ? Math.max(m, parseInt(w.wCode)) : m, 0);
+    let changed = false;
+    workers.forEach(w => {
+        if(!w.wCode){ maxCode++; w.wCode = String(maxCode).padStart(4,'0'); changed = true; }
+    });
+    if(changed) localStorage.setItem("rawy_v3_workers", JSON.stringify(workers));
+})();
+let attendance = JSON.parse(localStorage.getItem("rawy_v3_att"))   || [];
+let loans      = JSON.parse(localStorage.getItem("rawy_v3_loans")) || [];
+let archive    = JSON.parse(localStorage.getItem("rawy_v3_arch"))  || [];
 let selID = null;
 
 function save(){
     localStorage.setItem("rawy_v3_workers", JSON.stringify(workers));
-    localStorage.setItem("rawy_v3_att", JSON.stringify(attendance));
-    localStorage.setItem("rawy_v3_loans", JSON.stringify(loans));
-    localStorage.setItem("rawy_v3_arch", JSON.stringify(archive));
+    localStorage.setItem("rawy_v3_att",     JSON.stringify(attendance));
+    localStorage.setItem("rawy_v3_loans",   JSON.stringify(loans));
+    localStorage.setItem("rawy_v3_arch",    JSON.stringify(archive));
 }
 
+/* ══════════════════════════════════════
+   NAV & RENDER
+══════════════════════════════════════ */
 function showPage(id){
-    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-    document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active-nav"));
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll("nav button").forEach(b => b.classList.remove("active-nav"));
     document.getElementById(id).classList.add("active");
-    if(document.getElementById('nav-'+id)) document.getElementById('nav-'+id).classList.add("active-nav");
+    const nb = document.getElementById('nav-'+id);
+    if(nb) nb.classList.add("active-nav");
     render();
 }
 
 function render(){
     const today = new Date().toLocaleDateString();
-    
-    // إحصائيات
-    document.getElementById("sWorkers").innerText = workers.length;
-    document.getElementById("sPresent").innerText = attendance.filter(a=>a.date===today && a.status==='present').length;
-    document.getElementById("sAbsent").innerText = attendance.filter(a=>a.date===today && a.status==='absent').length;
-    document.getElementById("sLoans").innerText = loans.reduce((s,l)=>s+Number(l.amt),0) + " ج.م";
 
-    // جدول العمال
+    // Stats
+    document.getElementById("sWorkers").textContent = workers.length;
+    document.getElementById("sPresent").textContent = attendance.filter(a=>a.date===today && a.status==='present').length;
+    document.getElementById("sAbsent").textContent  = attendance.filter(a=>a.date===today && a.status==='absent').length;
+    const totalLoans = loans.reduce((s,l)=>s+Number(l.amt),0);
+    document.getElementById("sLoans").textContent   = totalLoans.toLocaleString('ar-EG') + " ج.م";
+
+    // Workers table
     const wt = document.getElementById("workersTable");
-    wt.innerHTML = `<tr><th>العامـل</th><th>المهنة</th><th>اليومية</th><th>الحالة</th></tr>`;
-    workers.forEach(w=>{
-        wt.innerHTML += `<tr class="clickable" onclick="openP(${w.id})">
-            <td style="font-weight:700; color:var(--primary)">${w.name}</td><td>${w.job}</td><td>${w.daily} ج.م</td>
-            <td><span class="badge ${w.active?'badge-active':'badge-inactive'}">${w.active?'نشط':'موقف'}</span></td></tr>`;
+    wt.innerHTML = `<thead><tr><th>الكود</th><th>العامـل</th><th>المهنة</th><th>اليومية</th><th>الحالة</th></tr></thead><tbody></tbody>`;
+    const wb = wt.querySelector('tbody');
+    workers.forEach(w => {
+        const tr = document.createElement('tr');
+        tr.className = 'clickable';
+        tr.onclick = () => openP(w.id);
+        tr.innerHTML = `
+            <td><span class="worker-code">#${w.wCode||'----'}</span></td>
+            <td class="td-name">${w.name}</td>
+            <td>${w.job}</td>
+            <td style="color:var(--accent2);font-weight:700">${w.daily.toLocaleString('ar-EG')} ج.م</td>
+            <td><span class="badge ${w.active?'badge-active':'badge-inactive'}">${w.active?'نشط':'موقوف'}</span></td>`;
+        wb.appendChild(tr);
     });
 
-    // التحضير
-    const pending = workers.filter(w=>w.active && !attendance.some(a=>a.workerId===w.id && a.date===today));
+    // Attendance pending
+    const pending = workers.filter(w => w.active && !attendance.some(a => a.workerId===w.id && a.date===today));
     const cur = document.getElementById("currentWName");
-    if(pending.length > 0){ cur.innerText = pending[0].name; cur.dataset.id = pending[0].id; }
-    else { cur.innerText = "اكتمل التحضير ✅"; cur.dataset.id = ""; }
+    if(pending.length > 0){ cur.textContent = pending[0].name; cur.dataset.id = pending[0].id; }
+    else { cur.textContent = "اكتمل التحضير ✅"; cur.dataset.id = ""; }
 
-    // السلف
+    // Loans table
     const lt = document.getElementById("loanTable");
-    lt.innerHTML = `<tr><th>العامل</th><th>المبلغ</th><th>التاريخ</th></tr>`;
-    loans.forEach(l=>{
+    lt.innerHTML = `<thead><tr><th>العامل</th><th>المبلغ</th><th>التاريخ</th></tr></thead><tbody></tbody>`;
+    const lb = lt.querySelector('tbody');
+    loans.forEach(l => {
         const w = workers.find(x=>x.id===l.workerId);
-        lt.innerHTML += `<tr><td style="font-weight:700">${w?w.name:'--'}</td><td style="color:#dc2626; font-weight:800">${l.amt} ج.م</td><td>${l.date}</td></tr>`;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="td-name">${w?w.name:'—'}</td>
+            <td style="color:var(--red);font-weight:800">${Number(l.amt).toLocaleString('ar-EG')} ج.م</td>
+            <td style="color:var(--text3)">${l.date}</td>`;
+        lb.appendChild(tr);
     });
 
-    // الأرشيف
-    const art = document.getElementById("archiveTable");
-    art.innerHTML = `<tr><th>تاريخ الترحيل</th><th>إجمالي المسحوبات</th></tr>`;
-    archive.forEach(a=>{ art.innerHTML += `<tr><td>${a.date}</td><td style="font-weight:bold">${a.total} ج.م</td></tr>`; });
+    // Archive table
+    const at = document.getElementById("archiveTable");
+    at.innerHTML = `<thead><tr><th>تاريخ الترحيل</th><th>إجمالي المسحوبات</th></tr></thead><tbody></tbody>`;
+    const ab = at.querySelector('tbody');
+    archive.forEach(a => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td style="color:var(--text3)">${a.date}</td><td style="font-weight:800;color:var(--accent2)">${Number(a.total).toLocaleString('ar-EG')} ج.م</td>`;
+        ab.appendChild(tr);
+    });
 
-    // القوائم
-    document.getElementById("loanWSelect").innerHTML = workers.filter(w=>w.active).map(w=>`<option value="${w.id}">${w.name}</option>`).join("");
+    // Loans select
+    document.getElementById("loanWSelect").innerHTML =
+        workers.filter(w=>w.active).map(w=>`<option value="${w.id}">${w.name}</option>`).join("");
+}
+
+/* ══════════════════════════════════════
+   ACTIONS
+══════════════════════════════════════ */
+function nextWCode(){
+    const max = workers.reduce((m,w) => w.wCode ? Math.max(m, parseInt(w.wCode)) : m, 0);
+    return String(max + 1).padStart(4, '0');
 }
 
 function addWorker(){
-    const n = document.getElementById("wName").value;
-    const j = document.getElementById("wJob").value;
+    const n = document.getElementById("wName").value.trim();
+    const j = document.getElementById("wJob").value.trim();
     const d = document.getElementById("wDaily").value;
-    if(!n || !d) return alert("أكمل البيانات");
-    workers.push({id:Date.now(), name:n, job:j, daily:Number(d), active:true});
-    document.getElementById("wName").value = "";
-    document.getElementById("wJob").value = "";
-    document.getElementById("wDaily").value = "";
+    if(!n || !d) return alert("أكمل بيانات العامل");
+    workers.push({id:Date.now(), wCode:nextWCode(), name:n, job:j||'غير محدد', daily:Number(d), active:true});
+    ["wName","wJob","wDaily"].forEach(id => document.getElementById(id).value="");
     save(); render();
 }
 
@@ -645,14 +1019,14 @@ function record(stat){
 }
 
 function resetDay(){
-    if(confirm("هل تريد مسح سجل حضور اليوم للبدء من جديد؟")){
+    if(confirm("هل تريد مسح سجل حضور اليوم بالكامل والبدء من جديد؟")){
         attendance = attendance.filter(a=>a.date !== new Date().toLocaleDateString());
         save(); render();
     }
 }
 
 function addLoan(){
-    const id = Number(document.getElementById("loanWSelect").value);
+    const id  = Number(document.getElementById("loanWSelect").value);
     const amt = Number(document.getElementById("loanAmt").value);
     if(!amt) return;
     loans.push({workerId:id, amt:amt, date:new Date().toLocaleDateString()});
@@ -664,21 +1038,31 @@ function openP(id){
     selID = id;
     const w = workers.find(x=>x.id===id);
     showPage("profile");
-    document.getElementById("pName").innerText = w.name;
-    document.getElementById("pJob").innerText = w.job;
+    document.getElementById("pName").textContent = w.name;
+    document.getElementById("pJob").textContent  = w.job;
+    const codeEl = document.getElementById("pCode");
+    if(codeEl) codeEl.textContent = '#' + (w.wCode||'----');
+
     const days = attendance.filter(a=>a.workerId===id && a.status==='present').length;
-    const lns = loans.filter(l=>l.workerId===id).reduce((s,l)=>s+l.amt,0);
-    document.getElementById("pDays").innerText = days;
-    document.getElementById("pLoansAmt").innerText = lns + " ج.م";
-    document.getElementById("pNet").innerText = (days * w.daily) - lns + " ج.م";
-    
-    const b = document.getElementById("pStatus");
-    b.innerText = w.active ? "عامل نشط" : "عامل موقوف";
-    b.className = "badge " + (w.active?"badge-active":"badge-inactive");
+    const lns  = loans.filter(l=>l.workerId===id).reduce((s,l)=>s+l.amt, 0);
+    const net  = days * w.daily - lns;
+
+    document.getElementById("pDays").textContent     = days;
+    document.getElementById("pLoansAmt").textContent = lns.toLocaleString('ar-EG') + " ج.م";
+    document.getElementById("pNet").textContent      = net.toLocaleString('ar-EG') + " ج.م";
+
+    const badge = document.getElementById("pStatus");
+    badge.textContent = w.active ? "نشط" : "موقوف";
+    badge.className   = "badge " + (w.active ? "badge-active" : "badge-inactive");
 
     const btn = document.getElementById("pToggleBtn");
-    btn.innerText = w.active ? "إيقاف العامل عن العمل 🛑" : "إعادة تفعيل العامل ✅";
-    btn.className = "btn btn-main " + (w.active?"btn-danger":"");
+    if(w.active){
+        btn.textContent = "🛑 إيقاف العامل";
+        btn.className   = "btn btn-red btn-lg";
+    } else {
+        btn.textContent = "✅ إعادة تفعيل";
+        btn.className   = "btn btn-green btn-lg";
+    }
 }
 
 function toggleStatus(){
@@ -688,20 +1072,16 @@ function toggleStatus(){
 }
 
 function doArchive(){
-    if(confirm("سيتم تصفير السلف وأيام العمل وترحيل البيانات للأرشيف. هل أنت متأكد؟")){
-        archive.push({date: new Date().toLocaleDateString(), total: loans.reduce((s,l)=>s+l.amt,0)});
+    if(confirm("سيتم ترحيل البيانات وتصفير السلف وأيام العمل. هل أنت متأكد؟")){
+        archive.push({date:new Date().toLocaleDateString(), total:loans.reduce((s,l)=>s+l.amt,0)});
         attendance = []; loans = [];
-        save(); render();
-        showPage('dashboard');
+        save(); render(); showPage('dashboard');
     }
 }
 
-// منع التفاعل مع الصفحة أثناء ظهور شاشة التحميل
-splashOverlay.addEventListener('click', (e) => {
-    e.stopPropagation();
-});
-
+/* init */
 render();
+showPage('dashboard');
 </script>
 </body>
 </html>
