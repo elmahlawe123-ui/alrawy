@@ -1357,29 +1357,45 @@ function printPayroll(){
     const lns=loans.filter(l=>l.workerId===w.id);
     const totalLoan=lns.reduce((s,l)=>s+l.amt,0);
     const net=earned-totalLoan;
-    return `<div style="border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;margin-bottom:24px;page-break-inside:avoid">
-      <div style="background:#0f172a;color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">
-        <div><div style="font-size:18px;font-weight:900;font-family:Tajawal,sans-serif">${projectName}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">كشف الراتب الشهري</div></div>
-        <div style="text-align:left;font-size:11px;color:#94a3b8">${today}<br><span style="font-family:monospace">#${w.wCode}</span></div>
+    return `<div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;margin-bottom:10px;page-break-inside:avoid;background:#fff">
+      <div style="background:#fff;border-bottom:2px solid #e2e8f0;padding:8px 12px;display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-family:monospace;font-size:10px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;color:#64748b">#${w.wCode}</span>
+          <div>
+            <div style="font-size:13px;font-weight:900;color:#0f172a">${w.name}</div>
+            <div style="font-size:10px;color:#94a3b8">${w.job}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div style="text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:4px 8px">
+            <div style="font-size:9px;color:#16a34a;font-weight:700">حضور</div>
+            <div style="font-size:14px;font-weight:900;color:#15803d">${days}</div>
+          </div>
+          <div style="text-align:center;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:4px 8px">
+            <div style="font-size:9px;color:#dc2626;font-weight:700">غياب</div>
+            <div style="font-size:14px;font-weight:900;color:#b91c1c">${abs}</div>
+          </div>
+          <div style="text-align:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:4px 8px">
+            <div style="font-size:9px;color:#64748b;font-weight:700">الأجر</div>
+            <div style="font-size:12px;font-weight:900;color:#0f172a">${earned.toLocaleString('ar-EG')}</div>
+          </div>
+          <div style="text-align:center;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:4px 8px">
+            <div style="font-size:9px;color:#ea580c;font-weight:700">سلف</div>
+            <div style="font-size:12px;font-weight:900;color:#c2410c">${totalLoan.toLocaleString('ar-EG')}</div>
+          </div>
+          <div style="text-align:center;background:#0f172a;border-radius:6px;padding:4px 10px;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+            <div style="font-size:9px;color:#94a3b8;font-weight:700">الصافي</div>
+            <div style="font-size:13px;font-weight:900;color:#10b981">${net.toLocaleString('ar-EG')}</div>
+          </div>
+        </div>
       </div>
-      <div style="padding:20px 24px">
-        <div style="font-size:20px;font-weight:900;color:#0f172a;margin-bottom:2px">${w.name}</div>
-        <div style="font-size:12px;color:#64748b;margin-bottom:16px">${w.job} · اليومية: ${w.daily.toLocaleString('ar-EG')} ج.م · ${w.active?'نشط':'موقوف'}</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">أيام الحضور</div><div style="font-size:18px;font-weight:900;color:#059669">${days}</div></div>
-          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">أيام الغياب</div><div style="font-size:18px;font-weight:900;color:#dc2626">${abs}</div></div>
-          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">إجمالي الأجر</div><div style="font-size:18px;font-weight:900;color:#0f172a">${earned.toLocaleString('ar-EG')} ج.م</div></div>
-        </div>
-        ${lns.length?`<div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px;padding-top:12px;border-top:1px solid #e2e8f0">💸 السلفيات (${lns.length})</div>${lns.map(l=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px"><span>${l.date}${l.note?' — '+l.note:''}</span><span style="color:#ef4444;font-weight:700">${Number(l.amt).toLocaleString('ar-EG')} ج.م</span></div>`).join('')}`:''}
-        <div style="background:#0f172a;color:#fff;border-radius:10px;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:16px;-webkit-print-color-adjust:exact;print-color-adjust:exact">
-          <span style="font-size:12px;color:#94a3b8">الصافي المستحق</span>
-          <span style="font-size:20px;font-weight:900;color:#10b981">${net.toLocaleString('ar-EG')} ج.م</span>
-        </div>
-        <div style="text-align:center;font-size:10px;color:#94a3b8;padding:12px;border-top:1px solid #e2e8f0;margin-top:12px">${projectName} · ${today}</div>
-      </div></div>`;
+      ${lns.length?`<div style="padding:4px 12px;background:#fafafa;display:flex;flex-wrap:wrap;gap:6px">${lns.map(l=>`<span style="font-size:10px;color:#64748b;background:#f1f5f9;border-radius:4px;padding:2px 6px">${l.date}: ${Number(l.amt).toLocaleString('ar-EG')} ج.م${l.note?' ('+l.note+')':''}</span>`).join('')}</div>`:''}
+    </div>`;
   }).join('');
   const win=window.open('','_blank','width=800,height=600');
-  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف الرواتب</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:20px;direction:rtl;}</style></head><body>'+html+'</body></html>');
+  const header='<div style="background:#0f172a;color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-radius:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div><div style="font-size:15px;font-weight:900">'+projectName+'</div><div style="font-size:10px;color:#94a3b8">كشف الرواتب الشهري</div></div><div style="font-size:10px;color:#94a3b8;text-align:left">'+today+'</div></div>';
+  const footer='<div style="text-align:center;font-size:10px;color:#94a3b8;margin-top:12px;padding-top:8px;border-top:1px solid #e2e8f0">'+projectName+' · '+today+'</div>';
+  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف الرواتب</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:12px;direction:rtl;font-size:12px;}@media print{body{padding:8px;}@page{size:A4;margin:8mm;}}</style></head><body>'+header+html+footer+'</body></html>');
   win.document.close();
   setTimeout(()=>{win.print();},600);
 }
