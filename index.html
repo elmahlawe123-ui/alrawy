@@ -1592,16 +1592,16 @@ function printWorkerCards(){
     const days=attendance.filter(a=>a.workerId===w.id&&a.status==='present').length;
     const lns=loans.filter(l=>l.workerId===w.id).reduce((s,l)=>s+l.amt,0);
     const net=days*w.daily-lns;
-    return '<div style="display:inline-block;width:85mm;border:1px solid #cbd5e1;border-radius:10px;overflow:hidden;margin:4mm;vertical-align:top;page-break-inside:avoid;background:#fff">'
-      +'<div style="background:#0f172a;color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
-      +'<div style="font-size:14px;font-weight:900">'+w.name+'</div>'
+    return '<div style="display:inline-block;width:48%;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;margin:1%;vertical-align:top;page-break-inside:avoid;background:#fff">'
+      +'<div style="background:#0f172a;color:#fff;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
+      +'<div style="font-size:12px;font-weight:900">'+w.name+'</div>'
       +'<span style="font-family:monospace;font-size:10px;background:rgba(255,255,255,.15);border-radius:4px;padding:2px 6px">#'+w.wCode+'</span></div>'
-      +'<div style="padding:10px 14px"><div style="font-size:11px;color:#64748b;margin-bottom:8px">'+w.job+' · '+(w.active?'نشط':'موقوف')+'</div>'
-      +'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:8px">'
-      +'<div style="background:#f8fafc;border-radius:6px;padding:6px 10px;text-align:center"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:2px">اليومية</div><div style="font-size:13px;font-weight:900;color:#c9810a">'+w.daily.toLocaleString('ar-EG')+' ج.م</div></div>'
-      +'<div style="background:#f0fdf4;border-radius:6px;padding:6px 10px;text-align:center"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:2px">الحضور</div><div style="font-size:13px;font-weight:900;color:#059669">'+days+'</div></div>'
-      +'<div style="background:#fef2f2;border-radius:6px;padding:6px 10px;text-align:center"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:2px">السلف</div><div style="font-size:13px;font-weight:900;color:#dc2626">'+lns.toLocaleString('ar-EG')+' ج.م</div></div>'
-      +'<div style="background:#0f172a;border-radius:6px;padding:6px 10px;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:2px">الصافي</div><div style="font-size:13px;font-weight:900;color:#10b981">'+net.toLocaleString('ar-EG')+' ج.م</div></div>'
+      +'<div style="padding:7px 10px"><div style="font-size:10px;color:#64748b;margin-bottom:6px">'+w.job+' · '+(w.active?'نشط':'موقوف')+'</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-bottom:6px">'
+      +'<div style="background:#f8fafc;border-radius:5px;padding:4px 6px;text-align:center"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:1px">اليومية</div><div style="font-size:12px;font-weight:900;color:#c9810a">'+w.daily.toLocaleString('ar-EG')+' ج.م</div></div>'
+      +'<div style="background:#f0fdf4;border-radius:5px;padding:4px 6px;text-align:center"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:1px">الحضور</div><div style="font-size:12px;font-weight:900;color:#059669">'+days+'</div></div>'
+      +'<div style="background:#fef2f2;border-radius:5px;padding:4px 6px;text-align:center"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:1px">السلف</div><div style="font-size:12px;font-weight:900;color:#dc2626">'+lns.toLocaleString('ar-EG')+' ج.م</div></div>'
+      +'<div style="background:#0f172a;border-radius:5px;padding:4px 6px;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:1px">الصافي</div><div style="font-size:12px;font-weight:900;color:#10b981">'+net.toLocaleString('ar-EG')+' ج.م</div></div>'
       +'</div>'+(w.phone?'<div style="font-size:10px;color:#64748b;border-top:1px solid #f1f5f9;padding-top:6px">📞 '+w.phone+'</div>':'')+'</div></div>';
   }).join('');
   const win=window.open('','_blank','width=900,height=700');
