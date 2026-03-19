@@ -1565,6 +1565,50 @@ window.addEventListener('DOMContentLoaded',()=>{
   const lp=document.getElementById('loginPass');
   if(lp)lp.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 });
+
+function printTodayAttendance(){
+  const today=new Date().toLocaleDateString();
+  const todayAR=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const todayAtt=attendance.filter(a=>a.date===today);
+  const presL=todayAtt.filter(a=>a.status==='present').map(a=>workers.find(w=>w.id===a.workerId)).filter(Boolean);
+  const absL=todayAtt.filter(a=>a.status==='absent').map(a=>workers.find(w=>w.id===a.workerId)).filter(Boolean);
+  const pending=workers.filter(w=>w.active&&!todayAtt.some(a=>a.workerId===w.id));
+  const presRows=presL.map((w,i)=>`<tr><td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;text-align:center;color:#64748b;font-size:11px">${i+1}</td><td style="padding:6px 10px;border-bottom:1px solid #f1f5f9"><span style="font-family:monospace;font-size:10px;background:#f1f5f9;border-radius:4px;padding:1px 5px;margin-left:6px">#${w.wCode}</span>${w.name}</td><td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;color:#64748b;font-size:11px">${w.job}</td><td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;text-align:center;color:#059669;font-weight:700">حاضر</td></tr>`).join('');
+  const absRows=absL.map((w,i)=>`<tr style="background:#fef2f2"><td style="padding:6px 10px;border-bottom:1px solid #fee2e2;text-align:center;color:#64748b;font-size:11px">${presL.length+i+1}</td><td style="padding:6px 10px;border-bottom:1px solid #fee2e2"><span style="font-family:monospace;font-size:10px;background:#fee2e2;border-radius:4px;padding:1px 5px;margin-left:6px">#${w.wCode}</span>${w.name}</td><td style="padding:6px 10px;border-bottom:1px solid #fee2e2;color:#64748b;font-size:11px">${w.job}</td><td style="padding:6px 10px;border-bottom:1px solid #fee2e2;text-align:center;color:#dc2626;font-weight:700">غائب</td></tr>`).join('');
+  const html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #0f172a"><div><div style="font-size:16px;font-weight:900;color:#0f172a">'+projectName+'</div><div style="font-size:11px;color:#64748b">كشف الحضور اليومي</div></div><div style="font-size:11px;color:#64748b">'+todayAR+'</div></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;text-align:center"><div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px"><div style="font-size:9px;color:#16a34a;font-weight:700">الحاضرون</div><div style="font-size:20px;font-weight:900;color:#15803d">'+presL.length+'</div></div><div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px"><div style="font-size:9px;color:#dc2626;font-weight:700">الغائبون</div><div style="font-size:20px;font-weight:900;color:#b91c1c">'+absL.length+'</div></div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px"><div style="font-size:9px;color:#64748b;font-weight:700">لم يُحضَّر</div><div style="font-size:20px;font-weight:900;color:#94a3b8">'+pending.length+'</div></div></div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact"><th style="padding:7px 10px;color:#fff;text-align:center;width:40px">#</th><th style="padding:7px 10px;color:#fff;text-align:right">العامل</th><th style="padding:7px 10px;color:#fff;text-align:right">التخصص</th><th style="padding:7px 10px;color:#fff;text-align:center">الحالة</th></tr></thead><tbody>'+presRows+absRows+'</tbody></table>'
+    +(pending.length?'<div style="margin-top:10px;padding:8px 12px;background:#fafafa;border:1px dashed #cbd5e1;border-radius:6px;font-size:11px;color:#94a3b8">لم يُحضَّر: '+pending.map(w=>w.name).join(' · ')+'</div>':'')
+    +'<div style="text-align:center;font-size:10px;color:#94a3b8;margin-top:10px;padding-top:8px;border-top:1px solid #e2e8f0">'+projectName+' · '+todayAR+'</div>';
+  const win=window.open('','_blank','width=800,height=600');
+  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف الحضور</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:12mm;direction:rtl;font-size:12px;}@media print{@page{size:A4;margin:10mm;}}</style></head><body>'+html+'</body></html>');
+  win.document.close();
+  setTimeout(()=>{win.print();},600);
+}
+
+function printWorkerCards(){
+  const today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+  const html=workers.map(w=>{
+    const days=attendance.filter(a=>a.workerId===w.id&&a.status==='present').length;
+    const lns=loans.filter(l=>l.workerId===w.id).reduce((s,l)=>s+l.amt,0);
+    const net=days*w.daily-lns;
+    return '<div style="display:inline-block;width:85mm;border:1px solid #cbd5e1;border-radius:10px;overflow:hidden;margin:4mm;vertical-align:top;page-break-inside:avoid;background:#fff">'
+      +'<div style="background:#0f172a;color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
+      +'<div style="font-size:14px;font-weight:900">'+w.name+'</div>'
+      +'<span style="font-family:monospace;font-size:10px;background:rgba(255,255,255,.15);border-radius:4px;padding:2px 6px">#'+w.wCode+'</span></div>'
+      +'<div style="padding:10px 14px"><div style="font-size:11px;color:#64748b;margin-bottom:8px">'+w.job+' · '+(w.active?'نشط':'موقوف')+'</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:8px">'
+      +'<div style="background:#f8fafc;border-radius:6px;padding:6px 10px;text-align:center"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:2px">اليومية</div><div style="font-size:13px;font-weight:900;color:#c9810a">'+w.daily.toLocaleString('ar-EG')+' ج.م</div></div>'
+      +'<div style="background:#f0fdf4;border-radius:6px;padding:6px 10px;text-align:center"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:2px">الحضور</div><div style="font-size:13px;font-weight:900;color:#059669">'+days+'</div></div>'
+      +'<div style="background:#fef2f2;border-radius:6px;padding:6px 10px;text-align:center"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:2px">السلف</div><div style="font-size:13px;font-weight:900;color:#dc2626">'+lns.toLocaleString('ar-EG')+' ج.م</div></div>'
+      +'<div style="background:#0f172a;border-radius:6px;padding:6px 10px;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div style="font-size:8px;color:#94a3b8;font-weight:700;margin-bottom:2px">الصافي</div><div style="font-size:13px;font-weight:900;color:#10b981">'+net.toLocaleString('ar-EG')+' ج.م</div></div>'
+      +'</div>'+(w.phone?'<div style="font-size:10px;color:#64748b;border-top:1px solid #f1f5f9;padding-top:6px">📞 '+w.phone+'</div>':'')+'</div></div>';
+  }).join('');
+  const win=window.open('','_blank','width=900,height=700');
+  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كروت العمال</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:8mm;direction:rtl;}@media print{@page{size:A4;margin:6mm;}}</style></head><body><div style="text-align:center;margin-bottom:8mm;font-size:13px;font-weight:700;color:#64748b">'+projectName+' · كروت العمال · '+today+'</div>'+html+'</body></html>');
+  win.document.close();
+  setTimeout(()=>{win.print();},600);
+}
 </script>
 <div class="id-card-print" id="idCardPrint"></div>
 </body>
