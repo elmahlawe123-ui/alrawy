@@ -384,6 +384,15 @@ tbody tr.clickable:hover{background:var(--surface2);}
 .data-size-bar{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;margin:8px 0;}
 .data-size-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s ease;}
 
+/* ══ BIOMETRIC ══ */
+.bio-btn{display:flex;flex-direction:column;align-items:center;gap:6px;border:none;background:transparent;cursor:pointer;font-family:inherit;padding:8px 16px;border-radius:12px;transition:all .2s;}
+.bio-btn:hover{background:var(--surface2);}
+.bio-icon{font-size:40px;line-height:1;animation:bioPulse 2s ease-in-out infinite;}
+.bio-label{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1px;}
+@keyframes bioPulse{0%,100%{transform:scale(1);opacity:.7;}50%{transform:scale(1.08);opacity:1;}}
+.bio-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--text3);font-size:12px;}
+.bio-divider::before,.bio-divider::after{content:'';flex:1;height:1px;background:var(--border2);}
+
 /* ══ SCROLLBAR ══ */
 ::-webkit-scrollbar{width:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
@@ -424,6 +433,15 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <input id="loginPass" type="password" placeholder="كلمة المرور" autocomplete="current-password" style="margin-bottom:4px">
     <label class="remember-row"><input type="checkbox" id="rememberMe"> تذكّرني</label>
     <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">دخول ←</button>
+    <div id="bioBtnWrap" style="display:none;margin-top:4px">
+      <div class="bio-divider">أو</div>
+      <div style="display:flex;justify-content:center">
+        <button class="bio-btn" onclick="doBiometric()" title="تسجيل الدخول بالبصمة">
+          <span class="bio-icon">🫆</span>
+          <span class="bio-label">بصمة الإصبع</span>
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -789,6 +807,11 @@ tbody tr.clickable:hover{background:var(--surface2);}
       <div style="font-size:11px;color:var(--text3);margin-top:4px" id="dataSizeBreakdown"></div>
     </div>
   </div>
+  <!-- Biometric -->
+  <div class="settings-section">
+    <div class="settings-section-title">🫆 تسجيل الدخول بالبصمة</div>
+    <div id="bioSettingsWrap"><div style="padding:14px 20px;font-size:13px;color:var(--text3)">جاري التحقق...</div></div>
+  </div>
   <!-- Payroll -->
   <div class="settings-section">
     <div class="settings-section-title">🖨️ كشف الرواتب</div>
@@ -889,6 +912,96 @@ function doLogin(){
   document.getElementById('loginScreen').classList.add('hidden');
   applyPermissions();render();showPage('dashboard');
   toast(`مرحباً ${currentUser.displayName} 👋`,'success');
+}
+
+/* ══ BIOMETRIC ══ */
+const BIO_KEY='rawy_bio_users'; // stores {username} list of users with biometric enabled
+
+function getBioUsers(){return JSON.parse(localStorage.getItem(BIO_KEY)||'[]');}
+function saveBioUsers(arr){localStorage.setItem(BIO_KEY,JSON.stringify(arr));}
+
+async function isBiometricAvailable(){
+  try{
+    return !!(window.PublicKeyCredential&&
+      await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable());
+  }catch{return false;}
+}
+
+async function initBioButton(){
+  const available=await isBiometricAvailable();
+  const bioUsers=getBioUsers();
+  const wrap=document.getElementById('bioBtnWrap');
+  // Show button if biometric available AND at least one user enrolled
+  if(wrap&&available&&bioUsers.length>0){
+    wrap.style.display='block';
+  }
+}
+
+async function doBiometric(){
+  const bioUsers=getBioUsers();
+  if(!bioUsers.length){toast('⚠️ لا يوجد مستخدمون مسجّلون بالبصمة','error');return;}
+  try{
+    // Use WebAuthn assertion to verify
+    const cred=await navigator.credentials.get({
+      publicKey:{
+        challenge:new Uint8Array(32),
+        timeout:60000,
+        userVerification:'required',
+        allowCredentials:[]
+      }
+    });
+    if(cred){
+      // Find the last bio-enrolled user that matches remembered session or first enrolled
+      const rem=JSON.parse(localStorage.getItem('rawy_remembered')||'null');
+      let username=rem?.username||bioUsers[0];
+      const found=appUsers.find(u=>u.username===username&&bioUsers.includes(u.username));
+      if(found){
+        currentUser=found;
+        document.getElementById('loginScreen').classList.add('hidden');
+        applyPermissions();render();showPage('dashboard');
+        toast(`مرحباً ${currentUser.displayName} 👋 (بصمة)`,'success');
+      } else {
+        toast('⚠️ لم يتم التعرف على المستخدم','error');
+      }
+    }
+  }catch(e){
+    if(e.name==='NotAllowedError')toast('⚠️ تم إلغاء التحقق بالبصمة','error');
+    else toast('⚠️ البصمة غير متاحة على هذا الجهاز','error');
+  }
+}
+
+async function enrollBiometric(username){
+  const available=await isBiometricAvailable();
+  if(!available){toast('⚠️ جهازك لا يدعم البصمة','error');return;}
+  try{
+    const enc=new TextEncoder();
+    await navigator.credentials.create({
+      publicKey:{
+        challenge:new Uint8Array(32),
+        rp:{name:'الراوي الإداري',id:location.hostname||'localhost'},
+        user:{id:enc.encode(username),name:username,displayName:username},
+        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+        authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
+        timeout:60000
+      }
+    });
+    const bioUsers=getBioUsers();
+    if(!bioUsers.includes(username)){bioUsers.push(username);saveBioUsers(bioUsers);}
+    toast('✅ تم تسجيل البصمة بنجاح','success');
+    initBioButton();
+    renderSettings();
+  }catch(e){
+    if(e.name==='NotAllowedError')toast('⚠️ تم إلغاء تسجيل البصمة','error');
+    else toast('⚠️ فشل تسجيل البصمة: '+e.message,'error');
+  }
+}
+
+function removeBiometric(username){
+  const bioUsers=getBioUsers().filter(u=>u!==username);
+  saveBioUsers(bioUsers);
+  toast('🗑️ تم إلغاء البصمة','info');
+  initBioButton();
+  renderSettings();
 }
 
 function doLogout(){
@@ -1342,6 +1455,7 @@ function renderSettings(){
   document.getElementById('setMyName').textContent=currentUser.displayName+' (@'+currentUser.username+')';
   document.getElementById('setMyRole').textContent=currentUser.role==='admin'?'مدير — صلاحيات كاملة':'مستخدم عادي';
   renderDataSize();
+  renderBiometricSection();
   const rt=document.getElementById('reminderTime');
   if(rt)rt.value=localStorage.getItem('rawy_reminder_time')||'09:00';
   renderUsersList();
@@ -1601,6 +1715,39 @@ sheet.style.display='block';
 
 
 /* ══ DATA SIZE ══ */
+async function renderBiometricSection(){
+  const wrap=document.getElementById('bioSettingsWrap');
+  if(!wrap)return;
+  const available=await isBiometricAvailable();
+  const bioUsers=getBioUsers();
+  const enrolled=bioUsers.includes(currentUser.username);
+  if(!available){
+    wrap.innerHTML='<div style="padding:14px 20px;font-size:13px;color:var(--text3)">⚠️ جهازك لا يدعم تسجيل الدخول بالبصمة</div>';
+    return;
+  }
+  wrap.innerHTML=`
+    <div style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">🫆 البصمة لحسابك</div>
+        <div style="font-size:12px;color:var(--text3)">${enrolled?'البصمة مفعّلة — يمكنك الدخول بدون كلمة مرور':'البصمة غير مفعّلة'}</div>
+      </div>
+      ${enrolled
+        ?`<button class="btn btn-outline-red btn-sm" onclick="removeBiometric('${currentUser.username}')">🗑️ إلغاء البصمة</button>`
+        :`<button class="btn btn-primary btn-sm" onclick="enrollBiometric('${currentUser.username}')">🫆 تفعيل البصمة</button>`}
+    </div>
+    ${currentUser.role==='admin'&&appUsers.filter(u=>u.username!==currentUser.username).length?`
+    <div style="border-top:1px solid var(--border);padding:12px 20px">
+      <div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">بصمات المستخدمين</div>
+      ${appUsers.filter(u=>u.username!==currentUser.username).map(u=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:13px;color:var(--text)">${u.displayName} <span style="color:var(--text3);font-size:11px">@${u.username}</span></span>
+          ${bioUsers.includes(u.username)
+            ?`<span style="font-size:11px;color:var(--green);font-weight:700">✅ مفعّلة</span>`
+            :`<span style="font-size:11px;color:var(--text3)">غير مفعّلة</span>`}
+        </div>`).join('')}
+    </div>`:''}`;
+}
+
 function renderDataSize(){
   const keys=['rawy_v3_workers','rawy_v3_att','rawy_v3_loans','rawy_v3_arch','rawy_users'];
   const labels={rawy_v3_workers:'العمال',rawy_v3_att:'الحضور',rawy_v3_loans:'السلفيات',rawy_v3_arch:'الأرشيف',rawy_users:'المستخدمون'};
@@ -1641,6 +1788,16 @@ window.addEventListener('DOMContentLoaded',()=>{
       toast(`مرحباً ${currentUser.displayName} 👋`,'success');;return;
     }
   }
+  // Check if current device has any biometric enrolled users
+  (async()=>{
+    const available=await isBiometricAvailable();
+    const bioUsers=getBioUsers();
+    if(available&&bioUsers.length>0){
+      // Auto-trigger biometric prompt
+      setTimeout(()=>doBiometric(),400);
+    }
+    initBioButton();
+  })();
   const lu=document.getElementById('loginUser');
   if(lu){
     lu.focus();
