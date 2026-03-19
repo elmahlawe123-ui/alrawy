@@ -1349,40 +1349,43 @@ function deleteUser(uid){
 
 /* ══ PRINT PAYROLL ══ */
 function printPayroll(){
-  const sheet=document.getElementById('payrollSheet');
   const today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
-  sheet.innerHTML=workers.map(w=>{
+  const html=workers.map(w=>{
     const days=attendance.filter(a=>a.workerId===w.id&&a.status==='present').length;
     const abs=attendance.filter(a=>a.workerId===w.id&&a.status==='absent').length;
     const earned=days*w.daily;
     const lns=loans.filter(l=>l.workerId===w.id);
     const totalLoan=lns.reduce((s,l)=>s+l.amt,0);
     const net=earned-totalLoan;
-    return `<div style="border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;margin-bottom:20px">
-      <div class="pr-header"><div><div class="pr-company">${projectName}</div><div class="pr-sub">كشف الراتب الشهري</div></div><div class="pr-date">${today}<br><span style="font-family:monospace">#${w.wCode}</span></div></div>
-      <div class="pr-body">
-        <div class="pr-worker-name">${w.name}</div>
-        <div class="pr-worker-meta">${w.job} · اليومية: ${w.daily.toLocaleString('ar-EG')} ج.م · ${w.active?'نشط':'موقوف'}</div>
-        <div class="pr-grid">
-          <div class="pr-cell"><div class="pr-cell-label">أيام الحضور</div><div class="pr-cell-val" style="color:#059669">${days}</div></div>
-          <div class="pr-cell"><div class="pr-cell-label">أيام الغياب</div><div class="pr-cell-val" style="color:#dc2626">${abs}</div></div>
-          <div class="pr-cell"><div class="pr-cell-label">إجمالي الأجر</div><div class="pr-cell-val">${earned.toLocaleString('ar-EG')} ج.م</div></div>
+    return `<div style="border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;margin-bottom:24px;page-break-inside:avoid">
+      <div style="background:#0f172a;color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+        <div><div style="font-size:18px;font-weight:900;font-family:Tajawal,sans-serif">${projectName}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">كشف الراتب الشهري</div></div>
+        <div style="text-align:left;font-size:11px;color:#94a3b8">${today}<br><span style="font-family:monospace">#${w.wCode}</span></div>
+      </div>
+      <div style="padding:20px 24px">
+        <div style="font-size:20px;font-weight:900;color:#0f172a;margin-bottom:2px">${w.name}</div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:16px">${w.job} · اليومية: ${w.daily.toLocaleString('ar-EG')} ج.م · ${w.active?'نشط':'موقوف'}</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">أيام الحضور</div><div style="font-size:18px;font-weight:900;color:#059669">${days}</div></div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">أيام الغياب</div><div style="font-size:18px;font-weight:900;color:#dc2626">${abs}</div></div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">إجمالي الأجر</div><div style="font-size:18px;font-weight:900;color:#0f172a">${earned.toLocaleString('ar-EG')} ج.م</div></div>
         </div>
-        ${lns.length?`<div class="pr-loans-title">💸 السلفيات (${lns.length})</div>${lns.map(l=>`<div class="pr-loan-row"><span>${l.date}${l.note?' — '+l.note:''}</span><span style="color:#ef4444;font-weight:700">${Number(l.amt).toLocaleString('ar-EG')} ج.م</span></div>`).join('')}`:''}
-        <div class="pr-net"><div><div class="pr-net-label">الصافي المستحق</div></div><div class="pr-net-val">${net.toLocaleString('ar-EG')} ج.م</div></div>
-        <div class="pr-footer">${projectName} · ${today}</div>
+        ${lns.length?`<div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px;padding-top:12px;border-top:1px solid #e2e8f0">💸 السلفيات (${lns.length})</div>${lns.map(l=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px"><span>${l.date}${l.note?' — '+l.note:''}</span><span style="color:#ef4444;font-weight:700">${Number(l.amt).toLocaleString('ar-EG')} ج.م</span></div>`).join('')}`:''}
+        <div style="background:#0f172a;color:#fff;border-radius:10px;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:16px;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+          <span style="font-size:12px;color:#94a3b8">الصافي المستحق</span>
+          <span style="font-size:20px;font-weight:900;color:#10b981">${net.toLocaleString('ar-EG')} ج.م</span>
+        </div>
+        <div style="text-align:center;font-size:10px;color:#94a3b8;padding:12px;border-top:1px solid #e2e8f0;margin-top:12px">${projectName} · ${today}</div>
       </div></div>`;
   }).join('');
-  document.body.classList.add('printing-payroll');
-  setTimeout(()=>{
-    window.print();
-    document.body.classList.remove('printing-payroll');
-  },300);
+  const win=window.open('','_blank','width=800,height=600');
+  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف الرواتب</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:20px;direction:rtl;}</style></head><body>'+html+'</body></html>');
+  win.document.close();
+  setTimeout(()=>{win.print();},600);
 }
 
 function printWorkerPayslip(){
   const w=workers.find(x=>x.id===selID);if(!w)return;
-  const sheet=document.getElementById('payrollSheet');
   const today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
   const days=attendance.filter(a=>a.workerId===w.id&&a.status==='present').length;
   const abs=attendance.filter(a=>a.workerId===w.id&&a.status==='absent').length;
@@ -1390,28 +1393,33 @@ function printWorkerPayslip(){
   const lns=loans.filter(l=>l.workerId===w.id);
   const totalLoan=lns.reduce((s,l)=>s+l.amt,0);
   const net=earned-totalLoan;
-  sheet.innerHTML=`<div style="border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;max-width:700px;margin:0 auto">
-    <div class="pr-header"><div><div class="pr-company">${projectName}</div><div class="pr-sub">كشف الراتب</div></div><div class="pr-date">${today}<br><span style="font-family:monospace">#${w.wCode}</span></div></div>
-    <div class="pr-body">
-      <div class="pr-worker-name">${w.name}</div>
-      <div class="pr-worker-meta">${w.job} · اليومية: ${w.daily.toLocaleString('ar-EG')} ج.م</div>
-      <div class="pr-grid">
-        <div class="pr-cell"><div class="pr-cell-label">أيام الحضور</div><div class="pr-cell-val" style="color:#059669">${days}</div></div>
-        <div class="pr-cell"><div class="pr-cell-label">أيام الغياب</div><div class="pr-cell-val" style="color:#dc2626">${abs}</div></div>
-        <div class="pr-cell"><div class="pr-cell-label">إجمالي الأجر</div><div class="pr-cell-val">${earned.toLocaleString('ar-EG')} ج.م</div></div>
+  const html=`<div style="border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;max-width:700px;margin:0 auto">
+    <div style="background:#0f172a;color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+      <div><div style="font-size:18px;font-weight:900;font-family:Tajawal,sans-serif">${projectName}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">كشف الراتب</div></div>
+      <div style="text-align:left;font-size:11px;color:#94a3b8">${today}<br><span style="font-family:monospace">#${w.wCode}</span></div>
+    </div>
+    <div style="padding:20px 24px">
+      <div style="font-size:20px;font-weight:900;color:#0f172a;margin-bottom:2px">${w.name}</div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:16px">${w.job} · اليومية: ${w.daily.toLocaleString('ar-EG')} ج.م</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;margin-bottom:5px">أيام الحضور</div><div style="font-size:18px;font-weight:900;color:#059669">${days}</div></div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;margin-bottom:5px">أيام الغياب</div><div style="font-size:18px;font-weight:900;color:#dc2626">${abs}</div></div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;margin-bottom:5px">إجمالي الأجر</div><div style="font-size:18px;font-weight:900;color:#0f172a">${earned.toLocaleString('ar-EG')} ج.م</div></div>
       </div>
-      ${lns.length?`<div class="pr-loans-title">💸 السلفيات (${lns.length})</div>${lns.map(l=>`<div class="pr-loan-row"><span>${l.date}${l.note?' — '+l.note:''}</span><span style="color:#ef4444;font-weight:700">${Number(l.amt).toLocaleString('ar-EG')} ج.م</span></div>`).join('')}`:''}
-      <div class="pr-net"><div><div class="pr-net-label">الصافي المستحق</div></div><div class="pr-net-val">${net.toLocaleString('ar-EG')} ج.م</div></div>
-      <div class="pr-footer">${projectName} · ${today}</div>
+      ${lns.length?`<div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px;padding-top:12px;border-top:1px solid #e2e8f0">💸 السلفيات (${lns.length})</div>${lns.map(l=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px"><span>${l.date}${l.note?' — '+l.note:''}</span><span style="color:#ef4444;font-weight:700">${Number(l.amt).toLocaleString('ar-EG')} ج.م</span></div>`).join('')}`:''}
+      <div style="background:#0f172a;color:#fff;border-radius:10px;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:16px;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+        <span style="font-size:12px;color:#94a3b8">الصافي المستحق</span>
+        <span style="font-size:20px;font-weight:900;color:#10b981">${net.toLocaleString('ar-EG')} ج.م</span>
+      </div>
+      <div style="text-align:center;font-size:10px;color:#94a3b8;padding:12px;border-top:1px solid #e2e8f0;margin-top:12px">${projectName} · ${today}</div>
     </div></div>`;
-  document.body.classList.add('printing-payroll');
-  setTimeout(()=>{
-    window.print();
-    document.body.classList.remove('printing-payroll');
-  },300);
+  const win=window.open('','_blank','width=800,height=600');
+  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف راتب '+w.name+'</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:20px;direction:rtl;}</style></head><body>'+html+'</body></html>');
+  win.document.close();
+  setTimeout(()=>{win.print();},600);
 }
 
-/* ══ BACKUP ══ */
+/* ══ BACKUP  ══ */
 function exportData(){
   const data={workers,attendance,loans,archive,exportedAt:new Date().toLocaleString('ar-EG')};
   const a=document.createElement('a');
