@@ -60,8 +60,6 @@ body{font-family:'IBM Plex Sans Arabic','Tajawal',sans-serif;background:var(--bg
 .login-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:32px;}
 .login-error{background:var(--red-bg);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;display:none;}
 .login-error.show{display:block;}
-.remember-row{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:13px;color:var(--text2);cursor:pointer;}
-.remember-row input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;margin:0;}
 
 /* ══ TOAST ══ */
 #toastContainer{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9000;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;}
@@ -431,7 +429,6 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <div class="login-error" id="loginError">اسم المستخدم أو كلمة المرور غير صحيحة</div>
     <input id="loginUser" placeholder="اسم المستخدم" autocomplete="username" style="margin-bottom:10px">
     <input id="loginPass" type="password" placeholder="كلمة المرور" autocomplete="current-password" style="margin-bottom:4px">
-    <label class="remember-row"><input type="checkbox" id="rememberMe"> تذكّرني</label>
     <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">دخول ←</button>
     <div id="bioBtnWrap" style="display:none;margin-top:4px">
       <div class="bio-divider">أو</div>
@@ -904,11 +901,7 @@ function doLogin(){
   const found=appUsers.find(x=>x.username===u&&x.password===p);
   if(!found){document.getElementById('loginError').classList.add('show');return;}
   currentUser=found;
-  if(document.getElementById('rememberMe').checked){
-    localStorage.setItem('rawy_remembered',JSON.stringify({username:u,password:p}));
-  } else {
-    localStorage.removeItem('rawy_remembered');
-  }
+  localStorage.removeItem('rawy_remembered');
   document.getElementById('loginScreen').classList.add('hidden');
   applyPermissions();render();showPage('dashboard');
   toast(`مرحباً ${currentUser.displayName} 👋`,'success');
@@ -951,9 +944,8 @@ async function doBiometric(){
       }
     });
     if(cred){
-      // Find the last bio-enrolled user that matches remembered session or first enrolled
-      const rem=JSON.parse(localStorage.getItem('rawy_remembered')||'null');
-      let username=rem?.username||bioUsers[0];
+      // Find enrolled user — if multiple, use first enrolled
+      const username=bioUsers[0];
       const found=appUsers.find(u=>u.username===username&&bioUsers.includes(u.username));
       if(found){
         currentUser=found;
@@ -1777,26 +1769,18 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 /* ══ INIT ══ */
 window.addEventListener('DOMContentLoaded',()=>{
-  // Auto-login if remembered
-  const rem=JSON.parse(localStorage.getItem('rawy_remembered')||'null');
-  if(rem){
-    const found=appUsers.find(x=>x.username===rem.username&&x.password===rem.password);
-    if(found){
-      currentUser=found;
-      document.getElementById('loginScreen').classList.add('hidden');
-      applyPermissions();render();showPage('dashboard');
-      toast(`مرحباً ${currentUser.displayName} 👋`,'success');;return;
-    }
-  }
-  // Check if current device has any biometric enrolled users
+  // Clear any old remembered session
+  localStorage.removeItem('rawy_remembered');
+  // Check biometric
   (async()=>{
     const available=await isBiometricAvailable();
     const bioUsers=getBioUsers();
     if(available&&bioUsers.length>0){
-      // Auto-trigger biometric prompt
-      setTimeout(()=>doBiometric(),400);
+      await initBioButton();
+      setTimeout(()=>doBiometric(),300);
+    } else {
+      initBioButton();
     }
-    initBioButton();
   })();
   const lu=document.getElementById('loginUser');
   if(lu){
