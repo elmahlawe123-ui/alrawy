@@ -502,6 +502,16 @@ tbody tr.clickable:hover{background:var(--surface2);}
     </div>
   </div>
 </div>
+<div class="modal-bg hidden" id="confirmModal">
+  <div class="modal">
+    <div class="modal-title" id="confirmModalTitle" style="color:var(--red)"></div>
+    <p id="confirmModalBody" style="color:var(--text2);font-size:13px;line-height:1.8;margin-bottom:16px"></p>
+    <div class="modal-actions">
+      <button class="btn btn-red" onclick="doConfirmModal()">تأكيد</button>
+      <button class="btn btn-ghost" onclick="closeModal('confirmModal')">إلغاء</button>
+    </div>
+  </div>
+</div>
 <div class="modal-bg hidden" id="deleteModal">
   <div class="modal">
     <div class="modal-title" style="color:var(--red)">🗑️ تأكيد الحذف</div>
@@ -727,7 +737,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
     </div>
     <button class="btn btn-ghost btn-sm" onclick="document.getElementById('loanSearchInput').value='';renderLoans()">✕ مسح</button>
   </div>
-  <div id="loanCardsWrap" class="loan-cards-wrap"></div>
+  <div id="loanCardsWrap" class="loan-cards-wrap" style="padding-bottom:20px"></div>
 </div>
 
 <!-- PROFILE -->
@@ -892,8 +902,8 @@ tbody tr.clickable:hover{background:var(--surface2);}
 /* ══ SPLASH ══ */
 let pct=0;
 const percentEl=document.getElementById('percentage'),progressBar=document.getElementById('progressFill'),splash=document.getElementById('splashOverlay');
-function tickLoader(){if(pct<100){pct+=Math.floor(Math.random()*12)+4;if(pct>100)pct=100;percentEl.textContent=pct+'%';progressBar.style.width=pct+'%';if(pct<100)setTimeout(tickLoader,180);else setTimeout(()=>splash.classList.add('hidden'),400);}}
-setTimeout(tickLoader,800);
+function tickLoader(){if(pct<100){pct+=Math.floor(Math.random()*12)+4;if(pct>100)pct=100;if(percentEl)percentEl.textContent=pct+'%';if(progressBar)progressBar.style.width=pct+'%';if(pct<100)setTimeout(tickLoader,180);else setTimeout(()=>{if(splash)splash.classList.add('hidden');},400);}}
+if(splash&&!splash.classList.contains('hidden'))setTimeout(tickLoader,800);
 document.getElementById('headerDate').textContent=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
 /* ══ TOAST ══ */
@@ -948,6 +958,11 @@ function save(){
   localStorage.setItem("rawy_v3_att",JSON.stringify(attendance));
   localStorage.setItem("rawy_v3_loans",JSON.stringify(loans));
   localStorage.setItem("rawy_v3_arch",JSON.stringify(archive));
+  // Auto sync debounce
+  if(typeof SYNC_AUTO_KEY!=='undefined'&&localStorage.getItem(SYNC_AUTO_KEY)==='true'&&typeof getSyncUrl==='function'&&getSyncUrl()){
+    clearTimeout(save._t);
+    save._t=setTimeout(()=>{if(typeof syncPush==='function')syncPush();},2000);
+  }
 }
 
 /* ══ AUTH ══ */
@@ -1045,6 +1060,7 @@ function checkPin(){
     resetSessionTimer();
     document.getElementById('loginScreen').classList.add('hidden');
     applyPermissions();render();showPage('dashboard');
+    pushHistory();
     toast(`مرحباً ${currentUser.displayName} 👋`,'success');
   } else {
     const err=document.getElementById('loginError');
@@ -1462,9 +1478,23 @@ function record(stat){
 }
 
 function resetDay(){
-  if(!confirm("مسح كشف حضور اليوم كاملاً؟"))return;
-  attendance=attendance.filter(a=>a.date!==new Date().toLocaleDateString());
-  save();render();toast('🗑️ تم تصفير كشف اليوم','info');
+  const today=new Date().toLocaleDateString();
+  const count=attendance.filter(a=>a.date===today).length;
+  if(!count){toast('لا يوجد تحضير اليوم','info');return;}
+  showConfirmModal(
+    '🗑️ تصفير كشف اليوم',
+    `سيتم حذف ${count} سجل حضور ليوم اليوم`,
+    ()=>{
+      attendance=attendance.filter(a=>a.date!==today);
+      save();
+      // Targeted re-render without triggering splash
+      const activeW=workers.filter(w=>w.active);
+      renderAttendance(today,activeW);
+      const el=document.getElementById('sAbsent');if(el)el.textContent='0';
+      const el2=document.getElementById('sPresent');if(el2)el2.textContent='0';
+      toast('🗑️ تم تصفير كشف اليوم','info');
+    }
+  );
 }
 
 function addLoan(){
@@ -1553,6 +1583,18 @@ function toggleStatus(){
 
 /* ══ MODALS ══ */
 function closeModal(id){document.getElementById(id).classList.add('hidden');}
+
+let _confirmCb=null;
+function showConfirmModal(title,body,cb){
+  _confirmCb=cb;
+  document.getElementById('confirmModalTitle').textContent=title;
+  document.getElementById('confirmModalBody').textContent=body;
+  document.getElementById('confirmModal').classList.remove('hidden');
+}
+function doConfirmModal(){
+  closeModal('confirmModal');
+  if(_confirmCb){_confirmCb();_confirmCb=null;}
+}
 
 function openEditModal(){
   const w=workers.find(x=>x.id===selID);
@@ -1934,7 +1976,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const dp=document.getElementById('deleteConfirmPwd');
   if(dp)dp.addEventListener('keydown',e=>{if(e.key==='Enter')confirmDelete();});
 });
-["editModal","deleteModal","addUserModal","editUserModal","changePwdModal"].forEach(id=>{
+["confirmModal","editModal","deleteModal","addUserModal","editUserModal","changePwdModal"].forEach(id=>{
   const el=document.getElementById(id);
   if(el)el.addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal(id);});
 });
@@ -2042,15 +2084,7 @@ async function syncPull(){
   }
 }
 
-// Auto sync on save
-const _origSave=save;
-function save(){
-  _origSave();
-  if(localStorage.getItem(SYNC_AUTO_KEY)==='true'&&getSyncUrl()){
-    clearTimeout(save._debounce);
-    save._debounce=setTimeout(()=>syncPush(),2000);
-  }
-}
+// Auto sync handled inside save()
 
 /* ══ SESSION TIMEOUT ══ */
 const SESSION_KEY='rawy_session';
@@ -2120,6 +2154,18 @@ function renderSessionSetting(){
   if(sel)sel.value=String(getSessionTimeout());
 }
 
+/* ══ BACK BUTTON ══ */
+window.addEventListener('popstate',()=>{
+  // Don't handle if any modal is open
+  const anyModal=[...document.querySelectorAll('.modal-bg')].some(m=>!m.classList.contains('hidden'));
+  if(anyModal){pushHistory();return;}
+  if(currentUser)showPage('dashboard');
+  else pushHistory();
+});
+function pushHistory(){
+  try{history.pushState({},'',location.href);}catch(e){}
+}
+
 /* ══ INIT ══ */
 window.addEventListener('DOMContentLoaded',()=>{
   localStorage.removeItem('rawy_remembered');
@@ -2130,7 +2176,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(loadSession()){
     document.getElementById('loginScreen').classList.add('hidden');
     applyPermissions();render();showPage('dashboard');
-    resetSessionTimer();
+    resetSessionTimer();pushHistory();
     toast(`مرحباً ${currentUser.displayName} 👋`,'success');
     return;
   }
