@@ -348,7 +348,6 @@ tbody tr.clickable:hover{background:var(--surface2);}
 
 /* ══ ID CARD PRINT ══ */
 /* ══ PRINT — unified ══ */
-.payroll-print-sheet{display:none;}
 .id-card-print{display:none;}
 
 @media print{
@@ -429,7 +428,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
 </div>
 
 <!-- PAYROLL PRINT SHEET -->
-<div class="payroll-print-sheet" id="payrollSheet"></div>
+<div id="payrollSheet" class="payroll-print-sheet" style="display:none"></div>
 
 <!-- SPLASH -->
 <div class="splash-overlay" id="splashOverlay">
@@ -1374,13 +1373,11 @@ function printPayroll(){
         <div class="pr-footer">${projectName} · ${today}</div>
       </div></div>`;
   }).join('');
-  sheet.style.display='block';
   document.body.classList.add('printing-payroll');
   setTimeout(()=>{
     window.print();
-    sheet.style.display='none';
     document.body.classList.remove('printing-payroll');
-  },200);
+  },300);
 }
 
 function printWorkerPayslip(){
@@ -1407,13 +1404,11 @@ function printWorkerPayslip(){
       <div class="pr-net"><div><div class="pr-net-label">الصافي المستحق</div></div><div class="pr-net-val">${net.toLocaleString('ar-EG')} ج.م</div></div>
       <div class="pr-footer">${projectName} · ${today}</div>
     </div></div>`;
-  sheet.style.display='block';
   document.body.classList.add('printing-payroll');
   setTimeout(()=>{
     window.print();
-    sheet.style.display='none';
     document.body.classList.remove('printing-payroll');
-  },200);
+  },300);
 }
 
 /* ══ BACKUP ══ */
@@ -1490,7 +1485,6 @@ sheet.style.display='block';
   document.body.classList.add('printing-id');
   setTimeout(()=>{
     window.print();
-    sheet.style.display='none';
     document.body.classList.remove('printing-id');
   },200);
 }
