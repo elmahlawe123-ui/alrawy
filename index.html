@@ -391,6 +391,19 @@ tbody tr.clickable:hover{background:var(--surface2);}
 .bio-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--text3);font-size:12px;}
 .bio-divider::before,.bio-divider::after{content:'';flex:1;height:1px;background:var(--border2);}
 
+/* ══ PIN ══ */
+.pin-display{display:flex;justify-content:center;gap:10px;margin:18px 0;}
+.pin-dot{width:16px;height:16px;border-radius:50%;background:var(--border2);border:2px solid var(--border2);transition:all .2s;}
+.pin-dot.filled{background:var(--accent2);border-color:var(--accent2);transform:scale(1.15);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:280px;margin:0 auto;}
+.pin-key{border:none;border-radius:14px;background:var(--surface2);color:var(--text);font-size:22px;font-weight:800;font-family:"Tajawal",sans-serif;padding:16px;cursor:pointer;transition:all .15s;border:1px solid var(--border2);}
+.pin-key:hover{background:var(--bg3);transform:scale(1.05);}
+.pin-key:active{transform:scale(.95);}
+.pin-key.del{font-size:18px;color:var(--text3);}
+.pin-key.empty{visibility:hidden;}
+.pin-error{animation:pinShake .4s ease;}
+@keyframes pinShake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);}}
+
 /* ══ SYNC ══ */
 .sync-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px;}
 .sync-status.ok{background:var(--green-bg);color:var(--green);}
@@ -431,18 +444,20 @@ tbody tr.clickable:hover{background:var(--surface2);}
 
 <!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
-  <div class="login-box">
+  <div class="login-box" style="max-width:340px">
     <div class="login-logo">🔨</div>
     <div class="login-title">ال<span style="background:linear-gradient(135deg,#c9810a,#f0a030);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">راوي</span> الإداري</div>
-    <div class="login-sub">سجّل الدخول للمتابعة</div>
-    <div class="login-error" id="loginError">اسم المستخدم أو كلمة المرور غير صحيحة</div>
-    <input id="loginUser" placeholder="اسم المستخدم" autocomplete="username" style="margin-bottom:10px">
-    <input id="loginPass" type="password" placeholder="كلمة المرور" autocomplete="current-password" style="margin-bottom:4px">
-    <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">دخول ←</button>
-    <div id="bioBtnWrap" style="display:none;margin-top:4px">
+
+    <!-- User selector cards -->
+    <div id="userCards" style="display:flex;flex-direction:column;gap:8px;margin:16px 0 4px"></div>
+
+    <div class="login-error" id="loginError">PIN غير صحيح</div>
+    <div class="pin-display" id="pinDisplay"></div>
+    <div class="pin-pad" id="pinPad"></div>
+    <div id="bioBtnWrap" style="display:none;margin-top:14px">
       <div class="bio-divider">أو</div>
       <div style="display:flex;justify-content:center">
-        <button class="bio-btn" onclick="doBiometric()" title="تسجيل الدخول بالبصمة">
+        <button class="bio-btn" onclick="doBiometric()">
           <span class="bio-icon">🫆</span>
           <span class="bio-label">بصمة الإصبع</span>
         </button>
@@ -549,9 +564,9 @@ tbody tr.clickable:hover{background:var(--surface2);}
 <div class="modal-bg hidden" id="changePwdModal">
   <div class="modal">
     <div class="modal-title">🔑 تغيير كلمة المرور</div>
-    <input id="oldPwd" type="password" placeholder="كلمة المرور الحالية">
-    <input id="newPwd" type="password" placeholder="كلمة المرور الجديدة">
-    <input id="newPwd2" type="password" placeholder="تأكيد كلمة المرور الجديدة">
+    <input id="oldPwd" type="password" placeholder="الـ PIN الحالي" type="text" inputmode="numeric" maxlength="20">
+    <input id="newPwd" type="password" placeholder="الـ PIN الجديد" type="text" inputmode="numeric" maxlength="20">
+    <input id="newPwd2" type="password" placeholder="تأكيد الـ PIN" type="text" inputmode="numeric" maxlength="20">
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="doChangePwd()">🔑 تغيير</button>
       <button class="btn btn-ghost" onclick="closeModal('changePwdModal')">إلغاء</button>
@@ -931,16 +946,105 @@ let appUsers=JSON.parse(localStorage.getItem('rawy_users'))||DEFAULT_USERS;
 let currentUser=null;
 function saveUsers(){localStorage.setItem('rawy_users',JSON.stringify(appUsers));}
 
+/* ══ PIN LOGIN SYSTEM ══ */
+let pinBuffer='';
+let pinTargetUser=null;
+
+function showUserHint(){}  // kept for compatibility
+
+function renderUserCards(){
+  const wrap=document.getElementById('userCards');
+  if(!wrap)return;
+  wrap.innerHTML=appUsers.map(u=>`
+    <div onclick="selectUser('${u.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:${pinTargetUser&&pinTargetUser.id===u.id?'rgba(201,129,10,.15)':'var(--surface2)'};border:1px solid ${pinTargetUser&&pinTargetUser.id===u.id?'rgba(201,129,10,.4)':'var(--border2)'};cursor:pointer;transition:all .2s">
+      <span style="font-size:22px">${u.role==='admin'?'👑':'👤'}</span>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:800;color:var(--text)">${u.displayName}</div>
+        <div style="font-size:11px;font-weight:700;color:${u.role==='admin'?'var(--accent2)':'var(--blue)'}">${u.role==='admin'?'مدير':'مستخدم'}</div>
+      </div>
+      ${pinTargetUser&&pinTargetUser.id===u.id?'<span style="color:var(--accent2);font-size:16px">✓</span>':''}
+    </div>`).join('');
+}
+
+function selectUser(uid){
+  const found=appUsers.find(u=>u.id===uid);
+  if(!found)return;
+  pinTargetUser=found;
+  pinBuffer='';
+  const err=document.getElementById('loginError');
+  if(err)err.classList.remove('show');
+  renderUserCards();
+  buildPinPad();
+  updatePinDisplay();
+}
+
+function goToPin(){
+  if(!pinTargetUser&&appUsers.length)selectUser(appUsers[0].id);
+}
+
+function backToUser(){
+  pinBuffer='';
+  updatePinDisplay();
+}
+
+function buildPinPad(){
+  const pad=document.getElementById('pinPad');
+  if(!pad)return;
+  const keys=['1','2','3','4','5','6','7','8','9','','0','del'];
+  pad.innerHTML=keys.map(k=>{
+    if(k==='')return '<button class="pin-key empty"></button>';
+    if(k==='del')return '<button class="pin-key del" onclick="pinKey(&quot;del&quot;)">⌫</button>';
+    return '<button class="pin-key" onclick="pinKey(&quot;'+k+'&quot;)">'+k+'</button>';
+  }).join('');
+}
+
+function updatePinDisplay(){
+  const disp=document.getElementById('pinDisplay');
+  if(!disp)return;
+  const len=pinTargetUser?pinTargetUser.password.length:4;
+  disp.innerHTML=Array.from({length:len},(_,i)=>`<div class="pin-dot${i<pinBuffer.length?' filled':''}"></div>`).join('');
+}
+
+function pinKey(k){
+  if(!pinTargetUser)return;
+  const maxLen=pinTargetUser.password.length;
+  if(k==='del'){
+    pinBuffer=pinBuffer.slice(0,-1);
+    updatePinDisplay();
+    return;
+  }
+  if(pinBuffer.length>=maxLen)return;
+  pinBuffer+=k;
+  updatePinDisplay();
+  if(pinBuffer.length===maxLen){
+    setTimeout(()=>checkPin(),150);
+  }
+}
+
+function checkPin(){
+  if(!pinTargetUser)return;
+  if(pinBuffer===pinTargetUser.password){
+    currentUser=pinTargetUser;
+    localStorage.removeItem('rawy_remembered');
+    document.getElementById('loginScreen').classList.add('hidden');
+    applyPermissions();render();showPage('dashboard');
+    toast(`مرحباً ${currentUser.displayName} 👋`,'success');
+  } else {
+    const err=document.getElementById('loginError');
+    if(err)err.classList.add('show');
+    const disp=document.getElementById('pinDisplay');
+    if(disp)disp.classList.add('pin-error');
+    setTimeout(()=>{
+      pinBuffer='';
+      updatePinDisplay();
+      if(disp)disp.classList.remove('pin-error');
+    },500);
+  }
+}
+
 function doLogin(){
-  const u=document.getElementById('loginUser').value.trim();
-  const p=document.getElementById('loginPass').value;
-  const found=appUsers.find(x=>x.username===u&&x.password===p);
-  if(!found){document.getElementById('loginError').classList.add('show');return;}
-  currentUser=found;
-  localStorage.removeItem('rawy_remembered');
-  document.getElementById('loginScreen').classList.add('hidden');
-  applyPermissions();render();showPage('dashboard');
-  toast(`مرحباً ${currentUser.displayName} 👋`,'success');
+  // Legacy fallback — now handled by PIN
+  goToPin();
 }
 
 /* ══ BIOMETRIC ══ */
@@ -1941,13 +2045,12 @@ window.addEventListener('DOMContentLoaded',()=>{
       initBioButton();
     }
   })();
-  const lu=document.getElementById('loginUser');
-  if(lu){
-    lu.focus();
-    lu.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus();});
-  }
-  const lp=document.getElementById('loginPass');
-  if(lp)lp.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  // Render user selection cards
+  renderUserCards();
+  buildPinPad();
+  updatePinDisplay();
+  // Auto select first user
+  if(appUsers.length)selectUser(appUsers[0].id);
 });
 
 function filterLoanWorkers(){
