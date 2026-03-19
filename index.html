@@ -745,19 +745,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
     </div>
   </div>
 
-  <!-- Recent Activity + Top Absent -->
-  <div class="dash-section">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div class="chart-panel">
-        <div class="chart-panel-title">🕐 آخر العمليات</div>
-        <div id="dashActivity"></div>
-      </div>
-      <div class="chart-panel">
-        <div class="chart-panel-title" style="color:var(--red)">⚠️ أكثر غياباً هذا الشهر</div>
-        <div id="dashTopAbsent"></div>
-      </div>
-    </div>
-  </div>
+
 
 </div>
 
@@ -1490,23 +1478,6 @@ function render(){
     alertsEl.innerHTML=alerts.join('');
   }
 
-  // Recent activity (last 5 loans)
-  const actEl=document.getElementById('dashActivity');
-  if(actEl){
-    const recent=loans.slice(-5).reverse();
-    actEl.innerHTML=recent.length?recent.map(l=>{
-      const w=workers.find(x=>x.id===l.workerId);
-      return `<div class="activity-item"><div class="activity-icon" style="background:var(--red-bg)">💸</div><div class="activity-text"><b>${w?w.name.split(' ')[0]:'—'}</b> — ${Number(l.amt).toLocaleString('ar-EG')} ج.م${l.note?' · '+l.note:''}</div><div class="activity-time">${l.date}</div></div>`;
-    }).join(''):`<div style="color:var(--text3);font-size:12px;padding:10px 0">لا توجد عمليات</div>`;
-  }
-
-  // Top absent this month
-  const topAbsEl=document.getElementById('dashTopAbsent');
-  if(topAbsEl){
-    const moAbs=workers.map(w=>({w,v:attendance.filter(a=>{const p=a.date.split('/');return p[2]==yr&&p[0].padStart(2,'0')==mo&&a.workerId===w.id&&a.status==='absent';}).length})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
-    const mx=Math.max(...moAbs.map(x=>x.v),1);
-    topAbsEl.innerHTML=moAbs.length?moAbs.map((x,i)=>`<div class="chart-row" onclick="openP(${x.w.id})"><span class="chart-row-rank">${i+1}</span><span class="chart-row-name">${x.w.name.split(' ').slice(0,2).join(' ')}</span><div class="chart-row-bar-wrap"><div class="chart-row-bar" style="width:${Math.max((x.v/mx)*100,4)}%;background:linear-gradient(90deg,#b91c1c,#ef4444)"></div></div><span class="chart-row-val" style="color:var(--red)">${x.v}</span></div>`).join(''):`<div style="color:var(--text3);font-size:12px;padding:10px 0">لا يوجد غياب هذا الشهر ✅</div>`;
-  }
 
   // Charts
   function buildRows(el,data,color,valColor){
