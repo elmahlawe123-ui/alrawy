@@ -691,9 +691,9 @@ tbody tr.clickable:hover{background:var(--surface2);}
           </div>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
         <span id="pStatus" class="badge"></span>
-        <a id="pCallBtn" href="#" style="display:none;align-items:center;gap:6px;background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none">📞 اتصال</a>
+        <a id="pCallBtn" href="#" style="display:none;align-items:center;gap:6px;background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;text-decoration:none">📞 اتصال</a>
       </div>
     </div>
     <div class="profile-body">
@@ -824,7 +824,12 @@ let workers=JSON.parse(localStorage.getItem("rawy_v3_workers"))||[
 ];
 (function migrate(){
   let max=workers.reduce((m,w)=>w.wCode?Math.max(m,parseInt(w.wCode)):m,0),ch=false;
-  workers.forEach(w=>{if(!w.wCode){max++;w.wCode=String(max).padStart(4,'0');ch=true;}if(w.groupId===undefined){w.groupId=null;ch=true;}});
+  workers.forEach(w=>{
+    if(!w.wCode){max++;w.wCode=String(max).padStart(4,'0');ch=true;}
+    if(w.groupId===undefined){w.groupId=null;ch=true;}
+    if(w.phone===undefined){w.phone='';ch=true;}
+    if(w.startDate===undefined){w.startDate='';ch=true;}
+  });
   if(ch)localStorage.setItem("rawy_v3_workers",JSON.stringify(workers));
 })();
 let attendance=JSON.parse(localStorage.getItem("rawy_v3_att"))||[];
