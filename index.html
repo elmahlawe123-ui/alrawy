@@ -644,7 +644,14 @@ tbody tr.clickable:hover{background:var(--surface2);}
   <div class="form-card admin-only">
     <h3>💵 تسجيل صرف جديد</h3>
     <div class="form-row" style="grid-template-columns:2fr 1fr">
-      <select id="loanWSelect" onchange="updateLoanInfo()"></select>
+      <div style="position:relative">
+        <div class="search-wrap" style="margin-bottom:0">
+          <span class="search-icon">🔍</span>
+          <input id="loanWorkerSearch" placeholder="ابحث عن عامل بالاسم أو الكود..." oninput="filterLoanWorkers()" autocomplete="off" style="margin-bottom:0;padding-right:40px">
+        </div>
+        <div id="loanWorkerDropdown" style="display:none;position:absolute;top:100%;right:0;left:0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);z-index:500;max-height:200px;overflow-y:auto;margin-top:4px;box-shadow:var(--shadow-sm)"></div>
+        <input type="hidden" id="loanWSelect">
+      </div>
       <input id="loanAmt" type="number" placeholder="المبلغ (ج.م)" oninput="updateLoanInfo()">
     </div>
     <textarea id="loanNote" placeholder="ملاحظة (اختياري)..." style="margin-bottom:12px"></textarea>
@@ -656,8 +663,11 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <button class="btn btn-primary" onclick="addLoan()">✔ تأكيد الصرف</button>
   </div>
   <div class="loan-filter-bar">
-    <select id="loanFilterWorker" onchange="renderLoans()" style="margin-bottom:0;width:auto"><option value="">كل العمال</option></select>
-    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('loanFilterWorker').value='';renderLoans()">✕ مسح الفلتر</button>
+    <div class="search-wrap" style="flex:1">
+      <span class="search-icon">🔍</span>
+      <input id="loanSearchInput" placeholder="بحث بالاسم أو الكود..." oninput="renderLoans()" style="margin-bottom:0;padding-right:40px">
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('loanSearchInput').value='';renderLoans()">✕ مسح</button>
   </div>
   <div id="loanCardsWrap" class="loan-cards-wrap"></div>
 </div>
@@ -938,7 +948,10 @@ function render(){
 
   renderWorkers();renderAttendance(today,activeW);renderLoans();renderArchive();
   (document.getElementById('loanWSelect')||{}).innerHTML=activeW.map(w=>`<option value="${w.id}">[#${w.wCode}] ${w.name}</option>`).join('');
-  (document.getElementById('loanFilterWorker')||{}).innerHTML='<option value="">كل العمال</option>'+workers.map(w=>`<option value="${w.id}">${w.name}</option>`).join('');
+  // pre-select first active worker in loan form
+  const firstActive=workers.find(w=>w.active);
+  const lws=document.getElementById('loanWSelect');
+  if(lws&&firstActive&&!lws.value){lws.value=firstActive.id;const ls=document.getElementById('loanWorkerSearch');if(ls&&!ls.value)ls.value=firstActive.name+' #'+firstActive.wCode;updateLoanInfo();}
 }
 
 /* ══ WORKERS ══ */
@@ -1002,9 +1015,13 @@ function workerTotalLoan(wid){return loans.filter(l=>l.workerId===wid).reduce((s
 
 function renderLoans(){
   const wrap=document.getElementById("loanCardsWrap");if(!wrap)return;
-  const fw=(document.getElementById('loanFilterWorker')||{}).value||'';
+  const fw=(document.getElementById('loanSearchInput')||{}).value||'';
+  const fwLower=fw.trim().toLowerCase();
   let list=loans.slice().reverse();
-  if(fw)list=list.filter(l=>String(l.workerId)===fw);
+  if(fwLower)list=list.filter(l=>{
+    const w=workers.find(x=>x.id===l.workerId);
+    return w&&(w.name.toLowerCase().includes(fwLower)||w.wCode.includes(fwLower)||w.job.toLowerCase().includes(fwLower));
+  });
   if(!list.length){wrap.innerHTML=`<div style="text-align:center;color:var(--text3);padding:40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)">لا توجد سلفيات</div>`;return;}
   wrap.innerHTML='';
   list.forEach((l,i)=>{
@@ -1140,6 +1157,9 @@ function addLoan(){
   const noteVal=(document.getElementById('loanNote')||{value:''}).value.trim();
   loans.push({workerId:id,amt,date:new Date().toLocaleDateString(),note:noteVal});
   const amtEl2=document.getElementById("loanAmt");if(amtEl2)amtEl2.value="";
+  const lws2=document.getElementById('loanWSelect');if(lws2)lws2.value='';
+  const lwSearch=document.getElementById('loanWorkerSearch');if(lwSearch)lwSearch.value='';
+  const lwDD=document.getElementById('loanWorkerDropdown');if(lwDD)lwDD.style.display='none';
   const noteEl=document.getElementById('loanNote');if(noteEl)noteEl.value='';
   save();renderLoans();updateLoanInfo();
   const totalL2=loans.reduce((s,l)=>s+Number(l.amt),0);
@@ -1564,6 +1584,40 @@ window.addEventListener('DOMContentLoaded',()=>{
   }
   const lp=document.getElementById('loginPass');
   if(lp)lp.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+});
+
+function filterLoanWorkers(){
+  const q=(document.getElementById('loanWorkerSearch')||{value:''}).value.trim().toLowerCase();
+  const dd=document.getElementById('loanWorkerDropdown');
+  const activeW=workers.filter(w=>w.active);
+  const filtered=q?activeW.filter(w=>w.name.toLowerCase().includes(q)||w.wCode.includes(q)||w.job.toLowerCase().includes(q)):activeW;
+  if(!dd)return;
+  if(!q&&!filtered.length){dd.style.display='none';return;}
+  dd.style.display='block';
+  dd.innerHTML=filtered.slice(0,8).map(w=>`
+    <div onclick="selectLoanWorker(${w.id},'${w.name.replace(/'/g,"\'")} #${w.wCode}')"
+      style="padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);transition:background .15s"
+      onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
+      <span style="font-family:monospace;font-size:11px;color:var(--accent2);background:rgba(201,129,10,.1);border:1px solid rgba(201,129,10,.25);border-radius:5px;padding:2px 7px">#${w.wCode}</span>
+      <div><div style="font-size:13px;font-weight:700;color:var(--text)">${w.name}</div><div style="font-size:11px;color:var(--text3)">${w.job}</div></div>
+    </div>`).join('')+(filtered.length>8?`<div style="padding:8px 14px;font-size:11px;color:var(--text3);text-align:center">+${filtered.length-8} عامل آخر...</div>`:'');
+}
+
+function selectLoanWorker(id,label){
+  const hidden=document.getElementById('loanWSelect');
+  const search=document.getElementById('loanWorkerSearch');
+  const dd=document.getElementById('loanWorkerDropdown');
+  if(hidden)hidden.value=id;
+  if(search)search.value=label;
+  if(dd)dd.style.display='none';
+  updateLoanInfo();
+}
+
+// Close dropdown on outside click
+document.addEventListener('click',e=>{
+  const dd=document.getElementById('loanWorkerDropdown');
+  const wrap=document.getElementById('loanWorkerSearch');
+  if(dd&&wrap&&!wrap.contains(e.target)&&!dd.contains(e.target))dd.style.display='none';
 });
 
 function printTodayAttendance(){
