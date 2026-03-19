@@ -437,6 +437,42 @@ tbody tr.clickable:hover{background:var(--surface2);}
   .btn-att-quick{padding:8px 10px;}
   .header-user-role{display:none;}
 }
+/* ══ DASHBOARD V2 ══ */
+.dash-section{margin-top:16px;}
+.dash-section-title{font-size:12px;font-weight:800;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.kpi-card.clickable-kpi{cursor:pointer;}
+.kpi-card.clickable-kpi:hover{border-color:rgba(201,129,10,.3);box-shadow:0 0 0 1px rgba(201,129,10,.15),var(--shadow-sm);}
+.kpi-card.hidden-kpi{display:none;}
+.kpi-card .kpi-sub{font-size:11px;color:var(--text3);margin-top:4px;font-weight:600;}
+.kpi-health{height:4px;border-radius:99px;margin-top:8px;background:var(--surface2);overflow:hidden;}
+.kpi-health-fill{height:100%;border-radius:99px;transition:width .8s ease;}
+.month-countdown{background:linear-gradient(135deg,var(--surface2),var(--surface));border:1px solid var(--border2);border-radius:var(--r);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.month-countdown-val{font-size:32px;font-weight:900;font-family:"Tajawal",sans-serif;color:var(--accent2);line-height:1;}
+.month-countdown-label{font-size:11px;color:var(--text3);font-weight:700;margin-top:2px;}
+.alert-banner{border-radius:var(--r-sm);padding:10px 14px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.alert-banner.warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#f59e0b;}
+.alert-banner.danger{background:var(--red-bg);border:1px solid rgba(239,68,68,.3);color:var(--red);}
+.activity-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.activity-item:last-child{border-bottom:none;}
+.activity-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.activity-text{font-size:12px;color:var(--text2);flex:1;}
+.activity-time{font-size:10px;color:var(--text3);}
+.quick-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px;}
+.quick-btn{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s;font-family:inherit;color:var(--text);}
+.quick-btn:hover{border-color:rgba(201,129,10,.3);background:var(--surface2);}
+.quick-btn-icon{font-size:22px;flex-shrink:0;}
+.quick-btn-label{font-size:13px;font-weight:700;text-align:right;}
+.quick-btn-sub{font-size:10px;color:var(--text3);}
+.kpi-toggle-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.kpi-toggle-chip{font-size:11px;padding:7px 6px;border-radius:9px;border:1px solid var(--border2);background:var(--surface2);color:var(--text3);cursor:pointer;font-weight:600;transition:all .2s;text-align:center;user-select:none;}
+.kpi-toggle-chip.active{background:rgba(201,129,10,.15);border-color:rgba(201,129,10,.35);color:var(--accent2);}
+.kpi-toggle-chip:active{transform:scale(.95);}
+.compact-mode .kpi-row{grid-template-columns:repeat(3,1fr);}
+.compact-mode .kpi-card{padding:12px;}
+.compact-mode .kpi-val{font-size:20px;}
+.compact-mode .kpi-icon{width:34px;height:34px;font-size:16px;}
+
+
 </style>
 </head>
 <body>
@@ -617,25 +653,112 @@ tbody tr.clickable:hover{background:var(--surface2);}
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="page active">
-  <div class="kpi-row">
-    <div class="kpi-card"><div class="kpi-icon" style="background:rgba(201,129,10,.15);color:var(--accent2)">👷</div><div><div class="kpi-label">القوة الإجمالية</div><div class="kpi-val" id="sWorkers">0</div></div></div>
-    <div class="kpi-card"><div class="kpi-icon" style="background:var(--green-bg);color:var(--green)">✅</div><div><div class="kpi-label">حاضرون اليوم</div><div class="kpi-val" id="sPresent" style="color:var(--green)">0</div></div></div>
-    <div class="kpi-card"><div class="kpi-icon" style="background:var(--red-bg);color:var(--red)">❌</div><div><div class="kpi-label">غائبون اليوم</div><div class="kpi-val" id="sAbsent" style="color:var(--red)">0</div></div></div>
-    <div class="kpi-card"><div class="kpi-icon" style="background:var(--blue-bg);color:var(--blue)">💸</div><div><div class="kpi-label">إجمالي السلف</div><div class="kpi-val" id="sLoans" style="color:var(--blue);font-size:18px">0</div></div></div>
-    <div class="kpi-card"><div class="kpi-icon" style="background:rgba(139,92,246,.15);color:#a78bfa">💰</div><div><div class="kpi-label">صافي الرواتب</div><div class="kpi-val" id="sNetSalary" style="color:#a78bfa;font-size:16px">0</div></div></div>
+
+  <!-- Alerts -->
+  <div id="dashAlerts"></div>
+
+  <!-- KPI Toggle + Compact mode -->
+  <div style="margin-bottom:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px">إظهار / إخفاء الكروت</span>
+      <button onclick="toggleCompactMode()" id="compactBtn" class="btn btn-ghost btn-sm">⬜ مضغوط</button>
+    </div>
+    <div class="kpi-toggle-bar" id="kpiToggleBar" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"></div>
   </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-row" id="kpiRow">
+    <div class="kpi-card clickable-kpi" id="kpi-workers" onclick="showPage('workers')">
+      <div class="kpi-icon" style="background:rgba(201,129,10,.15);color:var(--accent2)">👷</div>
+      <div style="flex:1"><div class="kpi-label">القوة الإجمالية</div><div class="kpi-val" id="sWorkers">0</div><div class="kpi-sub" id="sInactive"></div></div>
+    </div>
+    <div class="kpi-card clickable-kpi" id="kpi-present" onclick="showPage('attendance')">
+      <div class="kpi-icon" style="background:var(--green-bg);color:var(--green)">✅</div>
+      <div style="flex:1"><div class="kpi-label">حاضرون اليوم</div><div class="kpi-val" id="sPresent" style="color:var(--green)">0</div>
+      <div class="kpi-health"><div class="kpi-health-fill" id="sAttHealth" style="background:var(--green)"></div></div></div>
+    </div>
+    <div class="kpi-card clickable-kpi" id="kpi-absent" onclick="showPage('attendance')">
+      <div class="kpi-icon" style="background:var(--red-bg);color:var(--red)">❌</div>
+      <div style="flex:1"><div class="kpi-label">غائبون اليوم</div><div class="kpi-val" id="sAbsent" style="color:var(--red)">0</div></div>
+    </div>
+    <div class="kpi-card clickable-kpi" id="kpi-loans" onclick="showPage('loans')">
+      <div class="kpi-icon" style="background:var(--blue-bg);color:var(--blue)">💸</div>
+      <div style="flex:1"><div class="kpi-label">إجمالي السلف</div><div class="kpi-val" id="sLoans" style="color:var(--blue);font-size:18px">0</div><div class="kpi-sub" id="sTopLoan"></div></div>
+    </div>
+    <div class="kpi-card clickable-kpi" id="kpi-salary" onclick="printPayroll()">
+      <div class="kpi-icon" style="background:rgba(139,92,246,.15);color:#a78bfa">💰</div>
+      <div style="flex:1"><div class="kpi-label">صافي الرواتب</div><div class="kpi-val" id="sNetSalary" style="color:#a78bfa;font-size:16px">0</div></div>
+    </div>
+    <div class="kpi-card" id="kpi-attrate">
+      <div class="kpi-icon" style="background:rgba(16,185,129,.1);color:var(--green)">📊</div>
+      <div style="flex:1"><div class="kpi-label">نسبة الحضور الكلية</div><div class="kpi-val" id="sAttRate" style="color:var(--green)">0%</div>
+      <div class="kpi-health"><div class="kpi-health-fill" id="sAttRateBar" style="background:var(--green)"></div></div></div>
+    </div>
+    <div class="kpi-card" id="kpi-avgdaily">
+      <div class="kpi-icon" style="background:rgba(245,158,11,.1);color:#f59e0b">📅</div>
+      <div style="flex:1"><div class="kpi-label">متوسط اليومية</div><div class="kpi-val" id="sAvgDaily" style="color:#f59e0b;font-size:18px">0</div></div>
+    </div>
+    <div class="kpi-card" id="kpi-monthdays">
+      <div class="kpi-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">🗓️</div>
+      <div style="flex:1"><div class="kpi-label">حضور هذا الشهر</div><div class="kpi-val" id="sMonthDays" style="color:var(--blue)">0</div><div class="kpi-sub" id="sMonthRate"></div></div>
+    </div>
+  </div>
+
+  <!-- Print buttons -->
   <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;overflow-x:auto;white-space:nowrap">
     <button class="btn btn-ghost btn-sm" onclick="printTodayAttendance()" style="white-space:nowrap;flex-shrink:0">📋 حضور اليوم</button>
     <button class="btn btn-ghost btn-sm" onclick="printWorkerCards()" style="white-space:nowrap;flex-shrink:0">🪪 كروت العمال</button>
     <button class="btn btn-primary btn-sm" onclick="printPayroll()" style="white-space:nowrap;flex-shrink:0">🖨️ كشف الرواتب</button>
   </div>
-  <div class="charts-grid">
-    <div class="chart-panel"><div class="chart-panel-title" style="color:var(--green)">✅ أعلى 8 حضوراً</div><div id="chartPresent"></div></div>
-    <div class="chart-panel"><div class="chart-panel-title" style="color:var(--red)">❌ أعلى 8 غياباً</div><div id="chartAbsent"></div></div>
+
+  <!-- Month countdown -->
+  <div class="dash-section">
+    <div class="month-countdown">
+      <div>
+        <div class="month-countdown-val" id="monthCountdownDays">—</div>
+        <div class="month-countdown-label">يوم متبقي لنهاية الشهر</div>
+      </div>
+      <div style="text-align:left">
+        <div style="font-size:12px;color:var(--text2);font-weight:700" id="monthCountdownName"></div>
+        <div style="font-size:11px;color:var(--text3)" id="monthCountdownDate"></div>
+      </div>
+    </div>
   </div>
-  <div class="welcome-card">
-    <div><div class="welcome-title" id="welcomeTitle">أهلاً بك في نظام الراوي v5</div><div class="welcome-sub">منصة إدارية متكاملة — تحضير · مجموعات · سلفيات · تقارير · أرشفة</div></div>
+
+  <!-- Quick Actions -->
+  <div class="dash-section">
+    <div class="dash-section-title">⚡ إجراءات سريعة</div>
+    <div class="quick-actions">
+      <button class="quick-btn" onclick="showPage('attendance')"><span class="quick-btn-icon">📝</span><div><div class="quick-btn-label">تسجيل حضور</div><div class="quick-btn-sub" id="qAttPending"></div></div></button>
+      <button class="quick-btn" onclick="showPage('loans')"><span class="quick-btn-icon">💰</span><div><div class="quick-btn-label">صرف سلفة</div><div class="quick-btn-sub">فوري</div></div></button>
+      <button class="quick-btn" onclick="showPage('workers')"><span class="quick-btn-icon">👷</span><div><div class="quick-btn-label">إدارة العمال</div><div class="quick-btn-sub" id="qWorkerCount"></div></div></button>
+      <button class="quick-btn" onclick="printPayroll()"><span class="quick-btn-icon">🖨️</span><div><div class="quick-btn-label">طباعة الرواتب</div><div class="quick-btn-sub">PDF جاهز</div></div></button>
+    </div>
   </div>
+
+  <!-- Charts -->
+  <div class="dash-section">
+    <div class="dash-section-title">📈 الإحصائيات</div>
+    <div class="charts-grid">
+      <div class="chart-panel"><div class="chart-panel-title" style="color:var(--green)">✅ أعلى 8 حضوراً</div><div id="chartPresent"></div></div>
+      <div class="chart-panel"><div class="chart-panel-title" style="color:var(--red)">❌ أعلى 8 غياباً</div><div id="chartAbsent"></div></div>
+    </div>
+  </div>
+
+  <!-- Recent Activity + Top Absent -->
+  <div class="dash-section">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-panel">
+        <div class="chart-panel-title">🕐 آخر العمليات</div>
+        <div id="dashActivity"></div>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-panel-title" style="color:var(--red)">⚠️ أكثر غياباً هذا الشهر</div>
+        <div id="dashTopAbsent"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- WORKERS -->
@@ -1233,22 +1356,157 @@ function showPage(id){
   document.getElementById(id).classList.add("active");
   const nb=document.getElementById('nav-'+id);if(nb)nb.classList.add("active-nav");
   render();
+  if(id==='dashboard')initDashLayout();
   if(id==='settings')renderSettings();
+  window.scrollTo(0,0);
 }
 
 /* ══ RENDER ══ */
+/* ══ KPI VISIBILITY ══ */
+const KPI_VIS_KEY='rawy_kpi_vis';
+const KPI_COMPACT_KEY='rawy_kpi_compact';
+const ALL_KPIS=[
+  {id:'kpi-workers',label:'👷 القوة'},
+  {id:'kpi-present',label:'✅ الحضور'},
+  {id:'kpi-absent',label:'❌ الغياب'},
+  {id:'kpi-loans',label:'💸 السلف'},
+  {id:'kpi-salary',label:'💰 الرواتب'},
+  {id:'kpi-attrate',label:'📊 نسبة الحضور'},
+  {id:'kpi-avgdaily',label:'📅 متوسط اليومية'},
+  {id:'kpi-monthdays',label:'🗓️ هذا الشهر'},
+];
+function getKpiVis(){
+  try{return JSON.parse(localStorage.getItem(KPI_VIS_KEY)||'null')||ALL_KPIS.map(k=>k.id);}catch{return ALL_KPIS.map(k=>k.id);}
+}
+function saveKpiVis(arr){localStorage.setItem(KPI_VIS_KEY,JSON.stringify(arr));}
+function toggleKpi(id){
+  const vis=getKpiVis();
+  const idx=vis.indexOf(id);
+  if(idx>-1)vis.splice(idx,1); else vis.push(id);
+  saveKpiVis(vis);applyKpiVis();renderKpiToggleBar();
+}
+function applyKpiVis(){
+  const vis=getKpiVis();
+  ALL_KPIS.forEach(k=>{
+    const el=document.getElementById(k.id);
+    if(el)el.classList.toggle('hidden-kpi',!vis.includes(k.id));
+  });
+}
+function renderKpiToggleBar(){
+  const bar=document.getElementById('kpiToggleBar');if(!bar)return;
+  const vis=getKpiVis();
+  bar.innerHTML=ALL_KPIS.map(k=>`<span class="kpi-toggle-chip${vis.includes(k.id)?' active':''}" onclick="toggleKpi('${k.id}')" style="text-align:center">${k.label}</span>`).join('');
+}
+function toggleCompactMode(){
+  const row=document.getElementById('kpiRow');
+  const btn=document.getElementById('compactBtn');
+  const isCompact=row&&row.classList.contains('compact-mode');
+  if(row)row.classList.toggle('compact-mode',!isCompact);
+  if(btn)btn.textContent=isCompact?'⬜ مضغوط':'🔳 عادي';
+  localStorage.setItem(KPI_COMPACT_KEY,!isCompact);
+}
+function initDashLayout(){
+  applyKpiVis();renderKpiToggleBar();
+  const isCompact=localStorage.getItem(KPI_COMPACT_KEY)==='true';
+  const row=document.getElementById('kpiRow');
+  const btn=document.getElementById('compactBtn');
+  if(row&&isCompact)row.classList.add('compact-mode');
+  if(btn)btn.textContent=isCompact?'🔳 عادي':'⬜ مضغوط';
+}
+
 function render(){
   if(!currentUser)return;
   const today=new Date().toLocaleDateString();
   const activeW=workers.filter(w=>w.active);
+
+  // Basic KPIs
   (document.getElementById('sWorkers')||{}).textContent=workers.length;
+  const inactiveCount=workers.filter(w=>!w.active).length;
+  const inactiveEl=document.getElementById('sInactive');
+  if(inactiveEl)inactiveEl.textContent=inactiveCount>0?`${inactiveCount} موقوف`:'';
+
   const pres=attendance.filter(a=>a.date===today&&a.status==='present').length;
   (document.getElementById('sPresent')||{}).textContent=pres;
-  (document.getElementById('sAbsent')||{}).textContent=attendance.filter(a=>a.date===today&&a.status==='absent').length;
+  const abs=attendance.filter(a=>a.date===today&&a.status==='absent').length;
+  (document.getElementById('sAbsent')||{}).textContent=abs;
+
+  // Attendance health bar (today)
+  const attPct=activeW.length>0?Math.round((pres/activeW.length)*100):0;
+  const healthBar=document.getElementById('sAttHealth');
+  if(healthBar){healthBar.style.width=attPct+'%';healthBar.style.background=attPct>=80?'var(--green)':attPct>=50?'#f59e0b':'var(--red)';}
+
   const totalL=loans.reduce((s,l)=>s+Number(l.amt),0);
   (document.getElementById('sLoans')||{}).textContent=totalL.toLocaleString('ar-EG')+' ج.م';
+
+  // Top loan worker
+  const topLoanW=workers.map(w=>({w,t:loans.filter(l=>l.workerId===w.id).reduce((s,l)=>s+l.amt,0)})).sort((a,b)=>b.t-a.t)[0];
+  const topLoanEl=document.getElementById('sTopLoan');
+  if(topLoanEl)topLoanEl.textContent=topLoanW&&topLoanW.t>0?`أعلى: ${topLoanW.w.name.split(' ')[0]} (${topLoanW.t.toLocaleString('ar-EG')})` :'';
+
   const totalEarned=workers.reduce((s,w)=>s+attendance.filter(a=>a.workerId===w.id&&a.status==='present').length*w.daily,0);
   (document.getElementById('sNetSalary')||{}).textContent=(totalEarned-totalL).toLocaleString('ar-EG')+' ج.م';
+
+  // Overall attendance rate
+  const totalPoss=workers.reduce((s,w)=>s+attendance.filter(a=>a.workerId===w.id).length,0);
+  const totalPres=attendance.filter(a=>a.status==='present').length;
+  const overallRate=totalPoss>0?Math.round((totalPres/totalPoss)*100):0;
+  (document.getElementById('sAttRate')||{}).textContent=overallRate+'%';
+  const rateBar=document.getElementById('sAttRateBar');
+  if(rateBar){rateBar.style.width=overallRate+'%';rateBar.style.background=overallRate>=80?'var(--green)':overallRate>=60?'#f59e0b':'var(--red)';}
+
+  // Avg daily
+  const avgD=workers.length>0?Math.round(workers.reduce((s,w)=>s+w.daily,0)/workers.length):0;
+  (document.getElementById('sAvgDaily')||{}).textContent=avgD.toLocaleString('ar-EG')+' ج.م';
+
+  // Month attendance
+  const now=new Date();
+  const mo=String(now.getMonth()+1).padStart(2,'0'),yr=now.getFullYear();
+  const moPres=attendance.filter(a=>{const p=a.date.split('/');return p[2]==yr&&p[0].padStart(2,'0')==mo&&a.status==='present';}).length;
+  const moTotal=attendance.filter(a=>{const p=a.date.split('/');return p[2]==yr&&p[0].padStart(2,'0')==mo;}).length;
+  (document.getElementById('sMonthDays')||{}).textContent=moPres;
+  const moRateEl=document.getElementById('sMonthRate');
+  if(moRateEl)moRateEl.textContent=moTotal>0?Math.round((moPres/moTotal)*100)+'% حضور هذا الشهر':'';
+
+  // Month countdown
+  const lastDay=new Date(now.getFullYear(),now.getMonth()+1,0);
+  const daysLeft=Math.ceil((lastDay-now)/(1000*60*60*24));
+  (document.getElementById('monthCountdownDays')||{}).textContent=daysLeft;
+  const MONTHS_AR_MINI=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  (document.getElementById('monthCountdownName')||{}).textContent=MONTHS_AR_MINI[now.getMonth()]+' '+now.getFullYear();
+  (document.getElementById('monthCountdownDate')||{}).textContent='ينتهي '+lastDay.toLocaleDateString('ar-EG');
+
+  // Quick actions
+  const pending=activeW.filter(w=>!attendance.some(a=>a.workerId===w.id&&a.date===today)).length;
+  (document.getElementById('qAttPending')||{}).textContent=pending>0?`${pending} لم يُحضَّر`:'مكتمل ✅';
+  (document.getElementById('qWorkerCount')||{}).textContent=`${activeW.length} عامل نشط`;
+
+  // Alerts
+  const alertsEl=document.getElementById('dashAlerts');
+  if(alertsEl){
+    const alerts=[];
+    if(pending>0)alerts.push(`<div class="alert-banner warn">⚠️ ${pending} عامل لم يُحضَّر اليوم</div>`);
+    const overLoanW=workers.filter(w=>{const t=loans.filter(l=>l.workerId===w.id).reduce((s,l)=>s+l.amt,0);const net=attendance.filter(a=>a.workerId===w.id&&a.status==='present').length*w.daily;return t>net&&net>0;});
+    if(overLoanW.length)alerts.push(`<div class="alert-banner danger">🚨 ${overLoanW.length} عامل تجاوزت سلفتهم الراتب</div>`);
+    alertsEl.innerHTML=alerts.join('');
+  }
+
+  // Recent activity (last 5 loans)
+  const actEl=document.getElementById('dashActivity');
+  if(actEl){
+    const recent=loans.slice(-5).reverse();
+    actEl.innerHTML=recent.length?recent.map(l=>{
+      const w=workers.find(x=>x.id===l.workerId);
+      return `<div class="activity-item"><div class="activity-icon" style="background:var(--red-bg)">💸</div><div class="activity-text"><b>${w?w.name.split(' ')[0]:'—'}</b> — ${Number(l.amt).toLocaleString('ar-EG')} ج.م${l.note?' · '+l.note:''}</div><div class="activity-time">${l.date}</div></div>`;
+    }).join(''):`<div style="color:var(--text3);font-size:12px;padding:10px 0">لا توجد عمليات</div>`;
+  }
+
+  // Top absent this month
+  const topAbsEl=document.getElementById('dashTopAbsent');
+  if(topAbsEl){
+    const moAbs=workers.map(w=>({w,v:attendance.filter(a=>{const p=a.date.split('/');return p[2]==yr&&p[0].padStart(2,'0')==mo&&a.workerId===w.id&&a.status==='absent';}).length})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
+    const mx=Math.max(...moAbs.map(x=>x.v),1);
+    topAbsEl.innerHTML=moAbs.length?moAbs.map((x,i)=>`<div class="chart-row" onclick="openP(${x.w.id})"><span class="chart-row-rank">${i+1}</span><span class="chart-row-name">${x.w.name.split(' ').slice(0,2).join(' ')}</span><div class="chart-row-bar-wrap"><div class="chart-row-bar" style="width:${Math.max((x.v/mx)*100,4)}%;background:linear-gradient(90deg,#b91c1c,#ef4444)"></div></div><span class="chart-row-val" style="color:var(--red)">${x.v}</span></div>`).join(''):`<div style="color:var(--text3);font-size:12px;padding:10px 0">لا يوجد غياب هذا الشهر ✅</div>`;
+  }
 
   // Charts
   function buildRows(el,data,color,valColor){
@@ -2154,7 +2412,7 @@ function renderSessionSetting(){
   if(sel)sel.value=String(getSessionTimeout());
 }
 
-/* ══ BACK BUTTON ══ */
+
 window.addEventListener('popstate',()=>{
   // Don't handle if any modal is open
   const anyModal=[...document.querySelectorAll('.modal-bg')].some(m=>!m.classList.contains('hidden'));
@@ -2175,7 +2433,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Try restore session
   if(loadSession()){
     document.getElementById('loginScreen').classList.add('hidden');
-    applyPermissions();render();showPage('dashboard');
+    applyPermissions();render();showPage('dashboard');initDashLayout();
     resetSessionTimer();pushHistory();
     toast(`مرحباً ${currentUser.displayName} 👋`,'success');
     return;
