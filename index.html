@@ -803,9 +803,23 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <div class="settings-row">
       <div><div class="settings-row-label" id="setMyName">—</div><div class="settings-row-sub" id="setMyRole">—</div></div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-ghost btn-sm" onclick="openChangePwd()">🔑 تغيير كلمة المرور</button>
+        <button class="btn btn-ghost btn-sm" onclick="openChangePwd()">🔑 تغيير الـ PIN</button>
         <button class="btn btn-outline-red btn-sm" onclick="doLogout()">🚪 خروج</button>
       </div>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">⏱️ ابقاء التطبيق مفتوح</div>
+        <div class="settings-row-sub">مدة الجلسة من كل مرة تفتح التطبيق</div>
+      </div>
+      <select id="sessionTimeoutSelect" onchange="saveSessionTimeout()" style="margin-bottom:0;width:auto;min-width:130px">
+        <option value="0">دائماً مفتوح</option>
+        <option value="15">15 دقيقة</option>
+        <option value="30">نص ساعة</option>
+        <option value="60">ساعة</option>
+        <option value="240">4 ساعات</option>
+        <option value="480">8 ساعات</option>
+      </select>
     </div>
   </div>
   <!-- Users — admin -->
@@ -1026,6 +1040,8 @@ function checkPin(){
   if(pinBuffer===pinTargetUser.password){
     currentUser=pinTargetUser;
     localStorage.removeItem('rawy_remembered');
+    saveSession();
+    resetSessionTimer();
     document.getElementById('loginScreen').classList.add('hidden');
     applyPermissions();render();showPage('dashboard');
     toast(`مرحباً ${currentUser.displayName} 👋`,'success');
@@ -1090,6 +1106,8 @@ async function doBiometric(){
       const found=appUsers.find(u=>u.username===username&&bioUsers.includes(u.username));
       if(found){
         currentUser=found;
+        saveSession();
+        resetSessionTimer();
         document.getElementById('loginScreen').classList.add('hidden');
         applyPermissions();render();showPage('dashboard');
         toast(`مرحباً ${currentUser.displayName} 👋 (بصمة)`,'success');
@@ -1146,6 +1164,8 @@ function removeBiometric(username){
 }
 
 function doLogout(){
+  clearSession();
+  if(sessionTimer)clearTimeout(sessionTimer);
   currentUser=null;
   const lu2=document.getElementById('loginUser');if(lu2)lu2.value='';
   const lp2=document.getElementById('loginPass');if(lp2)lp2.value='';
@@ -1598,6 +1618,7 @@ function renderSettings(){
   renderDataSize();
   renderBiometricSection();
   renderSyncSettings();
+  renderSessionSetting();
   const rt=document.getElementById('reminderTime');
   if(rt)rt.value=localStorage.getItem('rawy_reminder_time')||'09:00';
   renderUsersList();
@@ -2030,10 +2051,88 @@ function save(){
   }
 }
 
+/* ══ SESSION TIMEOUT ══ */
+const SESSION_KEY='rawy_session';
+const SESSION_TIMEOUT_KEY='rawy_session_timeout';
+let sessionTimer=null;
+
+function getSessionTimeout(){return parseInt(localStorage.getItem(SESSION_TIMEOUT_KEY)||'15');}
+
+function saveSessionTimeout(){
+  const sel=document.getElementById('sessionTimeoutSelect');
+  const val=sel?sel.value:'0';
+  localStorage.setItem(SESSION_TIMEOUT_KEY,val);
+  resetSessionTimer();
+  toast(val==='0'?'✅ التطبيق سيبقى مفتوحاً دائماً':'✅ تم حفظ مدة الجلسة','success');
+}
+
+function saveSession(){
+  if(!currentUser)return;
+  localStorage.setItem(SESSION_KEY,JSON.stringify({
+    userId:currentUser.id,
+    loginTime:Date.now()
+  }));
+}
+
+function loadSession(){
+  const raw=localStorage.getItem(SESSION_KEY);
+  if(!raw){localStorage.removeItem(SESSION_KEY);return false;}
+  try{
+    const s=JSON.parse(raw);
+    // Must have loginTime (new format)
+    if(!s.loginTime||!s.userId){localStorage.removeItem(SESSION_KEY);return false;}
+    const timeout=getSessionTimeout();
+    // timeout=0 means always open — no expiry
+    if(timeout>0&&Date.now()-s.loginTime>timeout*60*1000){
+      localStorage.removeItem(SESSION_KEY);
+      return false;
+    }
+    const found=appUsers.find(u=>u.id===s.userId);
+    if(!found){localStorage.removeItem(SESSION_KEY);return false;}
+    currentUser=found;
+    return true;
+  }catch{localStorage.removeItem(SESSION_KEY);return false;}
+}
+
+function clearSession(){
+  localStorage.removeItem(SESSION_KEY);
+}
+
+function resetSessionTimer(){
+  if(sessionTimer)clearTimeout(sessionTimer);
+  const timeout=getSessionTimeout();
+  if(timeout===0||!currentUser)return;
+  const raw=localStorage.getItem(SESSION_KEY);
+  let remaining=timeout*60*1000;
+  if(raw){
+    try{const s=JSON.parse(raw);remaining=timeout*60*1000-(Date.now()-s.loginTime);}catch{}
+  }
+  if(remaining<=0){doLogout();return;}
+  sessionTimer=setTimeout(()=>{
+    toast('⏱️ انتهت مدة الجلسة — أعد الدخول','info');
+    doLogout();
+  },remaining);
+}
+
+function renderSessionSetting(){
+  const sel=document.getElementById('sessionTimeoutSelect');
+  if(sel)sel.value=String(getSessionTimeout());
+}
+
 /* ══ INIT ══ */
 window.addEventListener('DOMContentLoaded',()=>{
-  // Clear any old remembered session
   localStorage.removeItem('rawy_remembered');
+  // Clear old session format (without loginTime)
+  const _rawS=localStorage.getItem('rawy_session');
+  if(_rawS){try{const _s=JSON.parse(_rawS);if(!_s.loginTime)localStorage.removeItem('rawy_session');}catch{localStorage.removeItem('rawy_session');}}
+  // Try restore session
+  if(loadSession()){
+    document.getElementById('loginScreen').classList.add('hidden');
+    applyPermissions();render();showPage('dashboard');
+    resetSessionTimer();
+    toast(`مرحباً ${currentUser.displayName} 👋`,'success');
+    return;
+  }
   // Check biometric
   (async()=>{
     const available=await isBiometricAvailable();
