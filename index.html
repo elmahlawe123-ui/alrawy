@@ -570,6 +570,11 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <div class="kpi-card"><div class="kpi-icon" style="background:var(--blue-bg);color:var(--blue)">💸</div><div><div class="kpi-label">إجمالي السلف</div><div class="kpi-val" id="sLoans" style="color:var(--blue);font-size:18px">0</div></div></div>
     <div class="kpi-card"><div class="kpi-icon" style="background:rgba(139,92,246,.15);color:#a78bfa">💰</div><div><div class="kpi-label">صافي الرواتب</div><div class="kpi-val" id="sNetSalary" style="color:#a78bfa;font-size:16px">0</div></div></div>
   </div>
+  <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;overflow-x:auto;white-space:nowrap">
+    <button class="btn btn-ghost btn-sm" onclick="printTodayAttendance()" style="white-space:nowrap;flex-shrink:0">📋 حضور اليوم</button>
+    <button class="btn btn-ghost btn-sm" onclick="printWorkerCards()" style="white-space:nowrap;flex-shrink:0">🪪 كروت العمال</button>
+    <button class="btn btn-primary btn-sm" onclick="printPayroll()" style="white-space:nowrap;flex-shrink:0">🖨️ كشف الرواتب</button>
+  </div>
   <div class="charts-grid">
     <div class="chart-panel"><div class="chart-panel-title" style="color:var(--green)">✅ أعلى 8 حضوراً</div><div id="chartPresent"></div></div>
     <div class="chart-panel"><div class="chart-panel-title" style="color:var(--red)">❌ أعلى 8 غياباً</div><div id="chartAbsent"></div></div>
