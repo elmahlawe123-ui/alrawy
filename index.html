@@ -934,17 +934,18 @@ async function doBiometric(){
   const bioUsers=getBioUsers();
   if(!bioUsers.length){toast('⚠️ لا يوجد مستخدمون مسجّلون بالبصمة','error');return;}
   try{
-    // Use WebAuthn assertion to verify
+    // Use platform authenticator only (fingerprint/face) — exclude password managers
     const cred=await navigator.credentials.get({
       publicKey:{
-        challenge:new Uint8Array(32),
+        challenge:crypto.getRandomValues(new Uint8Array(32)),
         timeout:60000,
         userVerification:'required',
-        allowCredentials:[]
-      }
+        allowCredentials:[],
+        rpId:location.hostname||'localhost'
+      },
+      mediation:'optional'
     });
     if(cred){
-      // Find enrolled user — if multiple, use first enrolled
       const username=bioUsers[0];
       const found=appUsers.find(u=>u.username===username&&bioUsers.includes(u.username));
       if(found){
@@ -957,8 +958,11 @@ async function doBiometric(){
       }
     }
   }catch(e){
-    if(e.name==='NotAllowedError')toast('⚠️ تم إلغاء التحقق بالبصمة','error');
-    else toast('⚠️ البصمة غير متاحة على هذا الجهاز','error');
+    if(e.name==='NotAllowedError'||e.name==='AbortError'){
+      // User dismissed — stay on login screen silently
+    } else {
+      toast('⚠️ تعذّر فتح البصمة: '+e.message,'error');
+    }
   }
 }
 
@@ -969,12 +973,17 @@ async function enrollBiometric(username){
     const enc=new TextEncoder();
     await navigator.credentials.create({
       publicKey:{
-        challenge:new Uint8Array(32),
+        challenge:crypto.getRandomValues(new Uint8Array(32)),
         rp:{name:'الراوي الإداري',id:location.hostname||'localhost'},
         user:{id:enc.encode(username),name:username,displayName:username},
         pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
-        authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
-        timeout:60000
+        authenticatorSelection:{
+          authenticatorAttachment:'platform',
+          userVerification:'required',
+          residentKey:'preferred'
+        },
+        timeout:60000,
+        excludeCredentials:[]
       }
     });
     const bioUsers=getBioUsers();
