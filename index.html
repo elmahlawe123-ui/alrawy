@@ -317,14 +317,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
 .perm-item.disabled{opacity:.4;pointer-events:none;}
 
 /* ══ PAYROLL PRINT ══ */
-@media print{
-  .login-screen,.splash-overlay,nav,header,#toastContainer,.modal-bg,.no-print{display:none!important;}
-  body{background:#fff!important;color:#000!important;}
-  .page{display:block!important;}
-  .page:not(.active){display:none!important;}
-  .payroll-print-sheet{display:block!important;}
-  .payroll-print-sheet>div{page-break-inside:avoid;break-inside:avoid;margin-bottom:20px;}
-}
+
 .payroll-print-sheet{display:none;}
 .pr-header{background:#0f172a;color:#fff;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 .pr-company{font-family:'Tajawal',sans-serif;font-size:20px;font-weight:900;}
@@ -354,11 +347,28 @@ tbody tr.clickable:hover{background:var(--surface2);}
 .att-edit-menu button:hover{background:var(--bg3);color:var(--text);}
 
 /* ══ ID CARD PRINT ══ */
+/* ══ PRINT — unified ══ */
+.payroll-print-sheet{display:none;}
 .id-card-print{display:none;}
+
 @media print{
-  .id-card-print{display:block!important;}
-  body>*:not(.id-card-print){display:none!important;}
-  .id-card-print{page-break-after:avoid;}
+  /* hide UI */
+  .login-screen,.splash-overlay,nav,header,
+  #toastContainer,.modal-bg,.no-print{display:none!important;}
+
+  /* payroll sheet mode */
+  body.printing-payroll>*:not(.payroll-print-sheet){display:none!important;}
+  body.printing-payroll .payroll-print-sheet{display:block!important;}
+  .payroll-print-sheet>div{page-break-inside:avoid;break-inside:avoid;margin-bottom:20px;}
+
+  /* id card mode */
+  body.printing-id>*:not(.id-card-print){display:none!important;}
+  body.printing-id .id-card-print{display:block!important;}
+
+  /* normal print (attendance sheet) */
+  body:not(.printing-payroll):not(.printing-id) .page{display:block!important;}
+  body:not(.printing-payroll):not(.printing-id) .page:not(.active){display:none!important;}
+  body{background:#fff!important;color:#000!important;}
 }
 .id-card{width:85mm;background:linear-gradient(135deg,#0d1a2e,#1a2540);border-radius:14px;padding:20px;color:#fff;font-family:"Tajawal",sans-serif;position:relative;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 .id-card::before{content:'';position:absolute;top:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(201,129,10,.15);}
@@ -1365,7 +1375,12 @@ function printPayroll(){
       </div></div>`;
   }).join('');
   sheet.style.display='block';
-  setTimeout(()=>{window.print();sheet.style.display='none';},200);
+  document.body.classList.add('printing-payroll');
+  setTimeout(()=>{
+    window.print();
+    sheet.style.display='none';
+    document.body.classList.remove('printing-payroll');
+  },200);
 }
 
 function printWorkerPayslip(){
@@ -1393,7 +1408,12 @@ function printWorkerPayslip(){
       <div class="pr-footer">${projectName} · ${today}</div>
     </div></div>`;
   sheet.style.display='block';
-  setTimeout(()=>{window.print();sheet.style.display='none';},200);
+  document.body.classList.add('printing-payroll');
+  setTimeout(()=>{
+    window.print();
+    sheet.style.display='none';
+    document.body.classList.remove('printing-payroll');
+  },200);
 }
 
 /* ══ BACKUP ══ */
@@ -1466,8 +1486,16 @@ function printIDCard(){
         <div style="margin-top:12px;font-size:9px;color:rgba(255,255,255,.3);border-top:1px solid rgba(255,255,255,.1);padding-top:8px">صدر بتاريخ: ${today}</div>
       </div>
     </div>`;
-  window.print();
+sheet.style.display='block';
+  document.body.classList.add('printing-id');
+  setTimeout(()=>{
+    window.print();
+    sheet.style.display='none';
+    document.body.classList.remove('printing-id');
+  },200);
 }
+
+
 
 /* ══ DATA SIZE ══ */
 function renderDataSize(){
