@@ -454,7 +454,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <div class="login-error" id="loginError">PIN غير صحيح</div>
     <div class="pin-display" id="pinDisplay"></div>
     <div class="pin-pad" id="pinPad"></div>
-    <div id="bioBtnWrap" style="display:none;margin-top:14px">
+    <div id="bioBtnWrap" style="display:none!important;margin-top:14px">
       <div class="bio-divider">أو</div>
       <div style="display:flex;justify-content:center">
         <button class="bio-btn" onclick="doBiometric()">
@@ -842,11 +842,12 @@ tbody tr.clickable:hover{background:var(--surface2);}
       <div style="font-size:11px;color:var(--text3);margin-top:4px" id="dataSizeBreakdown"></div>
     </div>
   </div>
-  <!-- Biometric -->
-  <div class="settings-section">
+  <!-- Biometric — disabled temporarily -->
+  <!-- <div class="settings-section">
     <div class="settings-section-title">🫆 تسجيل الدخول بالبصمة</div>
-    <div id="bioSettingsWrap"><div style="padding:14px 20px;font-size:13px;color:var(--text3)">جاري التحقق...</div></div>
-  </div>
+    <div id="bioSettingsWrap"></div>
+  </div> -->
+  <div id="bioSettingsWrap" style="display:none"></div>
   <!-- Google Sheets Sync -->
   <div class="settings-section admin-only">
     <div class="settings-section-title">🔄 مزامنة Google Sheets</div>
@@ -2133,17 +2134,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     toast(`مرحباً ${currentUser.displayName} 👋`,'success');
     return;
   }
-  // Check biometric
-  (async()=>{
-    const available=await isBiometricAvailable();
-    const bioUsers=getBioUsers();
-    if(available&&bioUsers.length>0){
-      await initBioButton();
-      setTimeout(()=>doBiometric(),300);
-    } else {
-      initBioButton();
-    }
-  })();
+  // Biometric disabled temporarily
+  // initBioButton();
   // Render user selection cards
   renderUserCards();
   buildPinPad();
