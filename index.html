@@ -2278,24 +2278,29 @@ function printPayroll(){
       +'<td style="padding:5px 6px;font-size:9px;font-family:monospace;color:#64748b">#'+w.wCode+'</td>'
       +'<td style="padding:5px 6px;font-weight:700;font-size:12px;color:#0f172a">'+w.name+(loanTags?'<div style="margin-top:2px">'+loanTags+'</div>':'')+'</td>'
       +'<td style="padding:5px 6px;font-size:10px;color:#64748b">'+w.job+'</td>'
-      +'<td style="padding:5px 6px;text-align:center;font-size:11px;color:#0f172a">'+w.daily.toLocaleString('ar-EG')+'</td>'
+      
       +'<td style="padding:5px 6px;text-align:center;font-weight:900;font-size:13px;color:#15803d;background:#f0fdf4">'+days+'</td>'
       +'<td style="padding:5px 6px;text-align:center;font-weight:700;font-size:12px;color:#b91c1c;background:#fef2f2">'+abs+'</td>'
       +'<td style="padding:5px 6px;text-align:center;font-size:11px;color:#0f172a">'+earned.toLocaleString('ar-EG')+'</td>'
       +'<td style="padding:5px 6px;text-align:center;font-size:11px;color:#c2410c">'+(totalLoan>0?totalLoan.toLocaleString('ar-EG'):'—')+'</td>'
       +'<td style="padding:5px 6px;text-align:center;font-weight:900;font-size:13px;color:'+netColor+';background:'+(net>=0?'#f0fdf4':'#fef2f2')+'">'+net.toLocaleString('ar-EG')+'</td>'
-      +'<td style="padding:5px 8px;border-right:1px dashed #cbd5e1;min-width:40px"></td>'
+      +'<td style="padding:5px 8px;border-right:1px dashed #cbd5e1;min-width:90px;width:90px"></td>'
       +'</tr>';
   }).join('');
 
+  const sigFooter='<div class="monthly-sig-footer"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding:12px 8px 8px;border-top:2px solid #e2e8f0;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">مُعِدّ الكشف</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">مراجعة المشرف</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">اعتماد المدير</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div></div></div>';
   const css=`*{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Tajawal',sans-serif;background:#fff;direction:rtl;font-size:11px;}
-@media print{@page{size:A4;margin:6mm;}body{padding:0;}}
+@media print{
+  @page{size:A4;margin:6mm 6mm 48mm 6mm;}
+  body{padding:0;}
+  .monthly-sig-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
 table{width:100%;border-collapse:collapse;}
 thead tr{background:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 thead th{padding:6px 6px;color:#fff;font-weight:700;font-size:10px;text-align:center;}
 tbody tr:hover{background:#f8fafc;}
-.summary-row td{background:#0f172a!important;color:#fff!important;font-weight:900;-webkit-print-color-adjust:exact;print-color-adjust:exact;}`;
+.summary-row td{background:#0f172a!important;color:#fff!important;font-weight:900;-webkit-print-color-adjust:exact;print-color-adjust:exact;}`; 
 
   const header=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 8px;background:#0f172a;color:#fff;margin-bottom:8px;border-radius:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact">
     <div><div style="font-size:16px;font-weight:900">`+projectName+`</div><div style="font-size:10px;color:#94a3b8">كشف الرواتب الشهري</div></div>
@@ -2308,17 +2313,16 @@ tbody tr:hover{background:#f8fafc;}
       <th style="width:44px">الكود</th>
       <th>الاسم</th>
       <th style="width:80px">التخصص</th>
-      <th style="width:50px">اليومية</th>
       <th style="width:36px">حضور</th>
       <th style="width:36px">غياب</th>
       <th style="width:60px">الأجر</th>
       <th style="width:60px">السلف</th>
       <th style="width:65px">الصافي</th>
-      <th style="width:48px">توقيع</th>
+      <th style="width:90px">توقيع</th>
     </tr></thead>
     <tbody>`+rows+`
       <tr class="summary-row">
-        <td colspan="7" style="padding:6px 8px;font-size:11px;text-align:right;color:#94a3b8">الإجمالي</td>
+        <td colspan="6" style="padding:6px 8px;font-size:11px;text-align:right;color:#94a3b8">الإجمالي</td>
         <td style="padding:6px 6px;text-align:center;font-size:12px;color:#fff">`+grandEarned.toLocaleString('ar-EG')+`</td>
         <td style="padding:6px 6px;text-align:center;font-size:12px;color:#fca5a5">`+grandLoan.toLocaleString('ar-EG')+`</td>
         <td style="padding:6px 6px;text-align:center;font-size:13px;color:#34d399">`+grandNet.toLocaleString('ar-EG')+`</td>
@@ -2331,7 +2335,7 @@ tbody tr:hover{background:#f8fafc;}
 
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة','error');return;}
-  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف الرواتب</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet"><style>'+css+'</style></head><body style="padding:6px">'+header+table+footer+'</body></html>');
+  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف الرواتب</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet"><style>'+css+'</style></head><body style="padding:6px">'+sigFooter+header+table+footer+'</body></html>');
   win.document.close();
   setTimeout(()=>{win.print();},600);
 }
@@ -2892,7 +2896,7 @@ function printTodayAttendance(){
     +'<div style="text-align:center;font-size:10px;color:#94a3b8;margin-top:10px;padding-top:8px;border-top:1px solid #e2e8f0">'+projectName+' · '+todayAR+'</div>';
   const win=window.open('','_blank','width=800,height=600');
   if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة في المتصفح','error');return;}
-  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف الحضور</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:12mm;direction:rtl;font-size:12px;}@media print{@page{size:A4;margin:10mm;}}</style></head><body>'+html+'</body></html>');
+  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف الحضور</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:12mm;direction:rtl;font-size:12px;}@media print{@page{size:A4;margin:10mm 10mm 45mm 10mm;}.att-sig-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:0 10mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;}body{padding-bottom:0;}}</style></head><body><div class=\"att-sig-footer\"><div style=\"display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding:16px 12px 10px;border-top:2px solid #e2e8f0;-webkit-print-color-adjust:exact;print-color-adjust:exact\"><div style=\"text-align:center\"><div style=\"font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a\">مُعِدّ الكشف</div><div style=\"height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px\"></div><div style=\"font-size:10px;color:#64748b\">الاسم والتوقيع</div></div><div style=\"text-align:center\"><div style=\"font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a\">مراجعة المشرف</div><div style=\"height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px\"></div><div style=\"font-size:10px;color:#64748b\">الاسم والتوقيع</div></div><div style=\"text-align:center\"><div style=\"font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a\">اعتماد المدير</div><div style=\"height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px\"></div><div style=\"font-size:10px;color:#64748b\">الاسم والتوقيع</div></div></div></div>'+html+'</body></html>');
   win.document.close();
   setTimeout(()=>{win.print();},600);
 }
@@ -2965,8 +2969,18 @@ function printWorkerCards(){
     +'</div>'
   +'</div>';
 
+  const signatureBlock='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding:16px 12px 10px;border-top:2px solid #e2e8f0;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
+    +'<div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">مُعِدّ الكشف</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div>'
+    +'<div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">مراجعة المشرف</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div>'
+    +'<div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">اعتماد المدير</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div>'
+  +'</div>';
+
   const css='*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"Tajawal",sans-serif;background:#fff;direction:rtl;}'
-    +'@media print{@page{size:A4 portrait;margin:5mm;}body{padding:0;}}';
+    +'@media print{'
+      +'@page{size:A4 portrait;margin:5mm 5mm 10mm 5mm;}'
+      +'body{padding:0;}'
+      +'.sig-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+    +'}';
 
   const header='<div style="text-align:center;padding:8px;background:#0f172a;color:#fff;margin-bottom:0;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
     +'<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJnbGQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y1ZDA2MCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjUwJSIgc3RvcC1jb2xvcj0iI2M5ODEwYSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM4YjVhMDQiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImdsZDIiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzhiNWEwNCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjUwJSIgc3RvcC1jb2xvcj0iI2YwYTAzMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM4YjVhMDQiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8ZmlsdGVyIGlkPSJzaCI+CiAgICAgIDxmZURyb3BTaGFkb3cgZHg9IjAiIGR5PSIxIiBzdGREZXZpYXRpb249IjEiIGZsb29kLWNvbG9yPSIjMDAwIiBmbG9vZC1vcGFjaXR5PSIwLjYiLz4KICAgIDwvZmlsdGVyPgogICAgPGZpbHRlciBpZD0iZ2xvdyI+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjIiIHJlc3VsdD0iYiIvPgogICAgICA8ZmVNZXJnZT48ZmVNZXJnZU5vZGUgaW49ImIiLz48ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz48L2ZlTWVyZ2U+CiAgICA8L2ZpbHRlcj4KICA8L2RlZnM+CgogIDwhLS0g2K7ZhNmB2YrYqSAtLT4KICA8cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMGQxMjIwIiByeD0iNiIvPgogIDxyZWN0IHg9IjEiIHk9IjEiIHdpZHRoPSIxNTgiIGhlaWdodD0iNzgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2M5ODEwYSIgc3Ryb2tlLXdpZHRoPSIwLjgiIHJ4PSI1LjUiIG9wYWNpdHk9IjAuNSIvPgoKICA8IS0tINiy2K7YsdmB2Kkg2KfZhNiy2YjYp9mK2KcgLS0+CiAgPHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjgiIGhlaWdodD0iMiIgZmlsbD0iI2M5ODEwYSIgb3BhY2l0eT0iMC43Ii8+CiAgPHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjIiIGhlaWdodD0iOCIgZmlsbD0iI2M5ODEwYSIgb3BhY2l0eT0iMC43Ii8+CiAgPHJlY3QgeD0iMTQ4IiB5PSI0IiB3aWR0aD0iOCIgaGVpZ2h0PSIyIiBmaWxsPSIjYzk4MTBhIiBvcGFjaXR5PSIwLjciLz4KICA8cmVjdCB4PSIxNTQiIHk9IjQiIHdpZHRoPSIyIiBoZWlnaHQ9IjgiIGZpbGw9IiNjOTgxMGEiIG9wYWNpdHk9IjAuNyIvPgogIDxyZWN0IHg9IjQiIHk9Ijc0IiB3aWR0aD0iOCIgaGVpZ2h0PSIyIiBmaWxsPSIjYzk4MTBhIiBvcGFjaXR5PSIwLjciLz4KICA8cmVjdCB4PSI0IiB5PSI2OCIgd2lkdGg9IjIiIGhlaWdodD0iOCIgZmlsbD0iI2M5ODEwYSIgb3BhY2l0eT0iMC43Ii8+CiAgPHJlY3QgeD0iMTQ4IiB5PSI3NCIgd2lkdGg9IjgiIGhlaWdodD0iMiIgZmlsbD0iI2M5ODEwYSIgb3BhY2l0eT0iMC43Ii8+CiAgPHJlY3QgeD0iMTU0IiB5PSI2OCIgd2lkdGg9IjIiIGhlaWdodD0iOCIgZmlsbD0iI2M5ODEwYSIgb3BhY2l0eT0iMC43Ii8+CgogIDwhLS0g2K7YtyDYstiu2LHZgdmKINi52YTZiNmKIC0tPgogIDxyZWN0IHg9IjE0IiB5PSIxMiIgd2lkdGg9IjEzMiIgaGVpZ2h0PSIxLjUiIGZpbGw9InVybCgjZ2xkMikiIG9wYWNpdHk9IjAuNiIvPgogIDwhLS0g2YbZgtin2Lcg2LLYrtix2YHZitipIC0tPgogIDxjaXJjbGUgY3g9IjE0IiBjeT0iMTIuOCIgcj0iMiIgZmlsbD0iI2YwYTAzMCIgb3BhY2l0eT0iMC44Ii8+CiAgPGNpcmNsZSBjeD0iODAiIGN5PSIxMi44IiByPSIyIiBmaWxsPSIjZjBhMDMwIiBvcGFjaXR5PSIwLjgiLz4KICA8Y2lyY2xlIGN4PSIxNDYiIGN5PSIxMi44IiByPSIyIiBmaWxsPSIjZjBhMDMwIiBvcGFjaXR5PSIwLjgiLz4KCiAgPCEtLSDYp9mE2YbYtSDYp9mE2YPZiNmB2Yog4oCUICLYp9mE2LHYp9mI2YoiIC0tPgogIDwhLS0g2LjZhCDYp9mE2YbYtSAtLT4KICA8dGV4dCB4PSI4MSIgeT0iNTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiCiAgICBmb250LWZhbWlseT0iJ1JlZW0gS3VmaScsICdTY2hlaGVyYXphZGUgTmV3Jywgc2VyaWYiCiAgICBmb250LXNpemU9IjM0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMDAwIiBvcGFjaXR5PSIwLjUiCiAgICBsZXR0ZXItc3BhY2luZz0iMiI+2KfZhNix2KfZiNmKPC90ZXh0PgogIDwhLS0g2KfZhNmG2LUg2KfZhNix2KbZitiz2Yog2KjYqtiv2LHYrCDYsNmH2KjZiiAtLT4KICA8dGV4dCB4PSI4MCIgeT0iNTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiCiAgICBmb250LWZhbWlseT0iJ1JlZW0gS3VmaScsICdTY2hlaGVyYXphZGUgTmV3Jywgc2VyaWYiCiAgICBmb250LXNpemU9IjM0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSJ1cmwoI2dsZCkiCiAgICBmaWx0ZXI9InVybCgjZ2xvdykiIGxldHRlci1zcGFjaW5nPSIyIj7Yp9mE2LHYp9mI2Yo8L3RleHQ+CgogIDwhLS0g2K7YtyDYstiu2LHZgdmKINiz2YHZhNmKIC0tPgogIDxyZWN0IHg9IjE0IiB5PSI2MiIgd2lkdGg9IjEzMiIgaGVpZ2h0PSIxLjUiIGZpbGw9InVybCgjZ2xkMikiIG9wYWNpdHk9IjAuNiIvPgogIDwhLS0g2YbZgtin2Lcg2LPZgdmE2YrYqSAtLT4KICA8Y2lyY2xlIGN4PSIxNCIgY3k9IjYyLjgiIHI9IjIiIGZpbGw9IiNmMGEwMzAiIG9wYWNpdHk9IjAuOCIvPgogIDxjaXJjbGUgY3g9IjgwIiBjeT0iNjIuOCIgcj0iMiIgZmlsbD0iI2YwYTAzMCIgb3BhY2l0eT0iMC44Ii8+CiAgPGNpcmNsZSBjeD0iMTQ2IiBjeT0iNjIuOCIgcj0iMiIgZmlsbD0iI2YwYTAzMCIgb3BhY2l0eT0iMC44Ii8+CgogIDwhLS0g2LLYrtix2YHYqSDZiNiz2LfZitipINi12LrZitix2KkgLS0+CiAgPHJlY3QgeD0iNzAiIHk9IjY2IiB3aWR0aD0iMjAiIGhlaWdodD0iMSIgZmlsbD0iI2M5ODEwYSIgb3BhY2l0eT0iMC41Ii8+CiAgPGNpcmNsZSBjeD0iODAiIGN5PSI3MCIgcj0iMS41IiBmaWxsPSIjYzk4MTBhIiBvcGFjaXR5PSIwLjYiLz4KPC9zdmc+" style="height:28px;margin-left:10px" alt="الراوي"><span style="font-size:14px;font-weight:900;color:#fff">'+projectName+'</span>'
@@ -2975,7 +2989,7 @@ function printWorkerCards(){
 
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة','error');return;}
-  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف صرف الرواتب</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet"><style>'+css+'</style></head><body>'+header+'<div style="display:flex;flex-wrap:wrap;gap:2mm">'+html+fillerCards+'</div>'+summary+'</body></html>');
+  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف صرف الرواتب</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet"><style>'+css+'</style></head><body><div class="sig-footer">'+signatureBlock+'</div>'+header+'<div style="display:flex;flex-wrap:wrap;gap:2mm;padding-bottom:140px">'+html+fillerCards+'</div>'+summary+'</body></html>');
   win.document.close();
   setTimeout(()=>{win.print();},600);
 }
