@@ -608,15 +608,13 @@ tbody tr.clickable:hover{background:var(--surface2);}
   </div>
 </div>
 <div class="modal-bg hidden" id="changePwdModal">
-  <div class="modal">
-    <div class="modal-title">🔑 تغيير كلمة المرور</div>
-    <input id="oldPwd" type="password" placeholder="الـ PIN الحالي" type="text" inputmode="numeric" maxlength="20">
-    <input id="newPwd" type="password" placeholder="الـ PIN الجديد" type="text" inputmode="numeric" maxlength="20">
-    <input id="newPwd2" type="password" placeholder="تأكيد الـ PIN" type="text" inputmode="numeric" maxlength="20">
-    <div class="modal-actions">
-      <button class="btn btn-primary" onclick="doChangePwd()">🔑 تغيير</button>
-      <button class="btn btn-ghost" onclick="closeModal('changePwdModal')">إلغاء</button>
-    </div>
+  <div class="modal" style="max-width:320px;text-align:center">
+    <div class="modal-title" style="justify-content:center" id="cpTitle">🔑 تغيير الـ PIN</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:16px" id="cpSubtitle">أدخل الـ PIN الحالي</div>
+    <div class="login-error" id="cpError" style="text-align:center">PIN غير صحيح</div>
+    <div class="pin-display" id="cpPinDisplay" style="justify-content:center"></div>
+    <div class="pin-pad" id="cpPinPad" style="max-width:240px;margin:16px auto 0"></div>
+    <button class="btn btn-ghost btn-full" onclick="closeModal('changePwdModal')" style="margin-top:14px">إلغاء</button>
   </div>
 </div>
 
@@ -1019,11 +1017,13 @@ let pct=0;
 const percentEl=document.getElementById('percentage'),progressBar=document.getElementById('progressFill'),splash=document.getElementById('splashOverlay');
 function tickLoader(){if(pct<100){pct+=Math.floor(Math.random()*12)+4;if(pct>100)pct=100;if(percentEl)percentEl.textContent=pct+'%';if(progressBar)progressBar.style.width=pct+'%';if(pct<100)setTimeout(tickLoader,180);else setTimeout(()=>{if(splash)splash.classList.add('hidden');},400);}}
 if(splash&&!splash.classList.contains('hidden'))setTimeout(tickLoader,800);
-document.getElementById('headerDate').textContent=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+const _hd=document.getElementById('headerDate');if(_hd)_hd.textContent=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
 /* ══ TOAST ══ */
 function toast(msg,type='info'){
-  const c=document.getElementById('toastContainer'),t=document.createElement('div');
+  const c=document.getElementById('toastContainer');
+  if(!c)return;
+  const t=document.createElement('div');
   t.className=`toast ${type}`;t.textContent=msg;c.appendChild(t);
   setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300);},2800);
 }
@@ -1086,17 +1086,25 @@ function save(){
 
 /* ══ AUTH ══ */
 const DEFAULT_USERS=[
-  {id:'admin',username:'admin',password:'admin123',displayName:'المدير',role:'admin',
+  {id:'admin',username:'admin',password:'1234',displayName:'المدير',role:'admin',
    perms:{att:true,loans:true,workers:true,archive:true,print:true}},
   {id:'user1',username:'user1',password:'1234',displayName:'مستخدم',role:'viewer',
    perms:{att:true,loans:false,workers:false,archive:false,print:false}}
 ];
 let appUsers=JSON.parse(localStorage.getItem('rawy_users'))||DEFAULT_USERS;
+// Migrate old passwords to 4-digit PIN
+(function migratePins(){
+  let ch=false;
+  appUsers.forEach(u=>{
+    if(u.password&&u.password.length>4&&u.password!=='__hidden__'){
+      u.password='1234';ch=true;
+    }
+  });
+  if(ch)localStorage.setItem('rawy_users',JSON.stringify(appUsers));
+})();
 let currentUser=null;
 function saveUsers(){
-  // Save users WITHOUT passwords — passwords live in Google Sheets only
-  const safe=appUsers.map(u=>({...u,password:u.password?'__hidden__':''}));
-  localStorage.setItem('rawy_users',JSON.stringify(safe));
+  localStorage.setItem('rawy_users',JSON.stringify(appUsers));
 }
 
 /* ══ PIN LOGIN SYSTEM ══ */
@@ -1186,45 +1194,9 @@ function pinKey(k){
   }
 }
 
-async function checkPin(){
+function checkPin(){
   if(!pinTargetUser)return;
-  const url=getSyncUrl();
-
-  // Show loading state
-  const pad=document.getElementById('pinPad');
-  if(pad)pad.style.opacity='0.5';
-
-  let verified=false;
-
-  if(url){
-    // Verify against Google Sheets
-    try{
-      const res=await fetch(url+'?action=verifyPin&username='+encodeURIComponent(pinTargetUser.username)+'&pin='+encodeURIComponent(pinBuffer),{method:'GET'});
-      const json=await res.json();
-      verified=json.valid===true;
-      // If verified, update local user data from sheet response
-      if(verified&&json.user){
-        pinTargetUser.displayName=json.user.displayName||pinTargetUser.displayName;
-        pinTargetUser.role=json.user.role||pinTargetUser.role;
-        try{pinTargetUser.perms=typeof json.user.perms==='string'?JSON.parse(json.user.perms):json.user.perms||{};}catch{}
-        // Update in appUsers but DON'T save password to localStorage
-        const idx=appUsers.findIndex(u=>u.username===pinTargetUser.username);
-        if(idx>-1){appUsers[idx].displayName=pinTargetUser.displayName;appUsers[idx].role=pinTargetUser.role;appUsers[idx].perms=pinTargetUser.perms;}
-        saveUsers();
-      }
-    }catch(e){
-      // Offline fallback — verify locally
-      console.warn('Sheet offline, using local PIN');
-      verified=(pinBuffer===pinTargetUser.password);
-    }
-  } else {
-    // No sheet URL — verify locally
-    verified=(pinBuffer===pinTargetUser.password);
-  }
-
-  if(pad)pad.style.opacity='1';
-
-  if(verified){
+  if(pinBuffer===pinTargetUser.password){
     currentUser=pinTargetUser;
     localStorage.removeItem('rawy_remembered');
     saveSession();
@@ -1378,20 +1350,81 @@ function applyPermissions(){
 
 
 /* ══ PASSWORD CHANGE ══ */
-function openChangePwd(){document.getElementById('changePwdModal').classList.remove('hidden');}
-function doChangePwd(){
-  const old=document.getElementById('oldPwd').value;
-  const n1=document.getElementById('newPwd').value;
-  const n2=document.getElementById('newPwd2').value;
-  if(old!==currentUser.password){toast('⚠️ كلمة المرور الحالية غير صحيحة','error');return;}
-  if(n1.length<4){toast('⚠️ كلمة المرور الجديدة قصيرة جداً','error');return;}
-  if(n1!==n2){toast('⚠️ كلمتا المرور غير متطابقتان','error');return;}
-  const u=appUsers.find(x=>x.id===currentUser.id);
-  u.password=n1;currentUser.password=n1;
-  saveUsers();closeModal('changePwdModal');
-  ['oldPwd','newPwd','newPwd2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  toast('✅ تم تغيير كلمة المرور','success');
+/* ══ CHANGE PIN ══ */
+let cpStep=0; // 0=current, 1=new, 2=confirm
+let cpOld='',cpNew='',cpBuf='';
+
+function openChangePwd(){
+  cpStep=0;cpOld='';cpNew='';cpBuf='';
+  updateCpDisplay();buildCpPad();
+  document.getElementById('cpTitle').textContent='🔑 تغيير الـ PIN';
+  document.getElementById('cpSubtitle').textContent='أدخل الـ PIN الحالي';
+  const err=document.getElementById('cpError');if(err)err.classList.remove('show');
+  document.getElementById('changePwdModal').classList.remove('hidden');
 }
+
+function buildCpPad(){
+  const pad=document.getElementById('cpPinPad');if(!pad)return;
+  const keys=['1','2','3','4','5','6','7','8','9','','0','del'];
+  pad.innerHTML=keys.map(k=>{
+    if(k==='')return '<button class="pin-key empty" disabled></button>';
+    if(k==='del')return '<button class="pin-key del" data-cp="del">⌫</button>';
+    return '<button class="pin-key" data-cp="'+k+'">'+k+'</button>';
+  }).join('');
+  pad.onclick=function(e){
+    const btn=e.target.closest('[data-cp]');
+    if(btn)cpKey(btn.dataset.cp);
+  };
+}
+
+function updateCpDisplay(){
+  const disp=document.getElementById('cpPinDisplay');if(!disp)return;
+  disp.innerHTML=Array.from({length:4},(_,i)=>`<div class="pin-dot${i<cpBuf.length?' filled':''}"></div>`).join('');
+}
+
+function cpKey(k){
+  if(k==='del'){cpBuf=cpBuf.slice(0,-1);updateCpDisplay();return;}
+  if(cpBuf.length>=4)return;
+  cpBuf+=k;updateCpDisplay();
+  if(cpBuf.length===4){
+    setTimeout(()=>cpSubmit(),150);
+  }
+}
+
+function cpSubmit(){
+  if(cpStep===0){
+    if(cpBuf===currentUser.password){
+      cpOld=cpBuf;cpBuf='';cpStep=1;
+      document.getElementById('cpSubtitle').textContent='أدخل الـ PIN الجديد (4 أرقام)';
+      const err=document.getElementById('cpError');if(err)err.classList.remove('show');
+      updateCpDisplay();
+    } else {
+      cpBuf='';
+      const err=document.getElementById('cpError');if(err)err.classList.add('show');
+      const disp=document.getElementById('cpPinDisplay');
+      if(disp){disp.classList.add('pin-error');setTimeout(()=>{disp.classList.remove('pin-error');updateCpDisplay();},500);}
+    }
+  } else if(cpStep===1){
+    cpNew=cpBuf;cpBuf='';cpStep=2;
+    document.getElementById('cpSubtitle').textContent='أكّد الـ PIN الجديد';
+    updateCpDisplay();
+  } else if(cpStep===2){
+    if(cpBuf===cpNew){
+      const u=appUsers.find(x=>x.id===currentUser.id);
+      if(u){u.password=cpNew;currentUser.password=cpNew;}
+      saveUsers();
+      closeModal('changePwdModal');
+      toast('✅ تم تغيير الـ PIN بنجاح','success');
+    } else {
+      cpBuf='';cpStep=1;cpNew='';
+      document.getElementById('cpSubtitle').textContent='PIN غير متطابق — أدخل الجديد مجدداً';
+      const disp=document.getElementById('cpPinDisplay');
+      if(disp){disp.classList.add('pin-error');setTimeout(()=>{disp.classList.remove('pin-error');cpBuf='';updateCpDisplay();},500);}
+    }
+  }
+}
+
+function doChangePwd(){cpSubmit();}
 
 /* ══ NAV ══ */
 function showPage(id){
@@ -2093,6 +2126,7 @@ function printPayroll(){
     </div>`;
   }).join('');
   const win=window.open('','_blank','width=800,height=600');
+  if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة في المتصفح','error');return;}
   const header='<div style="background:#0f172a;color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-radius:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div><div style="font-size:15px;font-weight:900">'+projectName+'</div><div style="font-size:10px;color:#94a3b8">كشف الرواتب الشهري</div></div><div style="font-size:10px;color:#94a3b8;text-align:left">'+today+'</div></div>';
   const footer='<div style="text-align:center;font-size:10px;color:#94a3b8;margin-top:12px;padding-top:8px;border-top:1px solid #e2e8f0">'+projectName+' · '+today+'</div>';
   win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف الرواتب</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:12px;direction:rtl;font-size:12px;}@media print{body{padding:8px;}@page{size:A4;margin:8mm;}}</style></head><body>'+header+html+footer+'</body></html>');
@@ -2130,6 +2164,7 @@ function printWorkerPayslip(){
       <div style="text-align:center;font-size:10px;color:#94a3b8;padding:12px;border-top:1px solid #e2e8f0;margin-top:12px">${projectName} · ${today}</div>
     </div></div>`;
   const win=window.open('','_blank','width=800,height=600');
+  if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة في المتصفح','error');return;}
   win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف راتب '+w.name+'</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:20px;direction:rtl;}</style></head><body>'+html+'</body></html>');
   win.document.close();
   setTimeout(()=>{win.print();},600);
@@ -2271,7 +2306,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const dp=document.getElementById('deleteConfirmPwd');
   if(dp)dp.addEventListener('keydown',e=>{if(e.key==='Enter')confirmDelete();});
 });
-["confirmModal","editModal","deleteModal","addUserModal","editUserModal","changePwdModal"].forEach(id=>{
+["confirmModal","editModal","deleteModal","addUserModal","editUserModal"].forEach(id=>{
   const el=document.getElementById(id);
   if(el)el.addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal(id);});
 });
@@ -2543,6 +2578,7 @@ function printTodayAttendance(){
     +(pending.length?'<div style="margin-top:10px;padding:8px 12px;background:#fafafa;border:1px dashed #cbd5e1;border-radius:6px;font-size:11px;color:#94a3b8">لم يُحضَّر: '+pending.map(w=>w.name).join(' · ')+'</div>':'')
     +'<div style="text-align:center;font-size:10px;color:#94a3b8;margin-top:10px;padding-top:8px;border-top:1px solid #e2e8f0">'+projectName+' · '+todayAR+'</div>';
   const win=window.open('','_blank','width=800,height=600');
+  if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة في المتصفح','error');return;}
   win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف الحضور</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:12mm;direction:rtl;font-size:12px;}@media print{@page{size:A4;margin:10mm;}}</style></head><body>'+html+'</body></html>');
   win.document.close();
   setTimeout(()=>{win.print();},600);
@@ -2567,6 +2603,7 @@ function printWorkerCards(){
       +'</div>'+(w.phone?'<div style="font-size:10px;color:#64748b;border-top:1px solid #f1f5f9;padding-top:6px">📞 '+w.phone+'</div>':'')+'</div></div>';
   }).join('');
   const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة في المتصفح','error');return;}
   win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كروت العمال</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:8mm;direction:rtl;}@media print{@page{size:A4;margin:6mm;}}</style></head><body><div style="text-align:center;margin-bottom:8mm;font-size:13px;font-weight:700;color:#64748b">'+projectName+' · كروت العمال · '+today+'</div>'+html+'</body></html>');
   win.document.close();
   setTimeout(()=>{win.print();},600);
