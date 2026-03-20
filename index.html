@@ -1290,27 +1290,31 @@ function showPinLockCountdown(){
 
 function pinKey(k){
   if(!pinTargetUser) return;
-  // تحقق من القفل
+  // ══ BYPASS مؤقت: أي رقم يفتح مباشرة ══
+  if(k !== 'del'){ pinBuffer = '1234'; updatePinDisplay(); setTimeout(function(){ checkPin(); }, 150); return; }
+  // ══════════════════════════════════════
   if(isPinLocked()) return;
   if(k === 'del'){
     pinBuffer = pinBuffer.slice(0, -1);
     updatePinDisplay();
     return;
   }
-  // الـ PIN دائماً 4 أرقام
   if(pinBuffer.length >= PIN_LENGTH) return;
   pinBuffer += k;
   updatePinDisplay();
   if(pinBuffer.length === PIN_LENGTH){
-    setTimeout(()=> checkPin(), 150);
+    setTimeout(function(){ checkPin(); }, 150);
   }
 }
 
 function checkPin(){
   if(!pinTargetUser) return;
-  // تحقق من مطابقة الـ PIN (أول 4 أرقام دائماً)
+  // ══ BYPASS مؤقت: تخطي التحقق من الـ PIN ══
+  // احذف هذا السطر عند الرجوع للوضع الطبيعي
+  const PIN_BYPASS = true;
+  // ══════════════════════════════════════════
   const storedPin = pinTargetUser.password.slice(0, PIN_LENGTH);
-  if(pinBuffer === storedPin){
+  if(PIN_BYPASS || pinBuffer === storedPin){
     // نجاح — إعادة تعيين العداد
     pinAttempts = 0;
     pinLockedUntil = 0;
