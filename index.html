@@ -826,7 +826,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
       <div style="position:relative">
         <div class="search-wrap" style="margin-bottom:0">
           <span class="search-icon">🔍</span>
-          <input id="loanWorkerSearch" placeholder="ابحث عن عامل بالاسم أو الكود..." oninput="filterLoanWorkers()" autocomplete="off" style="margin-bottom:0;padding-right:40px">
+          <input id="loanWorkerSearch" placeholder="ابحث بالاسم أو الـ ID (مثال: 1001)..." oninput="filterLoanWorkers()" autocomplete="off" style="margin-bottom:0;padding-right:40px">
         </div>
         <div id="loanWorkerDropdown" style="display:none;position:absolute;top:100%;right:0;left:0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);z-index:500;max-height:200px;overflow-y:auto;margin-top:4px;box-shadow:var(--shadow-sm)"></div>
         <input type="hidden" id="loanWSelect">
@@ -878,9 +878,13 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <div class="profile-body">
       <div class="profile-stats">
         <div class="profile-stat"><div class="profile-stat-label">اليومية</div><div class="profile-stat-val" id="pDaily" style="color:var(--accent2)">0</div></div>
-        <div class="profile-stat"><div class="profile-stat-label">حضور</div><div class="profile-stat-val" id="pDays">0</div></div>
-        <div class="profile-stat"><div class="profile-stat-label">السلف</div><div class="profile-stat-val" id="pLoansAmt" style="color:var(--red);font-size:16px">0</div></div>
-        <div class="profile-stat"><div class="profile-stat-label">الصافي</div><div class="profile-stat-val" id="pNet" style="color:var(--green);font-size:16px">0</div></div>
+        <div class="profile-stat"><div class="profile-stat-label">أيام الحضور</div><div class="profile-stat-val" id="pDays">0</div></div>
+        <div class="profile-stat"><div class="profile-stat-label">السلف</div><div class="profile-stat-val" id="pLoansAmt" style="color:var(--red);font-size:15px">0</div></div>
+        <div class="profile-stat">
+          <div class="profile-stat-label">الصافي المستحق</div>
+          <div class="profile-stat-val" id="pNet" style="color:var(--green);font-size:16px">0</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">من إجمالي: <span id="pGross" style="color:var(--blue)">0</span></div>
+        </div>
       </div>
       <div class="att-history"><div class="att-history-title">📅 سجل الحضور</div><div class="att-calendar" id="pAttCalendar"></div></div>
       <div class="p-loans-section"><div class="p-loans-title">💸 سجل السلفيات</div><div id="pLoansHistory"></div></div>
@@ -1027,31 +1031,35 @@ function toast(msg,type='info'){
 
 /* ══ DATA ══ */
 let workers=JSON.parse(localStorage.getItem("rawy_v3_workers"))||[
-  {id:1,wCode:"0001",name:"أحمد محمود علي",  job:"معلم بنا",     daily:250,active:true},
-  {id:2,wCode:"0002",name:"إبراهيم حسن سعد", job:"نجار مسلح",   daily:300,active:true},
-  {id:3,wCode:"0003",name:"محمود الصاوي",     job:"حداد مسلح",   daily:280,active:true},
-  {id:4,wCode:"0004",name:"سيد جاد الحق",     job:"عامل عادي",   daily:150,active:true},
-  {id:5,wCode:"0005",name:"عبدالله الشربيني", job:"كهربائي",     daily:350,active:true},
-  {id:6,wCode:"0006",name:"مصطفى قاسم",       job:"سباك",        daily:320,active:true},
-  {id:7,wCode:"0007",name:"ياسر عبد ربه",     job:"نقاش",        daily:220,active:true},
-  {id:8,wCode:"0008",name:"كرم جابر",         job:"عامل سيراميك",daily:270,active:true},
-  {id:9,wCode:"0009",name:"شريف الهواري",     job:"سائق لودر",   daily:400,active:true},
-  {id:10,wCode:"0010",name:"خالد مرسي",       job:"نجار مسلح",   daily:300,active:true},
-  {id:11,wCode:"0011",name:"رمضان صبحي",      job:"عامل عادي",   daily:150,active:true},
-  {id:12,wCode:"0012",name:"محمد أبو العلا",  job:"فني تكييف",   daily:380,active:true},
-  {id:13,wCode:"0013",name:"علاء حسني",       job:"مبيض محارة",  daily:240,active:true},
-  {id:14,wCode:"0014",name:"تامر يحيى",       job:"مقاول أنفار", daily:500,active:true},
-  {id:15,wCode:"0015",name:"حسن شاكوش",       job:"فني ألوميتال",daily:290,active:true},
-  {id:16,wCode:"0016",name:"وائل كفوري",      job:"عامل بناء",   daily:250,active:true},
-  {id:17,wCode:"0017",name:"هاني رمزي",       job:"سائق نقل",    daily:350,active:true},
-  {id:18,wCode:"0018",name:"منصور الرشيدي",   job:"حداد مسلح",   daily:280,active:true},
-  {id:19,wCode:"0019",name:"إيهاب توفيق",     job:"فني رخام",    daily:330,active:true},
-  {id:20,wCode:"0020",name:"فتحي سرور",       job:"حارس موقع",   daily:120,active:true}
+  {id:1,wCode:"1001",name:"أحمد محمود علي",  job:"معلم بنا",     daily:250,active:true},
+  {id:2,wCode:"1002",name:"إبراهيم حسن سعد", job:"نجار مسلح",   daily:300,active:true},
+  {id:3,wCode:"1003",name:"محمود الصاوي",     job:"حداد مسلح",   daily:280,active:true},
+  {id:4,wCode:"1004",name:"سيد جاد الحق",     job:"عامل عادي",   daily:150,active:true},
+  {id:5,wCode:"1005",name:"عبدالله الشربيني", job:"كهربائي",     daily:350,active:true},
+  {id:6,wCode:"1006",name:"مصطفى قاسم",       job:"سباك",        daily:320,active:true},
+  {id:7,wCode:"1007",name:"ياسر عبد ربه",     job:"نقاش",        daily:220,active:true},
+  {id:8,wCode:"1008",name:"كرم جابر",         job:"عامل سيراميك",daily:270,active:true},
+  {id:9,wCode:"1009",name:"شريف الهواري",     job:"سائق لودر",   daily:400,active:true},
+  {id:10,wCode:"1010",name:"خالد مرسي",       job:"نجار مسلح",   daily:300,active:true},
+  {id:11,wCode:"1011",name:"رمضان صبحي",      job:"عامل عادي",   daily:150,active:true},
+  {id:12,wCode:"1012",name:"محمد أبو العلا",  job:"فني تكييف",   daily:380,active:true},
+  {id:13,wCode:"1013",name:"علاء حسني",       job:"مبيض محارة",  daily:240,active:true},
+  {id:14,wCode:"1014",name:"تامر يحيى",       job:"مقاول أنفار", daily:500,active:true},
+  {id:15,wCode:"1015",name:"حسن شاكوش",       job:"فني ألوميتال",daily:290,active:true},
+  {id:16,wCode:"1016",name:"وائل كفوري",      job:"عامل بناء",   daily:250,active:true},
+  {id:17,wCode:"1017",name:"هاني رمزي",       job:"سائق نقل",    daily:350,active:true},
+  {id:18,wCode:"1018",name:"منصور الرشيدي",   job:"حداد مسلح",   daily:280,active:true},
+  {id:19,wCode:"1019",name:"إيهاب توفيق",     job:"فني رخام",    daily:330,active:true},
+  {id:20,wCode:"1020",name:"فتحي سرور",       job:"حارس موقع",   daily:120,active:true}
 ];
 (function migrate(){
-  let max=workers.reduce((m,w)=>w.wCode?Math.max(m,parseInt(w.wCode)):m,0),ch=false;
+  let max=workers.reduce((m,w)=>w.wCode?Math.max(m,parseInt(w.wCode)):m,1000),ch=false;
   workers.forEach(w=>{
-    if(!w.wCode){max++;w.wCode=String(max).padStart(4,'0');ch=true;}
+    // Upgrade old 4-digit zero-padded codes (0001-0020) to 1001+ format
+    if(w.wCode&&parseInt(w.wCode)<100){
+      w.wCode=String(1000+parseInt(w.wCode));ch=true;
+    }
+    if(!w.wCode){max++;w.wCode=String(max);ch=true;}
     if(w.groupId===undefined){w.groupId=null;ch=true;}
     if(w.phone===undefined){w.phone='';ch=true;}
     if(w.startDate===undefined){w.startDate='';ch=true;}
@@ -1493,9 +1501,10 @@ function render(){
   renderWorkers();renderAttendance(today,activeW);renderLoans();renderArchive();
   (document.getElementById('loanWSelect')||{}).innerHTML=activeW.map(w=>`<option value="${w.id}">[#${w.wCode}] ${w.name}</option>`).join('');
   // pre-select first active worker in loan form
-  const firstActive=workers.find(w=>w.active);
+  // Don't pre-select — user should search manually
   const lws=document.getElementById('loanWSelect');
-  if(lws&&firstActive&&!lws.value){lws.value=firstActive.id;const ls=document.getElementById('loanWorkerSearch');if(ls&&!ls.value)ls.value=firstActive.name+' #'+firstActive.wCode;updateLoanInfo();}
+  const lwsVal=lws?lws.value:'';
+  if(!lwsVal){const lsiBox=document.getElementById('loanSelectInfo');if(lsiBox)lsiBox.style.display='none';}
 }
 
 /* ══ WORKERS ══ */
@@ -1615,6 +1624,7 @@ function deleteLoan(idx){
       const lns=loans.filter(l=>l.workerId===selID).reduce((s,l)=>s+l.amt,0);
       pla.textContent=lns.toLocaleString('ar-EG')+' ج.م';
       pn.textContent=(days*w.daily-lns).toLocaleString('ar-EG')+' ج.م';
+      const pg=document.getElementById("pGross");if(pg)pg.textContent=(days*w.daily).toLocaleString('ar-EG')+' ج.م';
       const lhEl=document.getElementById('pLoansHistory');
       if(lhEl){
         const wLoans=loans.filter(l=>l.workerId===selID).slice().reverse();
@@ -1667,7 +1677,7 @@ function updateLoanInfo(){
 }
 
 /* ══ ACTIONS ══ */
-function nextWCode(){const max=workers.reduce((m,w)=>w.wCode?Math.max(m,parseInt(w.wCode)):m,999);return String(max+1);}
+function nextWCode(){const max=workers.reduce((m,w)=>w.wCode?Math.max(m,parseInt(w.wCode)):m,1000);return String(max+1);}
 
 function addWorker(){
   const n=document.getElementById("wName").value.trim(),j=document.getElementById("wJob").value.trim(),d=document.getElementById("wDaily").value;
@@ -1735,10 +1745,15 @@ function addLoan(){
   loans.push({workerId:id,amt,date:new Date().toLocaleDateString(),note:noteVal});
   const amtEl2=document.getElementById("loanAmt");if(amtEl2)amtEl2.value="";
   const lws2=document.getElementById('loanWSelect');if(lws2)lws2.value='';
-  const lwSearch=document.getElementById('loanWorkerSearch');if(lwSearch)lwSearch.value='';
+  const lwSearch=document.getElementById('loanWorkerSearch');if(lwSearch){lwSearch.value='';lwSearch.placeholder='ابحث بالاسم أو الـ ID (مثال: 1001)...';}
   const lwDD=document.getElementById('loanWorkerDropdown');if(lwDD)lwDD.style.display='none';
+  // Also clear loan info panel
+  const lsiNet=document.getElementById('lsiNet');if(lsiNet)lsiNet.textContent='—';
+  const lsiTotal=document.getElementById('lsiTotal');if(lsiTotal)lsiTotal.textContent='—';
+  const lsiBalance=document.getElementById('lsiBalance');if(lsiBalance)lsiBalance.textContent='—';
+  const lsiBox=document.getElementById('loanSelectInfo');if(lsiBox)lsiBox.style.display='none';
   const noteEl=document.getElementById('loanNote');if(noteEl)noteEl.value='';
-  save();renderLoans();updateLoanInfo();
+  save();renderLoans();
   const totalL2=loans.reduce((s,l)=>s+Number(l.amt),0);
   const slEl=document.getElementById("sLoans");if(slEl)slEl.textContent=totalL2.toLocaleString('ar-EG')+' ج.م';
   const totalE2=workers.reduce((s,w)=>s+attendance.filter(a=>a.workerId===w.id&&a.status==='present').length*w.daily,0);
@@ -1773,6 +1788,8 @@ function openP(id){
   const lns=loans.filter(l=>l.workerId===id).reduce((s,l)=>s+l.amt,0);
   const net=days*w.daily-lns;
   document.getElementById("pDays").textContent=days;
+  const gross=days*w.daily;
+  const pGrossEl=document.getElementById("pGross");if(pGrossEl)pGrossEl.textContent=gross.toLocaleString('ar-EG')+' ج.م';
   document.getElementById("pLoansAmt").textContent=lns.toLocaleString('ar-EG')+' ج.م';
   document.getElementById("pNet").textContent=net.toLocaleString('ar-EG')+' ج.م';
   const badge=document.getElementById("pStatus");
