@@ -1105,7 +1105,7 @@ function renderUserCards(){
   const wrap=document.getElementById('userCards');
   if(!wrap)return;
   wrap.innerHTML=appUsers.map(u=>`
-    <div onclick="selectUser('${u.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:${pinTargetUser&&pinTargetUser.id===u.id?'rgba(201,129,10,.15)':'var(--surface2)'};border:1px solid ${pinTargetUser&&pinTargetUser.id===u.id?'rgba(201,129,10,.4)':'var(--border2)'};cursor:pointer;transition:all .2s">
+    <div data-uid="${u.id}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:${pinTargetUser&&pinTargetUser.id===u.id?'rgba(201,129,10,.15)':'var(--surface2)'};border:1px solid ${pinTargetUser&&pinTargetUser.id===u.id?'rgba(201,129,10,.4)':'var(--border2)'};cursor:pointer;transition:all .2s">
       <span style="font-size:22px">${u.role==='admin'?'👑':'👤'}</span>
       <div style="flex:1">
         <div style="font-size:14px;font-weight:800;color:var(--text)">${u.displayName}</div>
@@ -1113,6 +1113,10 @@ function renderUserCards(){
       </div>
       ${pinTargetUser&&pinTargetUser.id===u.id?'<span style="color:var(--accent2);font-size:16px">✓</span>':''}
     </div>`).join('');
+  wrap.onclick=function(e){
+    const card=e.target.closest('[data-uid]');
+    if(card)selectUser(card.dataset.uid);
+  };
 }
 
 function selectUser(uid){
@@ -1141,10 +1145,15 @@ function buildPinPad(){
   if(!pad)return;
   const keys=['1','2','3','4','5','6','7','8','9','','0','del'];
   pad.innerHTML=keys.map(k=>{
-    if(k==='')return '<button class="pin-key empty"></button>';
-    if(k==='del')return '<button class="pin-key del" onclick="pinKey(&quot;del&quot;)">⌫</button>';
-    return '<button class="pin-key" onclick="pinKey(&quot;'+k+'&quot;)">'+k+'</button>';
+    if(k==='')return '<button class="pin-key empty" disabled></button>';
+    if(k==='del')return '<button class="pin-key del" data-key="del">⌫</button>';
+    return '<button class="pin-key" data-key="'+k+'">'+k+'</button>';
   }).join('');
+  // Use event delegation
+  pad.onclick=function(e){
+    const btn=e.target.closest('[data-key]');
+    if(btn)pinKey(btn.dataset.key);
+  };
 }
 
 function updatePinDisplay(){
