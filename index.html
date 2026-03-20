@@ -1179,18 +1179,18 @@ let pinLockTimer = null;        // مؤقت عرض العدّ التنازلي
 function showUserHint(){}  // kept for compatibility
 
 /* ── دالة موحّدة لبناء لوحة الأرقام ── */
-function buildGenericPad(padId, dataAttr, onKey){
-  const pad = document.getElementById(padId);
+function buildGenericPad(padId, onKey){
+  var pad = document.getElementById(padId);
   if(!pad) return;
-  const keys = ['1','2','3','4','5','6','7','8','9','','0','del'];
-  pad.innerHTML = keys.map(k => {
+  var keys = ['1','2','3','4','5','6','7','8','9','','0','del'];
+  pad.innerHTML = keys.map(function(k){
     if(k === '') return '<button class="pin-key empty" disabled></button>';
-    if(k === 'del') return `<button class="pin-key del" data-${dataAttr}="del">⌫</button>`;
-    return `<button class="pin-key" data-${dataAttr}="${k}">${k}</button>`;
+    if(k === 'del') return '<button class="pin-key del" data-pinval="del">⌫</button>';
+    return '<button class="pin-key" data-pinval="'+k+'">'+k+'</button>';
   }).join('');
   pad.onclick = function(e){
-    const btn = e.target.closest(`[data-${dataAttr}]`);
-    if(btn) onKey(btn.dataset[dataAttr]);
+    var btn = e.target.closest('[data-pinval]');
+    if(btn) onKey(btn.getAttribute('data-pinval'));
   };
 }
 
@@ -1253,7 +1253,7 @@ function backToUser(){
 }
 
 function buildPinPad(){
-  buildGenericPad('pinPad', 'key', pinKey);
+  buildGenericPad('pinPad', pinKey);
 }
 
 /* ── هل النظام مقفل حالياً؟ ── */
@@ -1504,7 +1504,7 @@ let cpAttempts = 0;  // عداد محاولات إدخال الـ PIN الحال
 function openChangePwd(){
   cpStep = 0; cpOld = ''; cpNew = ''; cpBuf = ''; cpAttempts = 0;
   updateCpDisplay();
-  buildGenericPad('cpPinPad', 'cp', cpKey);
+  buildGenericPad('cpPinPad', cpKey);
   document.getElementById('cpTitle').textContent = '🔑 تغيير الـ PIN';
   document.getElementById('cpSubtitle').textContent = 'أدخل الـ PIN الحالي';
   const err = document.getElementById('cpError');
