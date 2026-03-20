@@ -488,7 +488,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
 <div id="toastContainer"></div>
 
 <!-- LOGIN -->
-<div class="login-screen" id="loginScreen">
+<div class="login-screen hidden" id="loginScreen" style="display:none!important">
   <div class="login-box" style="max-width:340px">
     <div class="login-logo">🔨</div>
     <div class="login-title">ال<span style="background:linear-gradient(135deg,#c9810a,#f0a030);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">راوي</span> الإداري</div>
@@ -960,24 +960,11 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <div class="settings-row">
       <div><div class="settings-row-label" id="setMyName">—</div><div class="settings-row-sub" id="setMyRole">—</div></div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-ghost btn-sm" onclick="openChangePwd()">🔑 تغيير الـ PIN</button>
-        <button class="btn btn-outline-red btn-sm" onclick="doLogout()">🚪 خروج</button>
+        <!-- PIN button removed -->
+        <!-- logout button removed -->
       </div>
     </div>
-    <div class="settings-row">
-      <div>
-        <div class="settings-row-label">⏱️ ابقاء التطبيق مفتوح</div>
-        <div class="settings-row-sub">مدة الجلسة من كل مرة تفتح التطبيق</div>
-      </div>
-      <select id="sessionTimeoutSelect" onchange="saveSessionTimeout()" style="margin-bottom:0;width:auto;min-width:130px">
-        <option value="0">دائماً مفتوح</option>
-        <option value="15">15 دقيقة</option>
-        <option value="30">نص ساعة</option>
-        <option value="60">ساعة</option>
-        <option value="240">4 ساعات</option>
-        <option value="480">8 ساعات</option>
-      </select>
-    </div>
+<!-- session timeout setting removed -->
   </div>
   <!-- Users — admin -->
   <div class="settings-section admin-only">
@@ -1004,7 +991,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <div class="settings-section-title">🫆 تسجيل الدخول بالبصمة</div>
     <div id="bioSettingsWrap"></div>
   </div> -->
-  <div id="bioSettingsWrap" style="display:none"></div>
+  <!-- biometric section removed -->
   <!-- Google Sheets Sync -->
   <div class="settings-section admin-only">
     <div class="settings-section-title">🔄 مزامنة Google Sheets</div>
@@ -1464,21 +1451,13 @@ function doLogout(){
   clearSession();
   if(sessionTimer)clearTimeout(sessionTimer);
   if(syncIntervalTimer)clearInterval(syncIntervalTimer);
-  currentUser=null;
-  // إعادة تعيين حالة الـ PIN بالكامل
-  pinBuffer='';
-  pinTargetUser=null;
-  pinAttempts=0;
-  pinLockedUntil=0;
-  if(pinLockTimer){clearInterval(pinLockTimer);pinLockTimer=null;}
-  const errEl=document.getElementById('loginError');
-  if(errEl){errEl.classList.remove('show');errEl.textContent='PIN غير صحيح';}
-  document.getElementById('loginScreen').classList.remove('hidden');
-  // إعادة بناء شاشة الدخول نظيفة
-  renderUserCards();
-  buildPinPad();
-  updatePinDisplay();
-  if(appUsers.length)selectUser(appUsers[0].id);
+  // إعادة الدخول مباشرة بالمدير بدون شاشة login
+  currentUser = appUsers.find(u=>u.role==='admin') || appUsers[0];
+  applyPermissions();
+  render();
+  showPage('dashboard');
+  initDashLayout();
+  toast('تم تسجيل الخروج','info');
 }
 
 function applyPermissions(){
@@ -2841,27 +2820,15 @@ function pushHistory(){
 
 /* ══ INIT ══ */
 window.addEventListener('DOMContentLoaded',()=>{
-  localStorage.removeItem('rawy_remembered');
-  // Clear old session format (without loginTime)
-  const _rawS=localStorage.getItem('rawy_session');
-  if(_rawS){try{const _s=JSON.parse(_rawS);if(!_s.loginTime)localStorage.removeItem('rawy_session');}catch{localStorage.removeItem('rawy_session');}}
-  // Try restore session
-  if(loadSession()){
-    document.getElementById('loginScreen').classList.add('hidden');
-    applyPermissions();render();showPage('dashboard');initDashLayout();
-    resetSessionTimer();pushHistory();
-    startSyncInterval();
-    toast(`مرحباً ${currentUser.displayName} 👋`,'success');
-    return;
-  }
-  // Biometric disabled temporarily
-  // initBioButton();
-  // Render user selection cards
-  renderUserCards();
-  buildPinPad();
-  updatePinDisplay();
-  // Auto select first user
-  if(appUsers.length)selectUser(appUsers[0].id);
+  // دخول مباشر بدون شاشة تسجيل دخول
+  currentUser = appUsers.find(u=>u.role==='admin') || appUsers[0];
+  document.getElementById('loginScreen').classList.add('hidden');
+  applyPermissions();
+  render();
+  showPage('dashboard');
+  initDashLayout();
+  startSyncInterval();
+  pushHistory();
 });
 
 function filterLoanWorkers(){
