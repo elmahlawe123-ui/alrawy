@@ -2825,7 +2825,7 @@ function printWorkerCards(){
     // فاصل صفحة بعد كل 10 كروت
     const pageBreak=(idx>0&&idx%20===0)?'page-break-before:always;':'padding-right:1%;' ;
     // كارت بنص العرض — عمودان في الصفحة
-    return '<div style="'+pageBreak+'display:inline-block;width:49%;vertical-align:top;border:1px solid #cbd5e1;border-bottom:none;page-break-inside:avoid;background:#fff;padding:5px 8px;min-height:13mm">'
+    return '<div style="'+pageBreak+'display:inline-block;width:49%;vertical-align:top;border:1px solid #cbd5e1;border-radius:5px;page-break-inside:avoid;background:#fff;padding:5px 8px;min-height:13mm;margin-bottom:3mm">'
       +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
         +'<span style="font-size:8px;font-family:monospace;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;border-radius:3px;padding:1px 4px">#'+w.wCode+'</span>'
         +'<span style="font-size:12px;font-weight:900;color:#0f172a">'+w.name+'</span>'
@@ -2866,7 +2866,7 @@ function printWorkerCards(){
 
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة','error');return;}
-  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف صرف الرواتب</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>'+css+'</style></head><body>'+header+'<div style="border-bottom:1px solid #cbd5e1">'+html+'</div>'+summary+'</body></html>');
+  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف صرف الرواتب</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>'+css+'</style></head><body>'+header+'<div style="display:flex;flex-wrap:wrap;gap:2mm">'+html+'</div>'+summary+'</body></html>');
   win.document.close();
   setTimeout(()=>{win.print();},600);
 }
