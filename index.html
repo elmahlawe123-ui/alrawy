@@ -706,11 +706,18 @@ tbody tr.clickable:hover{background:var(--surface2);}
 
 <!-- WORKERS -->
 <div id="workers" class="page">
+  <!-- DEBUG: يُحذف بعد التشخيص -->
+  <div id="debugInfo" style="background:#1a2540;border:1px solid rgba(201,129,10,.4);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text2);display:none">
+    <div style="font-weight:700;color:var(--accent2);margin-bottom:6px">🔍 تشخيص البيانات</div>
+    <div id="debugText" style="font-family:monospace;font-size:11px;white-space:pre-wrap"></div>
+    <button onclick="document.getElementById('debugInfo').style.display='none'" style="margin-top:8px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:4px 10px;color:var(--text3);cursor:pointer;font-family:inherit;font-size:11px">إخفاء</button>
+  </div>
   <div class="section-header">
     <div class="section-title">👷 إدارة الطاقم</div>
     <div class="section-actions">
       <div class="search-wrap"><span class="search-icon">🔍</span><input id="workerSearch" placeholder="بحث..." oninput="renderWorkers()" style="margin-bottom:0;padding-right:40px"></div>
       <button id="noPhoneFilterBtn" class="btn btn-ghost btn-sm" onclick="toggleNoPhoneFilter()" title="عرض العمال بدون رقم هاتف">📵 بدون هاتف</button>
+      <button class="btn btn-ghost btn-sm" onclick="showDebug()" style="font-size:10px">🔍 تشخيص</button>
     </div>
   </div>
   <div style="margin-bottom:14px">
@@ -1024,9 +1031,9 @@ let workers=JSON.parse(localStorage.getItem("rawy_v3_workers"))||[
     if(w.groupId===undefined){w.groupId=null;ch=true;}
     if(w.phone===undefined){w.phone='';ch=true;}
     if(w.startDate===undefined){w.startDate='';ch=true;}
-    if(w.active===true){w.active='نشط';ch=true;}
-    if(w.active===false){w.active='موقوف';ch=true;}
-    if(w.active===undefined){w.active='نشط';ch=true;}
+    if(w.active===true||w.active==='TRUE'||w.active==='true'||w.active==='active'||w.active==='yes'){w.active='نشط';ch=true;}
+    if(w.active===false||w.active==='FALSE'||w.active==='false'||w.active==='inactive'||w.active==='no'||w.active===0){w.active='موقوف';ch=true;}
+    if(w.active===undefined||w.active===null||w.active===''){w.active='نشط';ch=true;}
   });
   if(ch)localStorage.setItem("rawy_v3_workers",JSON.stringify(workers));
 })();
@@ -1218,7 +1225,8 @@ function nextQuickPhone(){
 }
 function renderWorkers(){
   const q=((document.getElementById('workerSearch')||{}).value||'').trim().toLowerCase();
-  let list=q?workers.filter(w=>w.name.toLowerCase().includes(q)||w.wCode.includes(q)||w.job.toLowerCase().includes(q)):workers;
+  const allWorkers=workers; // عرض جميع العمال بدون فلترة active
+  let list=q?allWorkers.filter(w=>w.name.toLowerCase().includes(q)||w.wCode.includes(q)||w.job.toLowerCase().includes(q)):allWorkers;
   const wt=document.getElementById("workersTable");
   if(!wt)return;
   let hth=`<th>الكود</th><th>العامـل</th><th>المهنة</th>`;
@@ -1760,7 +1768,17 @@ async function syncPull(){
     const res=await fetch(url+'?action=pull');
     const json=await res.json();
     if(json.error)throw new Error(json.error);
-    if(json.workers&&json.workers.length){workers=json.workers.map(w=>({...w,active:w.active==='نشط'?'نشط':(w.active===true||w.active==='TRUE')?'نشط':'موقوف',daily:Number(w.daily)||0}));}
+    if(json.workers&&json.workers.length){
+      workers=json.workers.map(w=>{
+        // تطبيع حقل active من أي قيمة محتملة
+        const rawActive=w.active;
+        let active='نشط'; // الافتراضي نشط
+        if(rawActive==='موقوف'||rawActive===false||rawActive==='FALSE'||rawActive===0||rawActive==='0'||rawActive==='inactive'||rawActive==='stopped'){
+          active='موقوف';
+        }
+        return {...w, active, daily:Number(w.daily)||0};
+      });
+    }
     if(json.attendance)attendance=json.attendance;
     if(json.loans)loans=json.loans.map(l=>({...l,amt:Number(l.amt)||0}));
     if(json.archive)archive=json.archive.map(a=>({...a,total:Number(a.total)||0}));
@@ -1947,6 +1965,30 @@ window.addEventListener('popstate',()=>{
   if(currentUser)showPage('dashboard');else pushHistory();
 });
 function pushHistory(){try{history.pushState({},'',location.href);}catch(e){}}
+
+/* ══ DEBUG ══ */
+function showDebug(){
+  const dbEl=document.getElementById('debugInfo');
+  const dbText=document.getElementById('debugText');
+  if(!dbEl||!dbText)return;
+  const raw=localStorage.getItem('rawy_v3_workers');
+  const parsed=raw?JSON.parse(raw):null;
+  let info='';
+  info+='workers في الذاكرة: '+workers.length+'\n';
+  info+='workers في localStorage: '+(parsed?parsed.length:'لا يوجد')+'\n\n';
+  if(workers.length>0){
+    info+='أول 3 عمال:\n';
+    workers.slice(0,3).forEach(w=>{
+      info+=`  - id:${w.id} | wCode:${w.wCode} | name:"${w.name}" | active:"${w.active}" | daily:${w.daily}\n`;
+    });
+  }
+  if(parsed&&parsed.length>0){
+    info+='\nأول عامل في localStorage:\n';
+    info+=JSON.stringify(parsed[0],null,2);
+  }
+  dbText.textContent=info;
+  dbEl.style.display='block';
+}
 
 /* ══ INIT ══ */
 window.addEventListener('DOMContentLoaded',()=>{
