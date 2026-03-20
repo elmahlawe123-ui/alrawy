@@ -751,7 +751,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
       </div>
     </div>
   </div>
-  <div class="table-wrap"><table id="workersTable"></table></div>
+  <div class="table-wrap" style="min-height:100px"><table id="workersTable" style="min-width:100%"></table></div>
 </div>
 
 
@@ -1238,23 +1238,26 @@ function renderWorkers(){
   wt.innerHTML=`<thead><tr>${hth}</tr></thead><tbody></tbody>`;
   const wb=wt.querySelector('tbody');
   if(!list.length){wb.innerHTML=`<tr class="empty-row"><td colspan="10">لا توجد نتائج</td></tr>`;return;}
-  list.forEach(w=>{
+  const rows=list.map(w=>{
     const days=attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length;
     const abs=attendance.filter(a=>a.workerId===w.id&&a.status==='غياب').length;
     const lns=loans.filter(l=>l.workerId===w.id).reduce((s,l)=>s+l.amt,0);
     const salary=days*w.daily-lns;
-    const tr=document.createElement('tr');tr.className='clickable';
-    tr.onclick=e=>{if(!e.target.closest('button'))openP(w.id);};
     const hasPhone=w.phone&&w.phone.trim();
-    let td=`<td><span class="worker-code">#${w.wCode||'----'}</span></td><td class="td-name">${w.name} ${!hasPhone?'<span title="بدون رقم هاتف" style="font-size:11px;opacity:.7">📵</span>':''}</td><td>${w.job}</td>`;
-    if(colVis.daily)td+=`<td style="color:var(--accent2);font-weight:700">${w.daily.toLocaleString('ar-EG')} ج.م</td>`;
-    if(colVis.days)td+=`<td style="color:var(--green);font-weight:700">${days}</td>`;
-    if(colVis.abs)td+=`<td style="color:var(--red);font-weight:700">${abs}</td>`;
-    if(colVis.salary)td+=`<td style="color:var(--accent2);font-weight:800">${salary.toLocaleString('ar-EG')} ج.م</td>`;
-    td+=`<td><span class="badge ${w.active==='نشط'?'badge-active':'badge-inactive'}">${w.active==='نشط'?'نشط':'موقوف'}</span></td>`;
-    td+=`<td class="no-print"><button class="btn btn-ghost btn-sm" onclick="quickEdit(${w.id})">✏️</button></td>`;
-    tr.innerHTML=td;wb.appendChild(tr);
+    let td='<tr class="clickable" onclick="openP('+w.id+')">';
+    td+='<td><span class="worker-code">#'+(w.wCode||'----')+'</span></td>';
+    td+='<td class="td-name">'+w.name+' '+(hasPhone?'':'<span title="بدون رقم هاتف" style="font-size:11px;opacity:.7">📵</span>')+'</td>';
+    td+='<td>'+w.job+'</td>';
+    if(colVis.daily)td+='<td style="color:var(--accent2);font-weight:700">'+w.daily.toLocaleString('ar-EG')+' ج.م</td>';
+    if(colVis.days)td+='<td style="color:var(--green);font-weight:700">'+days+'</td>';
+    if(colVis.abs)td+='<td style="color:var(--red);font-weight:700">'+abs+'</td>';
+    if(colVis.salary)td+='<td style="color:var(--accent2);font-weight:800">'+salary.toLocaleString('ar-EG')+' ج.م</td>';
+    td+='<td><span class="badge '+(w.active==='نشط'?'badge-active':'badge-inactive')+'">'+(w.active==='نشط'?'نشط':'موقوف')+'</span></td>';
+    td+='<td class="no-print"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();quickEdit('+w.id+')">✏️</button></td>';
+    td+='</tr>';
+    return td;
   });
+  wb.innerHTML=rows.join('');
 }
 
 /* ══ ATTENDANCE ══ */
