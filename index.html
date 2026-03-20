@@ -2374,12 +2374,15 @@ function printWorkerPayslip(){
 
 /* ══ BACKUP  ══ */
 function showLoginClearData(){
-  // Show confirm modal adapted for login screen
-  const modal=document.getElementById('clearDataModal');
-  if(!modal)return;
-  modal.classList.remove('hidden');
-  const inp=document.getElementById('clearDataPin');
-  if(inp){inp.value='';setTimeout(()=>inp.focus(),200);}
+  const keys=[
+    'rawy_v3_workers','rawy_v3_att','rawy_v3_loans','rawy_v3_arch',
+    'rawy_users','rawy_session','rawy_sync_url','rawy_sync_auto',
+    'rawy_sync_interval','rawy_last_sync','rawy_session_timeout',
+    'rawy_kpi_vis','rawy_kpi_compact','rawy_bio_users','rawy_bio_creds',
+    'rawy_remembered'
+  ];
+  keys.forEach(k=>localStorage.removeItem(k));
+  location.reload();
 }
 
 function clearAllData(){
