@@ -1574,6 +1574,7 @@ function showPage(id){
   document.getElementById(id).classList.add("active");
   const nb=document.getElementById('nav-'+id);if(nb)nb.classList.add("active-nav");
   render();
+  applyPermissions();
   if(id==='dashboard')initDashLayout();
   if(id==='settings')renderSettings();
   window.scrollTo(0,0);
@@ -2823,8 +2824,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   // دخول مباشر بدون شاشة تسجيل دخول
   currentUser = appUsers.find(u=>u.role==='admin') || appUsers[0];
   document.getElementById('loginScreen').classList.add('hidden');
-  applyPermissions();
   render();
+  applyPermissions();
   showPage('dashboard');
   initDashLayout();
   startSyncInterval();
