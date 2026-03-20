@@ -1093,7 +1093,11 @@ const DEFAULT_USERS=[
 ];
 let appUsers=JSON.parse(localStorage.getItem('rawy_users'))||DEFAULT_USERS;
 let currentUser=null;
-function saveUsers(){localStorage.setItem('rawy_users',JSON.stringify(appUsers));}
+function saveUsers(){
+  // Save users WITHOUT passwords — passwords live in Google Sheets only
+  const safe=appUsers.map(u=>({...u,password:u.password?'__hidden__':''}));
+  localStorage.setItem('rawy_users',JSON.stringify(safe));
+}
 
 /* ══ PIN LOGIN SYSTEM ══ */
 let pinBuffer='';
@@ -1159,8 +1163,10 @@ function buildPinPad(){
 function updatePinDisplay(){
   const disp=document.getElementById('pinDisplay');
   if(!disp)return;
-  const len=pinTargetUser?pinTargetUser.password.length:4;
-  disp.innerHTML=Array.from({length:len},(_,i)=>`<div class="pin-dot${i<pinBuffer.length?' filled':''}"></div>`).join('');
+  // Always show 4 dots (visual only — actual PIN can be any length)
+  const displayLen=4;
+  const filled=Math.min(pinBuffer.length,displayLen);
+  disp.innerHTML=Array.from({length:displayLen},(_,i)=>`<div class="pin-dot${i<filled?' filled':''}"></div>`).join('');
 }
 
 function pinKey(k){
@@ -1174,32 +1180,66 @@ function pinKey(k){
   if(pinBuffer.length>=maxLen)return;
   pinBuffer+=k;
   updatePinDisplay();
+  // Check after reaching password length
   if(pinBuffer.length===maxLen){
     setTimeout(()=>checkPin(),150);
   }
 }
 
-function checkPin(){
+async function checkPin(){
   if(!pinTargetUser)return;
-  if(pinBuffer===pinTargetUser.password){
+  const url=getSyncUrl();
+
+  // Show loading state
+  const pad=document.getElementById('pinPad');
+  if(pad)pad.style.opacity='0.5';
+
+  let verified=false;
+
+  if(url){
+    // Verify against Google Sheets
+    try{
+      const res=await fetch(url+'?action=verifyPin&username='+encodeURIComponent(pinTargetUser.username)+'&pin='+encodeURIComponent(pinBuffer),{method:'GET'});
+      const json=await res.json();
+      verified=json.valid===true;
+      // If verified, update local user data from sheet response
+      if(verified&&json.user){
+        pinTargetUser.displayName=json.user.displayName||pinTargetUser.displayName;
+        pinTargetUser.role=json.user.role||pinTargetUser.role;
+        try{pinTargetUser.perms=typeof json.user.perms==='string'?JSON.parse(json.user.perms):json.user.perms||{};}catch{}
+        // Update in appUsers but DON'T save password to localStorage
+        const idx=appUsers.findIndex(u=>u.username===pinTargetUser.username);
+        if(idx>-1){appUsers[idx].displayName=pinTargetUser.displayName;appUsers[idx].role=pinTargetUser.role;appUsers[idx].perms=pinTargetUser.perms;}
+        saveUsers();
+      }
+    }catch(e){
+      // Offline fallback — verify locally
+      console.warn('Sheet offline, using local PIN');
+      verified=(pinBuffer===pinTargetUser.password);
+    }
+  } else {
+    // No sheet URL — verify locally
+    verified=(pinBuffer===pinTargetUser.password);
+  }
+
+  if(pad)pad.style.opacity='1';
+
+  if(verified){
     currentUser=pinTargetUser;
     localStorage.removeItem('rawy_remembered');
     saveSession();
     resetSessionTimer();
     document.getElementById('loginScreen').classList.add('hidden');
-    applyPermissions();render();showPage('dashboard');
+    applyPermissions();render();showPage('dashboard');initDashLayout();
     pushHistory();
     toast(`مرحباً ${currentUser.displayName} 👋`,'success');
   } else {
+    pinBuffer='';
     const err=document.getElementById('loginError');
     if(err)err.classList.add('show');
     const disp=document.getElementById('pinDisplay');
-    if(disp)disp.classList.add('pin-error');
-    setTimeout(()=>{
-      pinBuffer='';
-      updatePinDisplay();
-      if(disp)disp.classList.remove('pin-error');
-    },500);
+    if(disp){disp.classList.add('pin-error');setTimeout(()=>{disp.classList.remove('pin-error');updatePinDisplay();},500);}
+    else updatePinDisplay();
   }
 }
 
@@ -2322,8 +2362,17 @@ async function syncPull(){
     if(json.loans)loans=json.loans.map(l=>({...l,amt:Number(l.amt)||0}));
     if(json.archive)archive=json.archive.map(a=>({...a,total:Number(a.total)||0}));
     if(json.users&&json.users.length){
-      appUsers=json.users.map(u=>({...u,perms:typeof u.perms==='string'?JSON.parse(u.perms||'{}'):u.perms||{}}));
-      saveUsers();
+      // Merge sheet users — keep passwords in memory only, not localStorage
+      appUsers=json.users.map(u=>({
+        id:u.id||u.username,
+        username:u.username,
+        password:u.password||u.passwordHash||'',  // keep in memory only
+        displayName:u.displayName||u.username,
+        role:u.role||'viewer',
+        perms:typeof u.perms==='string'?JSON.parse(u.perms||'{}'):u.perms||{}
+      }));
+      saveUsers(); // saves WITHOUT passwords
+      renderUserCards();
     }
     save();render();
     const now=new Date().toISOString();
