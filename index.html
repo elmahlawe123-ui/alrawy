@@ -667,6 +667,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
   <div class="header-right">
     <div class="header-date" id="headerDate"></div>
     <button class="btn-att-quick" onclick="showPage('attendance')"><span>📝</span><span class="btn-att-text">التحضير</span></button>
+    <button onclick="syncPull()" title="مزامنة من Google Sheets" style="background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:6px 10px;font-size:16px;cursor:pointer;color:#94a3b8;transition:all .2s">🔄</button>
     <div class="header-user" onclick="showPage('settings')" id="headerUser">
       <div class="header-user-avatar" id="headerUserAvatar">👤</div>
       <div><div class="header-user-name" id="headerUserName">—</div><div class="header-user-role" id="headerUserRole">—</div></div>
@@ -1280,7 +1281,8 @@ function checkPin(){
     applyPermissions();render();showPage('dashboard');initDashLayout();
     pushHistory();
     toast(`مرحباً ${currentUser.displayName} 👋`,'success');
-    if(getSyncUrl())setTimeout(()=>syncPull(),3000);
+    // Auto-pull disabled — يدوي فقط لتجنب الكتابة فوق البيانات المحلية
+    // if(getSyncUrl())setTimeout(()=>syncPull(),3000);
   } else {
     pinBuffer='';
     const err=document.getElementById('loginError');
@@ -2832,8 +2834,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     resetSessionTimer();pushHistory();
     startSyncInterval();
     toast(`مرحباً ${currentUser.displayName} 👋`,'success');
-    // Auto-pull in background after login (non-blocking)
-    if(getSyncUrl())setTimeout(()=>syncPull(),3000);
+    // Auto-pull disabled — يدوي فقط لتجنب الكتابة فوق البيانات المحلية
+    // if(getSyncUrl())setTimeout(()=>syncPull(),3000);
     return;
   }
   // Biometric disabled temporarily
