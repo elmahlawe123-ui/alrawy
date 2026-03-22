@@ -1150,11 +1150,11 @@ function render(){
   const totalL=loans.reduce((s,l)=>s+Number(l.amt),0);
   (document.getElementById('sLoans')||{}).textContent=totalL.toLocaleString('ar-EG')+' ج.م';
 
-  const topLoanW=workers.map(w=>({w,t:loans.filter(l=>l.workerId===w.id).reduce((s,l)=>s+l.amt,0)})).sort((a,b)=>b.t-a.t)[0];
+  const topLoanW=workers.map(w=>({w,t:loans.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+l.amt,0)})).sort((a,b)=>b.t-a.t)[0];
   const topLoanEl=document.getElementById('sTopLoan');
   if(topLoanEl)topLoanEl.textContent=topLoanW&&topLoanW.t>0?`أعلى: ${topLoanW.w.name.split(' ')[0]} (${topLoanW.t.toLocaleString('ar-EG')})` :'';
 
-  const totalEarned=workers.reduce((s,w)=>s+attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length*w.daily,0);
+  const totalEarned=workers.reduce((s,w)=>s+attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length*w.daily,0);
   (document.getElementById('sNetSalary')||{}).textContent=(totalEarned-totalL).toLocaleString('ar-EG')+' ج.م';
 
   const totalPoss=attendance.length;
@@ -1182,7 +1182,7 @@ function render(){
   (document.getElementById('monthCountdownName')||{}).textContent=MONTHS_AR[now.getMonth()]+' '+now.getFullYear();
   (document.getElementById('monthCountdownDate')||{}).textContent='ينتهي '+lastDay.toLocaleDateString('ar-EG');
 
-  const pending=activeW.filter(w=>!attendance.some(a=>a.workerId===w.id&&a.date===today)).length;
+  const pending=activeW.filter(w=>!attendance.some(a=>String(a.workerId)===String(w.id)&&a.date===today)).length;
   (document.getElementById('qAttPending')||{}).textContent=pending>0?`${pending} لم يُحضَّر`:'مكتمل ✅';
   (document.getElementById('qWorkerCount')||{}).textContent=`${activeW.length} عامل نشط`;
 
@@ -1190,7 +1190,7 @@ function render(){
   if(alertsEl){
     const alerts=[];
     if(pending>0)alerts.push(`<div class="alert-banner warn">⚠️ ${pending} عامل لم يُحضَّر اليوم</div>`);
-    const overLoanW=workers.filter(w=>{const t=loans.filter(l=>l.workerId===w.id).reduce((s,l)=>s+l.amt,0);const net=attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length*w.daily;return t>net&&net>0;});
+    const overLoanW=workers.filter(w=>{const t=loans.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+l.amt,0);const net=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length*w.daily;return t>net&&net>0;});
     if(overLoanW.length)alerts.push(`<div class="alert-banner danger">🚨 ${overLoanW.length} عامل تجاوزت سلفتهم الراتب</div>`);
     alertsEl.innerHTML=alerts.join('');
   }
@@ -1202,8 +1202,8 @@ function render(){
       ?data.map((d,i)=>`<div class="chart-row" onclick="openP(${d.id})"><span class="chart-row-rank">${i+1}</span><span class="chart-row-name">${d.n}</span><div class="chart-row-bar-wrap"><div class="chart-row-bar" style="width:${Math.max((d.v/mx)*100,4)}%;background:${color}"></div></div><span class="chart-row-val" style="color:${valColor}">${d.v} يوم</span></div>`).join('')
       :`<div style="color:var(--text3);font-size:12px;padding:10px 0">لا توجد بيانات</div>`;
   }
-  buildRows(document.getElementById('chartPresent'),workers.map(w=>({id:w.id,n:w.name,v:attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length})).sort((a,b)=>b.v-a.v).slice(0,8),'linear-gradient(90deg,#059669,#10b981)','var(--green)');
-  buildRows(document.getElementById('chartAbsent'),workers.map(w=>({id:w.id,n:w.name,v:attendance.filter(a=>a.workerId===w.id&&a.status==='غياب').length})).sort((a,b)=>b.v-a.v).slice(0,8),'linear-gradient(90deg,#b91c1c,#ef4444)','var(--red)');
+  buildRows(document.getElementById('chartPresent'),workers.map(w=>({id:w.id,n:w.name,v:attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length})).sort((a,b)=>b.v-a.v).slice(0,8),'linear-gradient(90deg,#059669,#10b981)','var(--green)');
+  buildRows(document.getElementById('chartAbsent'),workers.map(w=>({id:w.id,n:w.name,v:attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length})).sort((a,b)=>b.v-a.v).slice(0,8),'linear-gradient(90deg,#b91c1c,#ef4444)','var(--red)');
 
   renderWorkers();renderAttendance(today,activeW);renderLoans();renderArchive();
 }
@@ -1259,9 +1259,9 @@ function renderWorkers(){
   const wb=wt.querySelector('tbody');
   if(!list.length){wb.innerHTML=`<tr class="empty-row"><td colspan="10">لا توجد نتائج</td></tr>`;return;}
   list.forEach(w=>{
-    const days=attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length;
-    const abs=attendance.filter(a=>a.workerId===w.id&&a.status==='غياب').length;
-    const lns=loans.filter(l=>l.workerId===w.id).reduce((s,l)=>s+l.amt,0);
+    const days=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
+    const abs=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
+    const lns=loans.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+l.amt,0);
     const salary=days*w.daily-lns;
     const tr=document.createElement('tr');tr.className='clickable';
     tr.onclick=e=>{if(!e.target.closest('button'))openP(w.id);};
@@ -1279,12 +1279,12 @@ function renderWorkers(){
 
 /* ══ ATTENDANCE ══ */
 function renderAttendance(today,activeW){
-  const total=activeW.length,done=attendance.filter(a=>a.date===today&&activeW.some(w=>w.id===a.workerId)).length;
+  const total=activeW.length,done=attendance.filter(a=>a.date===today&&activeW.some(w=>String(w.id)===String(a.workerId))).length;
   const pct=total?Math.round((done/total)*100):0;
   (document.getElementById('attProgressFill')||{}).style.width=pct+'%';
   (document.getElementById('attProgressText')||{}).textContent=`تم تحضير ${done} من ${total}`;
   (document.getElementById('attProgressPct')||{}).textContent=pct+'%';
-  const pending=activeW.filter(w=>!attendance.some(a=>a.workerId===w.id&&a.date===today));
+  const pending=activeW.filter(w=>!attendance.some(a=>String(a.workerId)===String(w.id)&&a.date===today));
   const cur=document.getElementById("currentWName");
   const inputCard=document.getElementById('attInputCard');
   const completeCard=document.getElementById('attCompleteCard');
@@ -1307,26 +1307,26 @@ function renderAttendance(today,activeW){
   }
   const rg=document.getElementById('dailyReportGrid');if(!rg)return;
   const todayAtt=attendance.filter(a=>a.date===today);
-  const presL=todayAtt.filter(a=>a.status==='دوام').map(a=>workers.find(w=>w.id===a.workerId)).filter(Boolean);
-  const absL=todayAtt.filter(a=>a.status==='غياب').map(a=>workers.find(w=>w.id===a.workerId)).filter(Boolean);
+  const presL=todayAtt.filter(a=>a.status==='دوام').map(a=>workers.find(w=>String(w.id)===String(a.workerId))).filter(Boolean);
+  const absL=todayAtt.filter(a=>a.status==='غياب').map(a=>workers.find(w=>String(w.id)===String(a.workerId))).filter(Boolean);
   rg.innerHTML=`
     <div class="report-list"><div class="report-list-header present">✅ الحاضرون (${presL.length})</div>${presL.length?presL.map(w=>`<div class="report-list-item"><span class="worker-code" style="font-size:10px">#${w.wCode}</span>${w.name}</div>`).join(''):'<div class="report-list-item" style="color:var(--text3)">لا يوجد</div>'}</div>
     <div class="report-list"><div class="report-list-header absent">❌ الغائبون (${absL.length})</div>${absL.length?absL.map(w=>`<div class="report-list-item"><span class="worker-code" style="font-size:10px">#${w.wCode}</span>${w.name}</div>`).join(''):'<div class="report-list-item" style="color:var(--text3)">لا يوجد</div>'}</div>`;
 }
 
 /* ══ LOANS ══ */
-function workerNet(w){return attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length*w.daily;}
-function workerTotalLoan(wid){return loans.filter(l=>l.workerId===wid).reduce((s,l)=>s+l.amt,0);}
+function workerNet(w){return attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length*w.daily;}
+function workerTotalLoan(wid){return loans.filter(l=>String(l.workerId)===String(wid)).reduce((s,l)=>s+l.amt,0);}
 
 function renderLoans(){
   const wrap=document.getElementById("loanCardsWrap");if(!wrap)return;
   const fw=(document.getElementById('loanSearchInput')||{value:''}).value.trim().toLowerCase();
   let list=loans.slice().reverse();
-  if(fw)list=list.filter(l=>{const w=workers.find(x=>x.id===l.workerId);return w&&(w.name.toLowerCase().includes(fw)||w.wCode.includes(fw));});
+  if(fw)list=list.filter(l=>{const w=workers.find(x=>String(x.id)===String(l.workerId));return w&&(w.name.toLowerCase().includes(fw)||w.wCode.includes(fw));});
   if(!list.length){wrap.innerHTML=`<div style="text-align:center;color:var(--text3);padding:40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)">لا توجد سلفيات</div>`;return;}
   wrap.innerHTML='';
   list.forEach(l=>{
-    const w=workers.find(x=>x.id===l.workerId);
+    const w=workers.find(x=>String(x.id)===String(l.workerId));
     const net=w?workerNet(w):0,total=w?workerTotalLoan(w.id):0;
     const isOver=total>net&&net>0;
     const totalClass=total===0?'ok':isOver?'over':'warn';
@@ -1359,8 +1359,9 @@ function deleteLoan(idx){
 function updateLoanInfo(){
   const selEl=document.getElementById("loanWSelect"),amtEl=document.getElementById("loanAmt");
   if(!selEl||!amtEl)return;
-  const id=Number(selEl.value),newAmt=Number(amtEl.value)||0;
-  const w=workers.find(x=>x.id===id);const box=document.getElementById('loanSelectInfo');
+  const rawId=selEl.dataset.wid||selEl.value;
+  const newAmt=Number(amtEl.value)||0;
+  const w=workers.find(x=>String(x.id)===String(rawId));const box=document.getElementById('loanSelectInfo');
   if(!w){if(box)box.style.display='none';return;}
   const net=workerNet(w),total=workerTotalLoan(w.id),afterNew=total+newAmt;
   const balance=net-afterNew,isOver=afterNew>net&&net>0;
@@ -1417,10 +1418,11 @@ function toggleColsBar(){
 
 function record(stat){
   const id=(document.getElementById('currentWName')||{}).dataset.id;if(!id)return;
-  attendance.push({workerId:Number(id),status:stat==='present'?'دوام':'غياب',date:new Date().toLocaleDateString()});
+  const w=workers.find(x=>String(x.id)===String(id));
+  if(!w)return;
+  attendance.push({workerId:w.id,status:stat==='present'?'دوام':'غياب',date:new Date().toLocaleDateString()});
   save();render();
-  const w=workers.find(x=>x.id===Number(id));
-  toast(stat==='present'?`✅ ${w?.name} — دوام`:`❌ ${w?.name} — غياب`,stat==='present'?'success':'error');
+  toast(stat==='present'?'✅ '+w.name+' — دوام':'❌ '+w.name+' — غياب',stat==='present'?'success':'error');
 }
 
 function resetDay(){
@@ -1434,22 +1436,26 @@ function resetDay(){
 }
 
 function addLoan(){
-  const id=Number((document.getElementById('loanWSelect')||{}).value),amt=Number(document.getElementById("loanAmt").value);
-  if(!id){toast('⚠️ اختر العامل أولاً','error');return;}
-  if(!amt){toast('⚠️ أدخل المبلغ','error');return;}
-  const w=workers.find(x=>x.id===id),net=w?workerNet(w):0,total=w?workerTotalLoan(w.id):0,afterNew=total+amt;
-  if(net>0&&afterNew>net){if(!confirm(`⚠️ السلفة ستتجاوز راتب ${w?.name} بـ ${(afterNew-net).toLocaleString('ar-EG')} ج.م — متابعة؟`))return;}
+  const selEl=document.getElementById('loanWSelect');
+  const rawId=selEl?(selEl.dataset.wid||selEl.value):'';
+  if(!rawId){toast('⚠️ اختر العامل أولاً من القائمة','error');return;}
+  const amt=Number((document.getElementById("loanAmt")||{}).value);
+  if(!amt||amt<=0){toast('⚠️ أدخل مبلغاً صحيحاً','error');return;}
+  const w=workers.find(x=>String(x.id)===String(rawId));
+  if(!w){toast('⚠️ لم يتم التعرف على العامل، اختره مجدداً','error');return;}
+  const net=workerNet(w),total=workerTotalLoan(w.id),afterNew=total+amt;
+  if(net>0&&afterNew>net){if(!confirm('⚠️ السلفة ستتجاوز راتب '+w.name+' بـ '+(afterNew-net).toLocaleString('ar-EG')+' ج.م — متابعة؟'))return;}
   const noteVal=(document.getElementById('loanNote')||{value:''}).value.trim();
-  loans.push({workerId:id,amt,date:new Date().toLocaleDateString(),note:noteVal});
+  loans.push({workerId:w.id,amt,date:new Date().toLocaleDateString(),note:noteVal});
   // Reset form
   const amtEl=document.getElementById("loanAmt");if(amtEl)amtEl.value="";
   const lwSearch=document.getElementById('loanWorkerSearch');if(lwSearch)lwSearch.value='';
   const lwDD=document.getElementById('loanWorkerDropdown');if(lwDD)lwDD.style.display='none';
-  const selEl=document.getElementById('loanWSelect');if(selEl)selEl.value='';
+  if(selEl){selEl.value='';selEl.dataset.wid='';}
   const noteEl=document.getElementById('loanNote');if(noteEl)noteEl.value='';
   const lsiBox=document.getElementById('loanSelectInfo');if(lsiBox)lsiBox.style.display='none';
   save();render();renderLoans();
-  toast(`💰 تم الصرف لـ ${w?.name}`,'info');
+  toast('💰 تم الصرف لـ '+w.name,'info');
 }
 
 function doArchive(){
@@ -1473,16 +1479,16 @@ function toggleAttEdit(e,i,wid){
 document.addEventListener('click',()=>{if(openMenuId){const m=document.getElementById(openMenuId);if(m)m.classList.remove('show');openMenuId=null;}});
 
 function editAttRecord(wid,date,newStatus){
-  const rec=attendance.find(a=>a.workerId===wid&&a.date===date);
+  const rec=attendance.find(a=>String(a.workerId)===String(wid)&&a.date===date);
   if(rec){rec.status=newStatus;save();openP(wid);toast(newStatus==='دوام'?'✅ تم التعديل إلى حاضر':'❌ تم التعديل إلى غائب','success');}
 }
 function deleteAttRecord(wid,date){
-  attendance=attendance.filter(a=>!(a.workerId===wid&&a.date===date));
+  attendance=attendance.filter(a=>!(String(a.workerId)===String(wid)&&a.date===date));
   save();openP(wid);toast('🗑️ تم حذف السجل','info');
 }
 
 function openP(id){
-  selID=id;const w=workers.find(x=>x.id===id);if(!w)return;
+  selID=id;const w=workers.find(x=>String(x.id)===String(id));if(!w)return;
   showPage("profile");
   document.getElementById("pName").textContent=w.name;
   document.getElementById("pJob").textContent=w.job;
@@ -1493,8 +1499,8 @@ function openP(id){
   const sdEl=document.getElementById('pStartDate');
   if(sdEl)sdEl.textContent=w.startDate?`📅 منذ ${new Date(w.startDate).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'})}`:'';
   document.getElementById("pDaily").textContent=w.daily.toLocaleString('ar-EG')+' ج.م';
-  const days=attendance.filter(a=>a.workerId===id&&a.status==='دوام').length;
-  const lns=loans.filter(l=>l.workerId===id).reduce((s,l)=>s+l.amt,0);
+  const days=attendance.filter(a=>String(a.workerId)===String(id)&&a.status==='دوام').length;
+  const lns=loans.filter(l=>String(l.workerId)===String(id)).reduce((s,l)=>s+l.amt,0);
   const net=days*w.daily-lns,gross=days*w.daily;
   document.getElementById("pDays").textContent=days;
   const pGrossEl=document.getElementById("pGross");if(pGrossEl)pGrossEl.textContent=gross.toLocaleString('ar-EG')+' ج.م';
@@ -1504,7 +1510,7 @@ function openP(id){
   badge.textContent=w.active==='نشط'?'نشط':'موقوف';badge.className='badge '+(w.active==='نشط'?'badge-active':'badge-inactive');
   const btn=document.getElementById("pToggleBtn");
   btn.textContent=w.active==='نشط'?'🛑 إيقاف':'✅ تفعيل';btn.className='btn btn-lg '+(w.active==='نشط'?'btn-red':'btn-green');
-  const recs=attendance.filter(a=>a.workerId===id).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const recs=attendance.filter(a=>String(a.workerId)===String(id)).sort((a,b)=>new Date(a.date)-new Date(b.date));
   const calEl=document.getElementById('pAttCalendar');
   if(recs.length){
     calEl.innerHTML=recs.map((a,i)=>`
@@ -1522,14 +1528,14 @@ function openP(id){
   } else {
     calEl.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:8px 0">لا توجد سجلات</div>`;
   }
-  const wLoans=loans.filter(l=>l.workerId===id).slice().reverse();
+  const wLoans=loans.filter(l=>String(l.workerId)===String(id)).slice().reverse();
   document.getElementById('pLoansHistory').innerHTML=wLoans.length
     ?wLoans.map(l=>`<div class="p-loan-item"><div class="p-loan-row"><span class="p-loan-amt">${Number(l.amt).toLocaleString('ar-EG')} ج.م</span><span class="p-loan-date">🗓️ ${l.date}</span></div>${l.note?`<div class="p-loan-note">💬 ${l.note}</div>`:''}</div>`).join('')
     :`<div style="color:var(--text3);font-size:12px;padding:8px 0">لا توجد سلفيات</div>`;
 }
 
 function toggleStatus(){
-  const w=workers.find(x=>x.id===selID);w.active=w.active==='نشط'?'موقوف':'نشط';
+  const w=workers.find(x=>String(x.id)===String(selID));w.active=w.active==='نشط'?'موقوف':'نشط';
   save();openP(selID);toast(w.active==='نشط'?`✅ تم تفعيل ${w.name}`:`🛑 تم إيقاف ${w.name}`,w.active==='نشط'?'success':'error');
 }
 
@@ -1546,7 +1552,7 @@ function showConfirmModal(title,body,cb){
 function doConfirmModal(){closeModal('confirmModal');if(_confirmCb){_confirmCb();_confirmCb=null;}}
 
 function openEditModal(){
-  const w=workers.find(x=>x.id===selID);if(!w)return;
+  const w=workers.find(x=>String(x.id)===String(selID));if(!w)return;
   document.getElementById('editName').value=w.name;
   document.getElementById('editJob').value=w.job;
   document.getElementById('editDaily').value=w.daily;
@@ -1556,7 +1562,7 @@ function openEditModal(){
 }
 function quickEdit(id){selID=id;openEditModal();}
 function saveEdit(){
-  const w=workers.find(x=>x.id===selID);if(!w)return;
+  const w=workers.find(x=>String(x.id)===String(selID));if(!w)return;
   const n=document.getElementById('editName').value.trim(),j=document.getElementById('editJob').value.trim(),d=Number(document.getElementById('editDaily').value);
   if(!n||!d){toast('⚠️ أكمل البيانات','error');return;}
   w.name=n;w.job=j||w.job;w.daily=d;
@@ -1566,17 +1572,17 @@ function saveEdit(){
 }
 
 function openDeleteModal(){
-  const w=workers.find(x=>x.id===selID);if(!w)return;
+  const w=workers.find(x=>String(x.id)===String(selID));if(!w)return;
   document.getElementById('deleteWorkerName').textContent=w.name;
   const extra=document.getElementById('deleteModalExtra');
-  if(extra){const days=attendance.filter(a=>a.workerId===selID).length,lns=loans.filter(l=>l.workerId===selID).length;extra.textContent=`(${days} سجل حضور · ${lns} سلفة سيتم حذفها)`;}
+  if(extra){const days=attendance.filter(a=>String(a.workerId)===String(selID)).length,lns=loans.filter(l=>String(l.workerId)===String(selID)).length;extra.textContent=`(${days} سجل حضور · ${lns} سلفة سيتم حذفها)`;}
   document.getElementById('deleteModal').classList.remove('hidden');
 }
 function confirmDelete(){
-  const name=workers.find(x=>x.id===selID)?.name;
-  workers=workers.filter(x=>x.id!==selID);
-  attendance=attendance.filter(a=>a.workerId!==selID);
-  loans=loans.filter(l=>l.workerId!==selID);
+  const name=workers.find(x=>String(x.id)===String(selID))?.name;
+  workers=workers.filter(x=>String(x.id)!==String(selID));
+  attendance=attendance.filter(a=>String(a.workerId)!==String(selID));
+  loans=loans.filter(l=>String(l.workerId)!==String(selID));
   save();closeModal('deleteModal');showPage('workers');toast(`🗑️ تم حذف ${name}`,'error');
 }
 
@@ -1642,7 +1648,7 @@ function filterLoanWorkers(){
 
 function selectLoanWorker(id,name){
   const hidden=document.getElementById('loanWSelect'),search=document.getElementById('loanWorkerSearch'),dd=document.getElementById('loanWorkerDropdown');
-  if(hidden)hidden.value=id;
+  if(hidden){hidden.value=String(id);hidden.dataset.wid=String(id);}
   if(search)search.value=name;
   if(dd)dd.style.display='none';
   updateLoanInfo();
@@ -1670,14 +1676,14 @@ function printPayroll(){
   const today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
   let grandEarned=0,grandLoan=0,grandNet=0;
   workers.forEach(w=>{
-    const earned=attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length*w.daily;
-    const lns=loans.filter(l=>l.workerId===w.id).reduce((s,l)=>s+l.amt,0);
+    const earned=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length*w.daily;
+    const lns=loans.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+l.amt,0);
     grandEarned+=earned;grandLoan+=lns;grandNet+=(earned-lns);
   });
   const rows=workers.map((w,idx)=>{
-    const days=attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length;
-    const abs=attendance.filter(a=>a.workerId===w.id&&a.status==='غياب').length;
-    const earned=days*w.daily,lns=loans.filter(l=>l.workerId===w.id);
+    const days=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
+    const abs=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
+    const earned=days*w.daily,lns=loans.filter(l=>String(l.workerId)===String(w.id));
     const totalLoan=lns.reduce((s,l)=>s+l.amt,0),net=earned-totalLoan;
     const netColor=net>=0?'#047857':'#b91c1c';
     const loanTags=lns.map(l=>'<span style="font-size:8px;background:#fee2e2;color:#dc2626;border-radius:3px;padding:1px 5px;margin-left:3px">'+l.date.split('/').slice(0,2).join('/')+(l.note?'-'+l.note.slice(0,8):'')+': '+Number(l.amt).toLocaleString('ar-EG')+'</span>').join('');
@@ -1706,11 +1712,11 @@ function printPayroll(){
 }
 
 function printWorkerPayslip(){
-  const w=workers.find(x=>x.id===selID);if(!w)return;
+  const w=workers.find(x=>String(x.id)===String(selID));if(!w)return;
   const today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
-  const days=attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length;
-  const abs=attendance.filter(a=>a.workerId===w.id&&a.status==='غياب').length;
-  const earned=days*w.daily,lns=loans.filter(l=>l.workerId===w.id);
+  const days=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
+  const abs=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
+  const earned=days*w.daily,lns=loans.filter(l=>String(l.workerId)===String(w.id));
   const totalLoan=lns.reduce((s,l)=>s+l.amt,0),net=earned-totalLoan;
   const html='<div style="border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;max-width:700px;margin:0 auto"><div style="background:#0f172a;color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div><div style="font-size:18px;font-weight:900">الراوي الإداري</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">كشف الراتب</div></div><div style="text-align:left;font-size:11px;color:#94a3b8">'+today+'<br><span style="font-family:monospace">#'+w.wCode+'</span></div></div><div style="padding:20px 24px"><div style="font-size:20px;font-weight:900;color:#0f172a;margin-bottom:2px">'+w.name+'</div><div style="font-size:12px;color:#64748b;margin-bottom:16px">'+w.job+' · اليومية: '+w.daily.toLocaleString('ar-EG')+' ج.م</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px"><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;margin-bottom:5px">أيام الحضور</div><div style="font-size:18px;font-weight:900;color:#059669">'+days+'</div></div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;margin-bottom:5px">أيام الغياب</div><div style="font-size:18px;font-weight:900;color:#dc2626">'+abs+'</div></div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;margin-bottom:5px">إجمالي الأجر</div><div style="font-size:18px;font-weight:900;color:#0f172a">'+earned.toLocaleString('ar-EG')+' ج.م</div></div></div>'+(lns.length?'<div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px;padding-top:12px;border-top:1px solid #e2e8f0">💸 السلفيات ('+lns.length+')</div>'+lns.map(l=>'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px"><span>'+l.date+(l.note?' — '+l.note:'')+'</span><span style="color:#ef4444;font-weight:700">'+Number(l.amt).toLocaleString('ar-EG')+' ج.م</span></div>').join(''):'')+'<div style="background:#0f172a;color:#fff;border-radius:10px;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:16px;-webkit-print-color-adjust:exact;print-color-adjust:exact"><span style="font-size:12px;color:#94a3b8">الصافي المستحق</span><span style="font-size:20px;font-weight:900;color:#10b981">'+net.toLocaleString('ar-EG')+' ج.م</span></div><div style="text-align:center;font-size:10px;color:#94a3b8;padding:12px;border-top:1px solid #e2e8f0;margin-top:12px">الراوي الإداري · '+today+'</div></div></div>';
   const win=window.open('','_blank','width=800,height=600');
@@ -1720,8 +1726,8 @@ function printWorkerPayslip(){
 }
 
 function printIDCard(){
-  const w=workers.find(x=>x.id===selID);if(!w)return;
-  const days=attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length;
+  const w=workers.find(x=>String(x.id)===String(selID));if(!w)return;
+  const days=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
   const today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
   const sheet=document.getElementById('idCardPrint');
   sheet.innerHTML=`<div style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f1f5f9;padding:20px">
@@ -1748,9 +1754,9 @@ function printIDCard(){
 function printTodayAttendance(){
   const today=new Date().toLocaleDateString(),todayAR=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const todayAtt=attendance.filter(a=>a.date===today);
-  const presL=todayAtt.filter(a=>a.status==='دوام').map(a=>workers.find(w=>w.id===a.workerId)).filter(Boolean);
-  const absL=todayAtt.filter(a=>a.status==='غياب').map(a=>workers.find(w=>w.id===a.workerId)).filter(Boolean);
-  const pending=workers.filter(w=>w.active==='نشط'&&!todayAtt.some(a=>a.workerId===w.id));
+  const presL=todayAtt.filter(a=>a.status==='دوام').map(a=>workers.find(w=>String(w.id)===String(a.workerId))).filter(Boolean);
+  const absL=todayAtt.filter(a=>a.status==='غياب').map(a=>workers.find(w=>String(w.id)===String(a.workerId))).filter(Boolean);
+  const pending=workers.filter(w=>w.active==='نشط'&&!todayAtt.some(a=>String(a.workerId)===String(w.id)));
   const presRows=presL.map((w,i)=>'<tr><td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;text-align:center;color:#64748b;font-size:11px">'+(i+1)+'</td><td style="padding:6px 10px;border-bottom:1px solid #f1f5f9"><span style="font-family:monospace;font-size:10px;background:#f1f5f9;border-radius:4px;padding:1px 5px;margin-left:6px">#'+w.wCode+'</span>'+w.name+'</td><td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;color:#64748b;font-size:11px">'+w.job+'</td><td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;text-align:center;color:#059669;font-weight:700">حاضر</td></tr>').join('');
   const absRows=absL.map((w,i)=>'<tr style="background:#fef2f2"><td style="padding:6px 10px;border-bottom:1px solid #fee2e2;text-align:center;color:#64748b;font-size:11px">'+(presL.length+i+1)+'</td><td style="padding:6px 10px;border-bottom:1px solid #fee2e2"><span style="font-family:monospace;font-size:10px;background:#fee2e2;border-radius:4px;padding:1px 5px;margin-left:6px">#'+w.wCode+'</span>'+w.name+'</td><td style="padding:6px 10px;border-bottom:1px solid #fee2e2;color:#64748b;font-size:11px">'+w.job+'</td><td style="padding:6px 10px;border-bottom:1px solid #fee2e2;text-align:center;color:#dc2626;font-weight:700">غائب</td></tr>').join('');
   const html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #0f172a"><div><div style="font-size:16px;font-weight:900;color:#0f172a">الراوي الإداري</div><div style="font-size:11px;color:#64748b">كشف الحضور اليومي</div></div><div style="font-size:11px;color:#64748b">'+todayAR+'</div></div>'
@@ -1769,9 +1775,9 @@ function printTodayAttendance(){
 function printWorkerCards(){
   const today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
   const html=workers.map((w,idx)=>{
-    const days=attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length;
-    const abs=attendance.filter(a=>a.workerId===w.id&&a.status==='غياب').length;
-    const lns=loans.filter(l=>l.workerId===w.id),totalLoan=lns.reduce((s,l)=>s+l.amt,0);
+    const days=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
+    const abs=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
+    const lns=loans.filter(l=>String(l.workerId)===String(w.id)),totalLoan=lns.reduce((s,l)=>s+l.amt,0);
     const earned=days*w.daily,net=earned-totalLoan,netColor=net>=0?'#047857':'#dc2626';
     const loanTags=lns.length?lns.map(l=>'<span style="font-size:8px;background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:3px;padding:1px 5px">'+l.date.split('/').slice(0,2).join('/')+(l.note?'-'+l.note.slice(0,10):'')+': '+Number(l.amt).toLocaleString('ar-EG')+'</span>').join(' '):'';
     const pageBreak=(idx>0&&idx%20===0)?'page-break-before:always;':'padding-right:1%;';
@@ -1790,8 +1796,8 @@ function printWorkerCards(){
       +(totalLoan>0?'<div style="padding:3px 8px;background:#fff7ed;border-top:1px solid #fed7aa;display:flex;align-items:center;gap:4px"><span style="font-size:8px;color:#ea580c;font-weight:700">سلف '+totalLoan.toLocaleString('ar-EG')+' ج.م</span><span style="flex:1"></span>'+loanTags+'</div>':'')
     +'</div>';
   }).join('');
-  const grandEarned=workers.reduce((s,w)=>s+attendance.filter(a=>a.workerId===w.id&&a.status==='دوام').length*w.daily,0);
-  const grandLoan=workers.reduce((s,w)=>s+loans.filter(l=>l.workerId===w.id).reduce((x,l)=>x+l.amt,0),0);
+  const grandEarned=workers.reduce((s,w)=>s+attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length*w.daily,0);
+  const grandLoan=workers.reduce((s,w)=>s+loans.filter(l=>String(l.workerId)===String(w.id)).reduce((x,l)=>x+l.amt,0),0);
   const grandNet=grandEarned-grandLoan;
   const summary='<div style="border:2px solid #0f172a;border-top:none;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;background:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact;page-break-inside:avoid"><span style="color:#fff;font-size:12px;font-weight:700">الإجمالي · '+workers.length+' عامل</span><div style="display:flex;gap:16px"><span style="color:#94a3b8;font-size:11px">الأجر: <b style="color:#fff">'+grandEarned.toLocaleString('ar-EG')+'</b></span><span style="color:#94a3b8;font-size:11px">السلف: <b style="color:#fca5a5">'+grandLoan.toLocaleString('ar-EG')+'</b></span><span style="color:#94a3b8;font-size:11px">الصافي: <b style="color:#34d399">'+grandNet.toLocaleString('ar-EG')+'</b></span></div></div>';
   const header='<div style="text-align:center;padding:8px;background:#0f172a;color:#fff;margin-bottom:0;-webkit-print-color-adjust:exact;print-color-adjust:exact"><span style="font-size:14px;font-weight:900">الراوي الإداري</span> <span style="font-size:10px;color:#94a3b8;margin-right:8px">كشف صرف الرواتب · '+today+'</span></div>';
