@@ -487,6 +487,32 @@ tbody tr.clickable:hover{background:var(--surface2);}
 .qr-scan-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(5,150,105,.45);}
 .qr-scan-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.15) 50%,transparent 60%);animation:attBtnShine 3s ease-in-out infinite;}
 
+
+/* ══ PRINT BUTTONS ROW ══ */
+.print-btns-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+  margin-top:12px;
+}
+.print-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;padding:9px 4px;
+  border-radius:10px;border:1px solid var(--border2);
+  background:var(--surface2);color:var(--text2);
+  font-family:inherit;cursor:pointer;transition:all .2s;
+}
+.print-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2);}
+.print-btn.primary{background:linear-gradient(135deg,var(--accent),#b8770a);color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(201,129,10,.3);}
+.print-btn.primary:hover{filter:brightness(1.1);}
+.pb-icon{font-size:18px;line-height:1;}
+.pb-label{font-size:9px;font-weight:700;letter-spacing:.3px;white-space:nowrap;}
+@media(max-width:400px){
+  .pb-label{font-size:8px;}
+  .pb-icon{font-size:16px;}
+  .print-btn{padding:7px 2px;}
+}
+
 /* ══ SCROLLBAR ══ */
 ::-webkit-scrollbar{width:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
@@ -793,10 +819,11 @@ tbody tr.clickable:hover{background:var(--surface2);}
       <div style="flex:1"><div class="kpi-label">حضور هذا الشهر</div><div class="kpi-val" id="sMonthDays" style="color:var(--blue)">0</div><div class="kpi-sub" id="sMonthRate"></div></div>
     </div>
   </div>
-  <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;overflow-x:auto;white-space:nowrap">
-    <button class="btn btn-ghost btn-sm" onclick="printTodayAttendance()" style="white-space:nowrap;flex-shrink:0">📋 حضور اليوم</button>
-    <button class="btn btn-ghost btn-sm" onclick="printWorkerCards()" style="white-space:nowrap;flex-shrink:0">🪪 كروت العمال</button>
-    <button class="btn btn-primary btn-sm" onclick="printPayroll()" style="white-space:nowrap;flex-shrink:0">🖨️ كشف الرواتب</button>
+  <div class="print-btns-row">
+    <button class="print-btn" onclick="printTodayAttendance()"><span class="pb-icon">📋</span><span class="pb-label">حضور اليوم</span></button>
+    <button class="print-btn" onclick="printWorkerCards()"><span class="pb-icon">🪪</span><span class="pb-label">كروت التحضير</span></button>
+    <button class="print-btn" onclick="printPayrollCards()"><span class="pb-icon">💵</span><span class="pb-label">كروت الرواتب</span></button>
+    <button class="print-btn primary" onclick="printPayroll()"><span class="pb-icon">🖨️</span><span class="pb-label">كشف الرواتب</span></button>
   </div>
   <div class="dash-section">
     <div class="month-countdown">
@@ -2576,63 +2603,316 @@ tr.abs-row td{border-bottom-color:#fee2e2;}
   win.document.close();setTimeout(()=>{win.print();},600);
 }
 
-async function printWorkerCards(){
-  const today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
-  // Pre-generate QR data URLs for all workers
+async function printPayrollCards(){
+  const today = new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+  const issueDate = todayStr();
+
+  /* ── توليد QR لكل عامل (حجم كبير وواضح) ── */
   async function genQR(text){
     return new Promise(resolve=>{
       const d=document.createElement('div');
-      d.style.cssText='position:absolute;left:-9999px;top:-9999px;width:56px;height:56px';
+      d.style.cssText='position:absolute;left:-9999px;top:-9999px;width:110px;height:110px';
       document.body.appendChild(d);
       try{
-        new QRCode(d,{text,width:56,height:56,colorDark:'#0f172a',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+        new QRCode(d,{text,width:110,height:110,
+          colorDark:'#0f172a',colorLight:'#ffffff',
+          correctLevel:QRCode.CorrectLevel.H});
         setTimeout(()=>{
           const c=d.querySelector('canvas');
           resolve(c?c.toDataURL('image/png'):'');
           document.body.removeChild(d);
-        },80);
+        },100);
       }catch(e){document.body.removeChild(d);resolve('');}
     });
   }
+
   const qrMap={};
   for(const w of workers){
     qrMap[w.id]=await genQR(w.wCode);
   }
 
-  const html=workers.map((w,idx)=>{
-    const qrDataUrl=qrMap[w.id]||'';
-    const days=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
-    const abs=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
-    const lns=loans.filter(l=>String(l.workerId)===String(w.id)),totalLoan=lns.reduce((s,l)=>s+l.amt,0);
-    const earned=days*w.daily,net=earned-totalLoan,netColor=net>=0?'#047857':'#dc2626';
-    const loanTags=lns.length?lns.map(l=>'<span style="font-size:8px;background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:3px;padding:1px 5px">'+l.date.split('/').slice(0,2).join('/')+(l.note?'-'+l.note.slice(0,10):'')+': '+Number(l.amt).toLocaleString('ar-EG')+'</span>').join(' '):'';
-    const pageBreak=(idx>0&&idx%20===0)?'page-break-before:always;':'padding-right:1%;';
-    return '<div style="'+pageBreak+'display:inline-block;width:49%;vertical-align:top;border:1px solid #cbd5e1;border-radius:6px;page-break-inside:avoid;background:#fff;margin-bottom:3mm;overflow:hidden">'
-      +'<div style="background:#0f172a;padding:4px 8px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
-        +'<div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">🔨</span><div><div style="font-size:11px;font-weight:900;color:#fff;line-height:1.2">'+w.name+'</div><div style="font-size:8px;color:#94a3b8">'+w.job+'</div></div></div>'
-      +'<div style="display:flex;align-items:center;gap:6px">'+(qrDataUrl?'<img src="'+qrDataUrl+'" style="width:38px;height:38px;border-radius:5px;background:#fff;padding:2px" alt="QR">':'')+'<span style="font-size:9px;font-family:monospace;background:rgba(255,255,255,.1);color:#f0a030;border-radius:4px;padding:2px 6px;font-weight:700">#'+w.wCode+'</span></div>'
-        +'<span style="font-size:9px;font-family:monospace;background:rgba(255,255,255,.1);color:#f0a030;border-radius:4px;padding:2px 6px;font-weight:700">#'+w.wCode+'</span>'
-      +'</div>'
-      +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0">'
-        +'<div style="text-align:center;padding:5px 3px;border-left:1px solid #e2e8f0"><div style="font-size:6px;color:#94a3b8;font-weight:700;margin-bottom:2px">اليومية</div><div style="font-size:10px;font-weight:900;color:#c9810a">'+w.daily.toLocaleString('ar-EG')+'</div></div>'
-        +'<div style="text-align:center;padding:5px 3px;border-left:1px solid #e2e8f0;background:#f0fdf4"><div style="font-size:6px;color:#16a34a;font-weight:700;margin-bottom:2px">دوام</div><div style="font-size:14px;font-weight:900;color:#15803d">'+days+'</div></div>'
-        +'<div style="text-align:center;padding:5px 3px;border-left:1px solid #e2e8f0;background:#fef2f2"><div style="font-size:6px;color:#dc2626;font-weight:700;margin-bottom:2px">غياب</div><div style="font-size:14px;font-weight:900;color:#b91c1c">'+abs+'</div></div>'
-        +'<div style="text-align:center;padding:5px 3px;border-left:1px solid #e2e8f0"><div style="font-size:6px;color:#64748b;font-weight:700;margin-bottom:2px">الأجر</div><div style="font-size:10px;font-weight:900;color:#0f172a">'+earned.toLocaleString('ar-EG')+'</div></div>'
-        +'<div style="text-align:center;padding:5px 3px;background:'+(net>=0?'#f0fdf4':'#fef2f2')+'"><div style="font-size:6px;color:'+netColor+';font-weight:700;margin-bottom:2px">الصافي</div><div style="font-size:11px;font-weight:900;color:'+netColor+'">'+net.toLocaleString('ar-EG')+'</div></div>'
-      +'</div>'
-      +(totalLoan>0?'<div style="padding:3px 8px;background:#fff7ed;border-top:1px solid #fed7aa;display:flex;align-items:center;gap:4px"><span style="font-size:8px;color:#ea580c;font-weight:700">سلف '+totalLoan.toLocaleString('ar-EG')+' ج.م</span><span style="flex:1"></span>'+loanTags+'</div>':'')
-    +'</div>';
+  /* ── بناء كروت العمال ── */
+  const cards = workers.map((w,idx)=>{
+    const qrDataUrl = qrMap[w.id]||'';
+    const proj = projects.find(p=>String(p.id)===String(w.projectId));
+    const _now2=new Date(),_cm2=_now2.getMonth()+1,_cy2=_now2.getFullYear();
+    const _curAtt2=attendance.filter(a=>isInMonth(a.date,_cm2,_cy2));
+    const _curLns2=loans.filter(l=>isInMonth(l.date,_cm2,_cy2));
+    const wDays=_curAtt2.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
+    const wLns=_curLns2.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+Number(l.amt),0);
+    const wNet=wDays*w.daily-wLns;
+    const projName = proj ? proj.name : '—';
+    const startLabel = w.startDate
+      ? new Date(w.startDate).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'})
+      : '—';
+    const statusColor = w.active==='نشط'?'#059669':'#dc2626';
+    const statusBg    = w.active==='نشط'?'#f0fdf4':'#fef2f2';
+
+    return `
+<div class="worker-card">
+
+  <!-- هيدر: لوجو + المشروع -->
+  <div class="card-header">
+    <div class="card-header-right">
+      <span class="card-logo">🔨</span>
+      <div>
+        <div class="card-company">الراوي الإداري</div>
+        <div class="card-version">v5.1</div>
+      </div>
+    </div>
+    <div class="card-project">
+      <span class="proj-icon">🏗️</span>
+      <span>${projName}</span>
+    </div>
+  </div>
+
+  <!-- جسم الكارت: QR + بيانات -->
+  <div class="card-body">
+    <!-- QR كبير وواضح -->
+    <div class="card-qr">
+      ${qrDataUrl
+        ? `<img src="${qrDataUrl}" alt="QR #${w.wCode}" class="qr-img">`
+        : `<div class="qr-placeholder">QR</div>`}
+      <div class="qr-code-label">#${w.wCode}</div>
+    </div>
+
+    <!-- بيانات العامل -->
+    <div class="card-info">
+      <div class="card-name">${w.name}</div>
+      <div class="card-job">${w.job}</div>
+      <div class="card-rows">
+        <div class="card-row">
+          <span class="card-row-icon">🪪</span>
+          <span class="card-row-label">الكود</span>
+          <span class="card-row-val code">#${w.wCode}</span>
+        </div>
+        ${w.phone ? `
+        <div class="card-row">
+          <span class="card-row-icon">📞</span>
+          <span class="card-row-label">الهاتف</span>
+          <span class="card-row-val">${w.phone}</span>
+        </div>` : ''}
+        <div class="card-row">
+          <span class="card-row-icon">📅</span>
+          <span class="card-row-label">منذ</span>
+          <span class="card-row-val">${startLabel}</span>
+        </div>
+        <div class="card-row">
+          <span class="card-row-icon">●</span>
+          <span class="card-row-label">الحالة</span>
+          <span class="card-row-val" style="color:${statusColor};background:${statusBg};padding:1px 7px;border-radius:5px;font-weight:800">${w.active}</span>
+        </div>
+      </div>
+      <!-- صافي الراتب -->
+      <div style="margin-top:7px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:5px 8px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:9px;color:#065f46;font-weight:700">الصافي المستحق</span>
+        <span style="font-size:13px;font-weight:900;color:#047857;font-family:Tajawal,sans-serif">${wNet.toLocaleString('ar-EG')} ج.م</span>
+      </div>
+      <!-- خط توقيع -->
+      <div style="margin-top:6px;border-bottom:1.5px solid #94a3b8;padding-bottom:14px;font-size:8px;color:#94a3b8;text-align:center">التوقيع</div>
+    </div>
+  </div>
+
+  <!-- تذييل الراتب -->
+  <div class="card-footer" style="background:#f0fdf4;border-top:1px solid #bbf7d0">
+    <span style="font-size:8.5px;font-weight:700;color:#065f46">💰 كارت استلام الراتب — التوقيع يُعدّ إقراراً بالاستلام</span>
+    <span class="card-issue" style="color:#047857">صدر: ${issueDate}</span>
+  </div>
+
+</div>`;
   }).join('');
-  const grandEarned=workers.reduce((s,w)=>s+attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length*w.daily,0);
-  const grandLoan=workers.reduce((s,w)=>s+loans.filter(l=>String(l.workerId)===String(w.id)).reduce((x,l)=>x+l.amt,0),0);
-  const grandNet=grandEarned-grandLoan;
-  const summary='<div style="border:2px solid #0f172a;border-top:none;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;background:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact;page-break-inside:avoid"><span style="color:#fff;font-size:12px;font-weight:700">الإجمالي · '+workers.length+' عامل</span><div style="display:flex;gap:16px"><span style="color:#94a3b8;font-size:11px">الأجر: <b style="color:#fff">'+grandEarned.toLocaleString('ar-EG')+'</b></span><span style="color:#94a3b8;font-size:11px">السلف: <b style="color:#fca5a5">'+grandLoan.toLocaleString('ar-EG')+'</b></span><span style="color:#94a3b8;font-size:11px">الصافي: <b style="color:#34d399">'+grandNet.toLocaleString('ar-EG')+'</b></span></div></div>';
-  const header='<div style="text-align:center;padding:8px;background:#0f172a;color:#fff;margin-bottom:0;-webkit-print-color-adjust:exact;print-color-adjust:exact"><span style="font-size:14px;font-weight:900">الراوي الإداري</span> <span style="font-size:10px;color:#94a3b8;margin-right:8px">كشف صرف الرواتب · '+today+'</span></div>';
-  const css='*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"Tajawal",sans-serif;background:#fff;direction:rtl;}@media print{@page{size:A4 portrait;margin:5mm;}}';
-  const win=window.open('','_blank','width=900,height=700');
+
+  /* ── CSS ── */
+  const css = `
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Tajawal',sans-serif;
+  direction:rtl;
+  background:#f1f5f9;
+  padding:6mm;
+}
+@media print{
+  @page{size:A4 portrait;margin:5mm;}
+  body{background:#fff;padding:3mm;}
+  .worker-card{break-inside:avoid;}
+}
+
+/* ── Grid ── */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:4mm;
+}
+
+/* ── Card ── */
+.worker-card{
+  background:#fff;
+  border:1.5px solid #cbd5e1;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+}
+
+/* ── Header ── */
+.card-header{
+  background:#0f172a;
+  padding:6px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+.card-header-right{display:flex;align-items:center;gap:7px;}
+.card-logo{font-size:18px;}
+.card-company{font-size:11px;font-weight:900;color:#fff;line-height:1.2;}
+.card-version{font-size:8px;color:#64748b;}
+.card-project{
+  display:flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:800;
+  color:#f0a030;
+  background:rgba(240,160,48,.12);
+  border:1px solid rgba(240,160,48,.3);
+  border-radius:5px;
+  padding:2px 8px;
+}
+.proj-icon{font-size:11px;}
+
+/* ── Body ── */
+.card-body{
+  display:flex;
+  gap:0;
+  padding:10px;
+  align-items:flex-start;
+}
+
+/* ── QR ── */
+.card-qr{
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  margin-left:10px;
+}
+.qr-img{
+  width:90px;
+  height:90px;
+  border:2px solid #0f172a;
+  border-radius:8px;
+  padding:3px;
+  background:#fff;
+  display:block;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+.qr-placeholder{
+  width:90px;height:90px;
+  background:#f1f5f9;
+  border:2px dashed #cbd5e1;
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:#94a3b8;
+}
+.qr-code-label{
+  font-size:9px;font-weight:900;
+  font-family:monospace;
+  color:#0f172a;
+  background:#f1f5f9;
+  border:1px solid #e2e8f0;
+  border-radius:4px;
+  padding:1px 7px;
+  letter-spacing:1px;
+}
+
+/* ── Info ── */
+.card-info{flex:1;}
+.card-name{
+  font-size:14px;font-weight:900;color:#0f172a;
+  margin-bottom:2px;line-height:1.2;
+}
+.card-job{
+  font-size:10px;color:#64748b;
+  margin-bottom:8px;
+}
+.card-rows{display:flex;flex-direction:column;gap:4px;}
+.card-row{
+  display:flex;align-items:center;gap:5px;
+  font-size:10px;
+}
+.card-row-icon{font-size:10px;width:14px;text-align:center;flex-shrink:0;}
+.card-row-label{color:#94a3b8;font-weight:700;width:34px;flex-shrink:0;}
+.card-row-val{color:#0f172a;font-weight:700;}
+.card-row-val.code{
+  font-family:monospace;font-size:10px;font-weight:900;
+  color:#c9810a;
+}
+
+/* ── Footer ── */
+.card-footer{
+  background:#fffbeb;
+  border-top:1px dashed #fde68a;
+  padding:5px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+.card-warning{
+  font-size:8.5px;font-weight:700;color:#92400e;
+  flex:1;
+}
+.card-issue{
+  font-size:8px;color:#a16207;
+  white-space:nowrap;flex-shrink:0;
+}
+
+/* ── Page header ── */
+.print-header{
+  background:#0f172a;
+  color:#fff;
+  padding:8px 12px;
+  border-radius:7px;
+  margin-bottom:4mm;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+.print-header-title{font-size:14px;font-weight:900;}
+.print-header-sub{font-size:10px;color:#94a3b8;margin-top:2px;}
+.print-header-date{font-size:10px;color:#94a3b8;text-align:left;}
+`;
+
+  const pageHeader = `
+<div class="print-header">
+  <div>
+    <div class="print-header-title">🔨 الراوي الإداري v5.1</div>
+    <div class="print-header-sub">كروت صرف الرواتب · ${workers.length} عامل</div>
+  </div>
+  <div class="print-header-date">${today}</div>
+</div>`;
+
+  const win = window.open('','_blank','width=900,height=700');
   if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة','error');return;}
-  win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كروت العمال</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>'+css+'</style></head><body>'+header+'<div style="display:flex;flex-wrap:wrap;gap:2mm;padding:4px">'+html+'</div>'+summary+'</body></html>');
-  win.document.close();setTimeout(()=>{win.print();},600);
+  win.document.write(`<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>كروت صرف الرواتب · ${today}</title>
+<style>${css}</style>
+</head>
+<body>
+${pageHeader}
+<div class="cards-grid">${cards}</div>
+</body>
+</html>`);
+  win.document.close();
+  setTimeout(()=>{win.print();},700);
 }
 
 /* ══ INIT ══ */
@@ -3196,6 +3476,152 @@ document.addEventListener('DOMContentLoaded', () => {
   loans      = demoLoans;
   console.log('✅ Demo data injected: 20 workers / 2 projects');
 })();
+
+/* ══ ATTENDANCE ID CARDS ══ */
+async function printWorkerCards(){
+  const today = new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+  const issueDate = todayStr();
+
+  async function genQR(text){
+    return new Promise(resolve=>{
+      const d=document.createElement('div');
+      d.style.cssText='position:absolute;left:-9999px;top:-9999px;width:110px;height:110px';
+      document.body.appendChild(d);
+      try{
+        new QRCode(d,{text,width:110,height:110,
+          colorDark:'#0f172a',colorLight:'#ffffff',
+          correctLevel:QRCode.CorrectLevel.H});
+        setTimeout(()=>{
+          const c=d.querySelector('canvas');
+          resolve(c?c.toDataURL('image/png'):'');
+          document.body.removeChild(d);
+        },100);
+      }catch(e){document.body.removeChild(d);resolve('');}
+    });
+  }
+
+  const qrMap={};
+  for(const w of workers){ qrMap[w.id]=await genQR(w.wCode); }
+
+  const cards = workers.map((w,idx)=>{
+    const qrDataUrl = qrMap[w.id]||'';
+    const proj = projects.find(p=>String(p.id)===String(w.projectId));
+    const projName = proj ? proj.name : '—';
+    const startLabel = w.startDate
+      ? new Date(w.startDate).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'})
+      : '—';
+    const statusColor = w.active==='نشط'?'#059669':'#dc2626';
+    const statusBg    = w.active==='نشط'?'#f0fdf4':'#fef2f2';
+
+    return `
+<div class="worker-card">
+  <div class="card-header">
+    <div class="card-header-right">
+      <span class="card-logo">🔨</span>
+      <div>
+        <div class="card-company">الراوي الإداري</div>
+        <div class="card-version">v5.1</div>
+      </div>
+    </div>
+    <div class="card-project">
+      <span class="proj-icon">🏗️</span>
+      <span>${projName}</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-qr">
+      ${qrDataUrl
+        ? `<img src="${qrDataUrl}" alt="QR #${w.wCode}" class="qr-img">`
+        : `<div class="qr-placeholder">QR</div>`}
+      <div class="qr-code-label">#${w.wCode}</div>
+    </div>
+    <div class="card-info">
+      <div class="card-name">${w.name}</div>
+      <div class="card-job">${w.job}</div>
+      <div class="card-rows">
+        <div class="card-row">
+          <span class="card-row-icon">🪪</span>
+          <span class="card-row-label">الكود</span>
+          <span class="card-row-val code">#${w.wCode}</span>
+        </div>
+        ${w.phone ? `
+        <div class="card-row">
+          <span class="card-row-icon">📞</span>
+          <span class="card-row-label">الهاتف</span>
+          <span class="card-row-val">${w.phone}</span>
+        </div>` : ''}
+        <div class="card-row">
+          <span class="card-row-icon">📅</span>
+          <span class="card-row-label">منذ</span>
+          <span class="card-row-val">${startLabel}</span>
+        </div>
+        <div class="card-row">
+          <span class="card-row-icon">●</span>
+          <span class="card-row-label">الحالة</span>
+          <span class="card-row-val" style="color:${statusColor};background:${statusBg};padding:1px 7px;border-radius:5px;font-weight:800">${w.active}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <span class="card-warning">⚠️ هذا الكارت خاص بصاحبه ويُستخدم للتحضير فقط</span>
+    <span class="card-issue">صدر: ${issueDate}</span>
+  </div>
+</div>`;
+  }).join('');
+
+  const css = `
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Tajawal',sans-serif;direction:rtl;background:#f1f5f9;padding:6mm;}
+@media print{@page{size:A4 portrait;margin:5mm;}body{background:#fff;padding:3mm;}.worker-card{break-inside:avoid;}}
+.cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:4mm;}
+.worker-card{background:#fff;border:1.5px solid #cbd5e1;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.card-header{background:#0f172a;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.card-header-right{display:flex;align-items:center;gap:7px;}
+.card-logo{font-size:18px;}
+.card-company{font-size:11px;font-weight:900;color:#fff;line-height:1.2;}
+.card-version{font-size:8px;color:#64748b;}
+.card-project{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:#f0a030;background:rgba(240,160,48,.12);border:1px solid rgba(240,160,48,.3);border-radius:5px;padding:2px 8px;}
+.proj-icon{font-size:11px;}
+.card-body{display:flex;gap:0;padding:10px;align-items:flex-start;}
+.card-qr{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;margin-left:10px;}
+.qr-img{width:90px;height:90px;border:2px solid #0f172a;border-radius:8px;padding:3px;background:#fff;display:block;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.qr-placeholder{width:90px;height:90px;background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#94a3b8;}
+.qr-code-label{font-size:9px;font-weight:900;font-family:monospace;color:#0f172a;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:1px 7px;letter-spacing:1px;}
+.card-info{flex:1;}
+.card-name{font-size:14px;font-weight:900;color:#0f172a;margin-bottom:2px;line-height:1.2;}
+.card-job{font-size:10px;color:#64748b;margin-bottom:8px;}
+.card-rows{display:flex;flex-direction:column;gap:4px;}
+.card-row{display:flex;align-items:center;gap:5px;font-size:10px;}
+.card-row-icon{font-size:10px;width:14px;text-align:center;flex-shrink:0;}
+.card-row-label{color:#94a3b8;font-weight:700;width:34px;flex-shrink:0;}
+.card-row-val{color:#0f172a;font-weight:700;}
+.card-row-val.code{font-family:monospace;font-size:10px;font-weight:900;color:#c9810a;}
+.card-footer{background:#fffbeb;border-top:1px dashed #fde68a;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.card-warning{font-size:8.5px;font-weight:700;color:#92400e;flex:1;}
+.card-issue{font-size:8px;color:#a16207;white-space:nowrap;flex-shrink:0;}
+.print-header{background:#0f172a;color:#fff;padding:8px 12px;border-radius:7px;margin-bottom:4mm;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.print-header-title{font-size:14px;font-weight:900;}
+.print-header-sub{font-size:10px;color:#94a3b8;margin-top:2px;}
+.print-header-date{font-size:10px;color:#94a3b8;text-align:left;}
+`;
+
+  const pageHeader = `
+<div class="print-header">
+  <div>
+    <div class="print-header-title">🔨 الراوي الإداري v5.1</div>
+    <div class="print-header-sub">كروت التحضير · ${workers.length} عامل</div>
+  </div>
+  <div class="print-header-date">${today}</div>
+</div>`;
+
+  const win = window.open('','_blank','width=900,height=700');
+  if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة','error');return;}
+  win.document.write(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كروت التحضير · ${today}</title><style>${css}</style></head><body>${pageHeader}<div class="cards-grid">${cards}</div></body></html>`);
+  win.document.close();
+  setTimeout(()=>{win.print();},700);
+}
 </script>
 
 <!-- COMPLETION MODAL -->
