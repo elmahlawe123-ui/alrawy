@@ -294,16 +294,40 @@ tbody tr.clickable:hover{background:var(--surface2);}
 .profile-actions .btn{flex:1;min-width:100px;}
 .att-history{margin-top:20px;}
 .att-history-title{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;}
-.att-calendar{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:5px;}
+.att-calendar{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:5px;overflow:visible;padding-top:10px;}
 .att-day-wrap{position:relative;display:inline-block;}
 .att-day{border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px 3px;font-size:9px;font-weight:700;gap:2px;cursor:pointer;transition:transform .15s,opacity .15s;}
 .att-day:hover{transform:scale(1.1);opacity:.85;}
 .att-day.present{background:var(--green-bg);color:var(--green);border:1px solid rgba(16,185,129,.3);}
 .att-day.absent{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.3);}
 
-.att-day.friday{background:rgba(124,58,237,.12)!important;border:1px solid rgba(124,58,237,.3)!important;color:#a78bfa!important;}
-.att-day.friday.present{background:rgba(124,58,237,.15)!important;border-color:rgba(124,58,237,.4)!important;}
-.att-day.friday.absent{background:rgba(124,58,237,.06)!important;}
+.att-day.friday{
+  background:rgba(124,58,237,.18)!important;
+  border:2px solid rgba(124,58,237,.6)!important;
+  color:#c4b5fd!important;
+  box-shadow:0 0 10px rgba(124,58,237,.35),inset 0 0 0 1px rgba(124,58,237,.3)!important;
+  outline:2px solid rgba(124,58,237,.4);
+  outline-offset:1px;
+}
+.att-day-wrap.friday-wrap::before{
+  content:'🕌';
+  position:absolute;
+  top:-8px;
+  right:-2px;
+  font-size:11px;
+  line-height:1;
+  pointer-events:none;
+  z-index:10;
+  filter:drop-shadow(0 0 3px rgba(124,58,237,.6));
+}
+.att-day.friday.present{
+  background:rgba(124,58,237,.22)!important;
+  border-color:rgba(124,58,237,.7)!important;
+}
+.att-day.friday.absent{
+  background:rgba(124,58,237,.08)!important;
+  border-color:rgba(124,58,237,.35)!important;
+}
 
 .att-day.partial{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.3);}
 .att-edit-menu{position:absolute;top:110%;right:0;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:6px;z-index:200;display:none;gap:4px;flex-direction:column;min-width:100px;box-shadow:var(--shadow);}
@@ -2207,10 +2231,12 @@ function printMonthReport(idx){
 
   let grandEarned=0,grandLoan=0,grandNet=0;
   const rows=snapWorkers.map((w,i)=>{
-    const pres=snapAtt.filter(x=>String(x.workerId)===String(w.id)&&x.status==='دوام').length;
+    const wAtt=snapAtt.filter(x=>String(x.workerId)===String(w.id)&&(x.status==='دوام'||x.status==='ناقص'));
+    let normalDays=0, friDaysCnt=0;
+    wAtt.forEach(a=>{ if(isFriday(a.date)) friDaysCnt++; else normalDays++; });
     const abs=snapAtt.filter(x=>String(x.workerId)===String(w.id)&&x.status==='غياب').length;
     const lns=snapLoans.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+Number(l.amt),0);
-    const earned=pres*w.daily,net=earned-lns;
+    const earned=(normalDays+friDaysCnt)*w.daily,net=earned-lns;
     grandEarned+=earned;grandLoan+=lns;grandNet+=net;
     const netC=net>=0?'#047857':'#b91c1c';
     return `<tr style="border-bottom:1px solid #e2e8f0">
@@ -2218,7 +2244,8 @@ function printMonthReport(idx){
       <td style="padding:5px 6px;font-size:9px;font-family:monospace;color:#64748b">#${w.wCode}</td>
       <td style="padding:5px 6px;font-weight:700;font-size:12px;color:#0f172a">${w.name}</td>
       <td style="padding:5px 6px;font-size:10px;color:#64748b">${w.job}</td>
-      <td style="padding:5px 6px;text-align:center;font-weight:900;color:#15803d;background:#f0fdf4">${pres}</td>
+      <td style="padding:5px 6px;text-align:center;font-weight:900;color:#15803d;background:#f0fdf4">${normalDays}</td>
+      <td style="padding:5px 6px;text-align:center;font-weight:900;color:#6d28d9;background:#f5f3ff;border-right:2px solid #c4b5fd;border-left:2px solid #c4b5fd">${friDaysCnt>0?friDaysCnt:'—'}</td>
       <td style="padding:5px 6px;text-align:center;font-weight:700;color:#b91c1c;background:#fef2f2">${abs}</td>
       <td style="padding:5px 6px;text-align:center;font-size:11px">${earned.toLocaleString('ar-EG')}</td>
       <td style="padding:5px 6px;text-align:center;font-size:11px;color:#c2410c">${lns>0?lns.toLocaleString('ar-EG'):'—'}</td>
@@ -2228,9 +2255,9 @@ function printMonthReport(idx){
   }).join('');
 
   const sigFooter=`<div class="sig-footer"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding:12px 8px 8px;border-top:2px solid #e2e8f0"><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">مُعِدّ الكشف</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">مراجعة المشرف</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">اعتماد المدير</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div></div></div>`;
-  const css=`*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Tajawal',sans-serif;background:#fff;direction:rtl;font-size:11px;}@media print{@page{size:A4;margin:6mm 6mm 48mm 6mm;}body{padding:0;}.sig-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}table{width:100%;border-collapse:collapse;}thead tr{background:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact;}thead th{padding:6px;color:#fff;font-weight:700;font-size:10px;text-align:center;}.summary-row td{background:#0f172a!important;color:#fff!important;font-weight:900;-webkit-print-color-adjust:exact;print-color-adjust:exact;}`;
+  const css=`*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Tajawal',sans-serif;background:#fff;direction:rtl;font-size:11px;}@media print{@page{size:A4;margin:6mm 6mm 48mm 6mm;}body{padding:0;}.sig-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}table{width:100%;border-collapse:collapse;}thead tr{background:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact;}thead th{padding:6px;color:#fff;font-weight:700;font-size:10px;text-align:center;}.summary-row td{background:#0f172a!important;color:#fff!important;font-weight:900;-webkit-print-color-adjust:exact;print-color-adjust:exact;}thead th[style*="ede9fe"]{background:#ede9fe!important;color:#5b21b6!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}`;
   const header=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 8px;background:#0f172a;color:#fff;margin-bottom:8px;border-radius:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div><div style="font-size:16px;font-weight:900">الراوي الإداري</div><div style="font-size:10px;color:#94a3b8">كشف رواتب (v5.1) ${label}</div></div><div style="text-align:left;font-size:10px;color:#94a3b8">تاريخ الترحيل: ${a.date}<br>عدد العمال: ${snapWorkers.length}</div></div>`;
-  const table=`<table><thead><tr><th style="width:28px">#</th><th style="width:44px">الكود</th><th>الاسم</th><th style="width:80px">التخصص</th><th style="width:36px">حضور</th><th style="width:36px">غياب</th><th style="width:60px">الأجر</th><th style="width:55px">السلف</th><th style="width:65px">الصافي</th><th style="width:90px">توقيع</th></tr></thead><tbody>${rows}<tr class="summary-row"><td colspan="6" style="padding:6px 8px;font-size:11px;text-align:right;color:#94a3b8">الإجمالي</td><td style="padding:6px;text-align:center;color:#fff">${grandEarned.toLocaleString('ar-EG')}</td><td style="padding:6px;text-align:center;color:#fca5a5">${grandLoan.toLocaleString('ar-EG')}</td><td style="padding:6px;text-align:center;color:#34d399">${grandNet.toLocaleString('ar-EG')}</td><td></td></tr></tbody></table>`;
+  const table=`<table><thead><tr><th style="width:28px">#</th><th style="width:44px">الكود</th><th>الاسم</th><th style="width:80px">التخصص</th><th style="width:36px">حضور</th><th style="width:36px;background:#ede9fe;color:#5b21b6">🕌 جمعة</th><th style="width:36px">غياب</th><th style="width:60px">الأجر</th><th style="width:55px">السلف</th><th style="width:65px">الصافي</th><th style="width:90px">توقيع</th></tr></thead><tbody>${rows}<tr class="summary-row"><td colspan="7" style="padding:6px 8px;font-size:11px;text-align:right;color:#94a3b8">الإجمالي</td><td style="padding:6px;text-align:center;color:#fff">${grandEarned.toLocaleString('ar-EG')}</td><td style="padding:6px;text-align:center;color:#fca5a5">${grandLoan.toLocaleString('ar-EG')}</td><td style="padding:6px;text-align:center;color:#34d399">${grandNet.toLocaleString('ar-EG')}</td><td></td></tr></tbody></table>`;
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة','error');return;}
   win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف '+label+'</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>'+css+'</style></head><body style="padding:6px">'+sigFooter+header+table+'</body></html>');
@@ -2398,7 +2425,7 @@ function openP(id){
   const calEl=document.getElementById('pAttCalendar');
   if(recs.length){
     calEl.innerHTML=recs.map((a,i)=>`
-      <div class="att-day-wrap">
+      <div class="att-day-wrap${isFriday(a.date)?' friday-wrap':''}">
         <div class="att-day ${a.status==='دوام'?'present':a.status==='ناقص'?'partial':'absent'}${isFriday(a.date)?' friday':''}" onclick="toggleAttEdit(event,${i},${id})" title="${isFriday(a.date)?'🕌 جمعة — ':''} ${a.timeIn?'🟢'+a.timeIn:''} ${a.otHours>0?'🔥'+a.otHours+'س':''}">
           <span style="font-size:12px">${a.status==='دوام'?(a.otHours>0?'🔥':isFriday(a.date)?'🕌':'✅'):a.status==='ناقص'?'⚠️':'❌'}</span>
           <span style="font-size:9px">${(function(ds){const p=ds.split('/');return p.length===3?p[0]+'/'+p[1]:ds;})(a.date)}</span>
@@ -2589,9 +2616,11 @@ function printPayroll(){
     grandEarned+=earned;grandOT+=_s.otPay;grandLoan+=lns;grandNet+=(earned-lns);
   });
   const rows=workers.map((w,idx)=>{
-    const days=attendance.filter(a=>String(a.workerId)===String(w.id)&&(a.status==='دوام'||a.status==='ناقص')).length;
+    const _sal=calcWorkerSalary(w,attendance);
+    const days=_sal.normalDays;
+    const friDays=_sal.friDays;
     const abs=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
-    const basePay=days*w.daily;
+    const basePay=_sal.basePay;
     const otPay=attendance.filter(a=>String(a.workerId)===String(w.id)).reduce((s,a)=>s+Number(a.otPay||0),0);
     const earned=basePay+otPay;
     const lns=loans.filter(l=>String(l.workerId)===String(w.id));
@@ -2603,7 +2632,8 @@ function printPayroll(){
       +'<td style="padding:5px 6px;font-size:9px;font-family:monospace;color:#64748b">#'+w.wCode+'</td>'
       +'<td style="padding:5px 6px;font-weight:700;font-size:12px;color:#0f172a">'+w.name+(loanTags?'<div style="margin-top:2px">'+loanTags+'</div>':'')+'</td>'
       +'<td style="padding:5px 6px;font-size:10px;color:#64748b">'+w.job+'</td>'
-      +'<td style="padding:5px 6px;text-align:center;font-weight:900;font-size:13px;color:#15803d;background:#f0fdf4">'+(days-friDays)+(friDays>0?'<div style="font-size:8px;color:#7c3aed;font-weight:700">+'+friDays+'🕌</div>':'')+'</td>'
+      +'<td style="padding:5px 6px;text-align:center;font-weight:900;font-size:13px;color:#15803d;background:#f0fdf4">'+days+'</td>'
+      +'<td style="padding:5px 6px;text-align:center;font-weight:900;font-size:13px;color:#6d28d9;background:#f5f3ff;border-right:2px solid #c4b5fd;border-left:2px solid #c4b5fd">'+(friDays>0?friDays:'—')+'</td>'
       +'<td style="padding:5px 6px;text-align:center;font-weight:700;font-size:12px;color:#b91c1c;background:#fef2f2">'+abs+'</td>'
       +'<td style="padding:5px 6px;text-align:center;font-size:11px;color:#0f172a">'+basePay.toLocaleString('ar-EG')+'</td>'
       +'<td style="padding:5px 6px;text-align:center;font-size:11px;color:#c9810a;font-weight:700">'+(otPay>0?otPay.toLocaleString('ar-EG'):'—')+'</td>'
@@ -2613,9 +2643,9 @@ function printPayroll(){
       +'</tr>';
   }).join('');
   const sigFooter='<div class="sig-footer"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding:12px 8px 8px;border-top:2px solid #e2e8f0"><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">مُعِدّ الكشف</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">مراجعة المشرف</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">اعتماد المدير</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div></div></div>';
-  const css='*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"Tajawal",sans-serif;background:#fff;direction:rtl;font-size:11px;}@media print{@page{size:A4;margin:6mm 6mm 48mm 6mm;}body{padding:0;}.sig-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}table{width:100%;border-collapse:collapse;}thead tr{background:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact;}thead th{padding:6px;color:#fff;font-weight:700;font-size:10px;text-align:center;}.summary-row td{background:#0f172a!important;color:#fff!important;font-weight:900;-webkit-print-color-adjust:exact;print-color-adjust:exact;}';
+  const css='*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"Tajawal",sans-serif;background:#fff;direction:rtl;font-size:11px;}@media print{@page{size:A4;margin:6mm 6mm 48mm 6mm;}body{padding:0;}.sig-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}table{width:100%;border-collapse:collapse;}thead tr{background:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact;}thead th{padding:6px;color:#fff;font-weight:700;font-size:10px;text-align:center;}.summary-row td{background:#0f172a!important;color:#fff!important;font-weight:900;-webkit-print-color-adjust:exact;print-color-adjust:exact;}thead th[style*="ede9fe"]{background:#ede9fe!important;color:#5b21b6!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}';
   const header='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 8px;background:#0f172a;color:#fff;margin-bottom:8px;border-radius:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div><div style="font-size:16px;font-weight:900">الراوي الإداري</div><div style="font-size:10px;color:#94a3b8">كشف الرواتب الشهري (v5.1)</div></div><div style="text-align:left;font-size:10px;color:#94a3b8">'+today+'<br>عدد العمال: '+workers.length+'</div></div>';
-  const table='<table><thead><tr><th style="width:28px">#</th><th style="width:44px">الكود</th><th>الاسم</th><th style="width:70px">التخصص</th><th style="width:32px">حضور</th><th style="width:32px">غياب</th><th style="width:55px">الأساسي</th><th style="width:50px">الإضافي</th><th style="width:50px">السلف</th><th style="width:58px">الصافي</th><th style="width:80px">توقيع</th></tr></thead><tbody>'+rows+'<tr class="summary-row"><td colspan="6" style="padding:6px 8px;font-size:11px;text-align:right;color:#94a3b8">الإجمالي</td><td style="padding:6px;text-align:center;color:#fff">'+grandEarned.toLocaleString('ar-EG')+'</td><td style="padding:6px;text-align:center;color:#fde68a">'+grandOT.toLocaleString('ar-EG')+'</td><td style="padding:6px;text-align:center;color:#fca5a5">'+grandLoan.toLocaleString('ar-EG')+'</td><td style="padding:6px;text-align:center;color:#34d399">'+grandNet.toLocaleString('ar-EG')+'</td><td></td></tr></tbody></table>';
+  const table='<table><thead><tr><th style="width:28px">#</th><th style="width:44px">الكود</th><th>الاسم</th><th style="width:70px">التخصص</th><th style="width:32px">حضور</th><th style="width:32px;background:#ede9fe;color:#5b21b6">🕌 جمعة</th><th style="width:32px">غياب</th><th style="width:55px">الأساسي</th><th style="width:50px">الإضافي</th><th style="width:50px">السلف</th><th style="width:58px">الصافي</th><th style="width:80px">توقيع</th></tr></thead><tbody>'+rows+'<tr class="summary-row"><td colspan="7" style="padding:6px 8px;font-size:11px;text-align:right;color:#94a3b8">الإجمالي</td><td style="padding:6px;text-align:center;color:#fff">'+grandEarned.toLocaleString('ar-EG')+'</td><td style="padding:6px;text-align:center;color:#fde68a">'+grandOT.toLocaleString('ar-EG')+'</td><td style="padding:6px;text-align:center;color:#fca5a5">'+grandLoan.toLocaleString('ar-EG')+'</td><td style="padding:6px;text-align:center;color:#34d399">'+grandNet.toLocaleString('ar-EG')+'</td><td></td></tr></tbody></table>';
   const footer='<div style="text-align:center;font-size:9px;color:#94a3b8;margin-top:8px;padding-top:6px;border-top:1px solid #e2e8f0">الراوي الإداري · '+today+'</div>';
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة','error');return;}
@@ -2972,15 +3002,19 @@ async function printPayrollCards(){
           <span class="card-row-val">${startLabel}</span>
         </div>
       </div>
-      <!-- دوام وغياب -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px;margin-bottom:2px">
-        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px;padding:5px 8px;text-align:center">
-          <div style="font-size:16px;font-weight:900;color:#15803d;font-family:Tajawal,sans-serif">${wDays}</div>
-          <div style="font-size:8px;font-weight:700;color:#16a34a;margin-top:1px">✅ يوم دوام</div>
+      <!-- دوام وغياب وجمعة -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:6px;margin-bottom:2px">
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px;padding:5px 6px;text-align:center">
+          <div style="font-size:16px;font-weight:900;color:#15803d;font-family:Tajawal,sans-serif">${_ws.normalDays}</div>
+          <div style="font-size:7.5px;font-weight:700;color:#16a34a;margin-top:1px">✅ دوام</div>
         </div>
-        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:7px;padding:5px 8px;text-align:center">
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:7px;padding:5px 6px;text-align:center">
           <div style="font-size:16px;font-weight:900;color:#b91c1c;font-family:Tajawal,sans-serif">${wAbsDays}</div>
-          <div style="font-size:8px;font-weight:700;color:#dc2626;margin-top:1px">❌ يوم غياب</div>
+          <div style="font-size:7.5px;font-weight:700;color:#dc2626;margin-top:1px">❌ غياب</div>
+        </div>
+        <div style="background:#f5f3ff;border:2px solid #c4b5fd;border-radius:7px;padding:5px 6px;text-align:center;position:relative">
+          <div style="font-size:16px;font-weight:900;color:#6d28d9;font-family:Tajawal,sans-serif">${_ws.friDays}</div>
+          <div style="font-size:7.5px;font-weight:700;color:#7c3aed;margin-top:1px">🕌 جمعة</div>
         </div>
       </div>
       <!-- إضافي إن وجد -->
@@ -3920,8 +3954,17 @@ body{font-family:'Tajawal',sans-serif;direction:rtl;background:#f1f5f9;padding:6
 // هل التاريخ يوم جمعة؟
 function isFriday(dateStr){
   const p=dateStr.split('/');
-  if(p.length!==3)return false;
-  return new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0])).getDay()===5;
+  if(p.length===3){
+    return new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0])).getDay()===5;
+  }
+  if(p.length===2){
+    const curY=new Date().getFullYear();
+    const d1=new Date(curY,parseInt(p[1])-1,parseInt(p[0]));
+    if(d1.getDay()===5)return true;
+    const d2=new Date(curY-1,parseInt(p[1])-1,parseInt(p[0]));
+    return d2.getDay()===5;
+  }
+  return false;
 }
 
 // حساب راتب عامل من سجلات الحضور
