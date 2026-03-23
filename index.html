@@ -3256,9 +3256,10 @@ window.addEventListener('DOMContentLoaded',()=>{
 function showCompletionModal(presCount,absCount,total){
   const modal=document.getElementById('completionModal');
   if(!modal)return;
-  // لا تظهر إلا مرة واحدة عند اكتمال التحضير الصباحي
+  // لا تظهر إلا مرة واحدة بعد تسجيل فعلي (مش عند فتح التطبيق)
   const _today=todayStr();
   if(_completionShownDate===_today)return;
+  if(!_userRecordedToday)return; // منع الظهور عند فتح التطبيق
   _completionShownDate=_today;
   // Fill stats
   document.getElementById('cmPresent').textContent=presCount;
@@ -4128,6 +4129,7 @@ function recordAbsent(){
   const w=workers.find(x=>String(x.id)===String(id));if(!w)return;
   const today=todayStr();
   const existing=attendance.find(a=>String(a.workerId)===String(w.id)&&a.date===today);
+  _userRecordedToday=true;
   const rec={workerId:w.id,date:today,status:'غياب',timeIn:'',timeMid:'',timeOut:'',totalHours:0,otHours:0,otPay:0};
   if(existing){const idx=attendance.indexOf(existing);if(idx>-1)attendance[idx]=rec;}
   else attendance.push(rec);
@@ -4178,7 +4180,8 @@ function onQRSuccess(code){
 
 /* ══ ATTENDANCE PHASE SYSTEM ══ */
 let currentPhase = 0;
-let _completionShownDate = ''; // منع ظهور شاشة الاكتمال أكثر من مرة في اليوم // 0=صباحي 1=وسطي 2=نهاية 3=إضافي
+let _completionShownDate = ''; // منع ظهور شاشة الاكتمال أكثر من مرة في اليوم
+let _userRecordedToday = false; // يصبح true بعد أول تسجيل حضور // 0=صباحي 1=وسطي 2=نهاية 3=إضافي
 
 const PHASE_CONFIG = [
   { key:'morning', icon:'🌅', label:'تسجيل الحضور الصباحي', btnClass:'morning', color:'att-phase-color-morning', phaseLabel:'جاري التحضير الصباحي', tabIcon:'🌅' },
@@ -4199,8 +4202,8 @@ function getPhasePending(phase, today, filteredW){
       return filteredW.filter(w=>attToday.some(a=>String(a.workerId)===String(w.id)&&(a.status==='دوام'||a.status==='ناقص')&&!a.timeMid));
     case 2: // النهاية: سجّل وسطي ولم يسجّل خروج
       return filteredW.filter(w=>attToday.some(a=>String(a.workerId)===String(w.id)&&a.timeMid&&!a.timeOut));
-    case 3: // الإضافي: سجّل خروج ولم يسجّل إضافي
-      return filteredW.filter(w=>attToday.some(a=>String(a.workerId)===String(w.id)&&a.timeOut&&!(a.otHours>0)));
+    case 3: // الإضافي: العمال الحاضرون اليوم ولم يُسجَّل لهم إضافي بعد
+      return filteredW.filter(w=>attToday.some(a=>String(a.workerId)===String(w.id)&&(a.status==='دوام'||a.status==='ناقص')&&!(a.otHours>0)));
     default: return [];
   }
 }
@@ -4294,20 +4297,16 @@ function updatePhaseUI(today, filteredW){
         const otCount=attendance.filter(a=>a.date===today&&a.otHours>0).length;
         sub.textContent=`✅ ${presCount} حاضر · ❌ ${absCount} غائب · 🔥 ${otCount} إضافي`;
       }
-      // Show next phase button if available
-      if(currentPhase<3){
-        const nextPending=getPhasePending(currentPhase+1,today,filteredW);
-        if(nextPending.length>0){
-          const nextCfg=PHASE_CONFIG[currentPhase+1];
-          const actEl=document.querySelector('.att-complete-actions');
-          if(actEl&&!actEl.querySelector('.next-phase-btn')){
-            const nb=document.createElement('button');
-            nb.className='btn btn-lg next-phase-btn';
-            nb.style.cssText=`background:linear-gradient(135deg,var(--accent),#b8770a);color:#fff;box-shadow:0 4px 16px rgba(201,129,10,.3)`;
-            nb.textContent=nextCfg.icon+' الانتقال لـ'+['الوسطي','النهاية','الإضافي'][currentPhase];
-            nb.onclick=()=>switchPhase(currentPhase+1);
-            actEl.insertBefore(nb,actEl.firstChild);
-          }
+      // زر الانتقال للإضافي (من الصباحي فقط)
+      if(currentPhase===0){
+        const actEl=document.querySelector('.att-complete-actions');
+        if(actEl&&!actEl.querySelector('.next-phase-btn')){
+          const nb=document.createElement('button');
+          nb.className='btn btn-lg next-phase-btn';
+          nb.style.cssText='background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;box-shadow:0 4px 16px rgba(124,58,237,.3);margin-bottom:8px';
+          nb.textContent='🔥 الانتقال لتسجيل الإضافي';
+          nb.onclick=()=>switchPhase(3);
+          actEl.insertBefore(nb,actEl.firstChild);
         }
       }
       // Trigger completion modal only for phase 0
@@ -4326,27 +4325,32 @@ function updatePhaseUI(today, filteredW){
 function updatePhaseTabs(today, filteredW){
   const counts=[
     getPhasePending(0,today,filteredW).length,
-    0, 0, // phases 1,2 unused
+    0, 0,
     getPhasePending(3,today,filteredW).length,
   ];
-  const phase0Done=filteredW.some(w=>attendance.some(a=>String(a.workerId)===String(w.id)&&a.date===today));
-  const unlocked=[true,false,false,phase0Done];
-
+  // كلا التابين متاحين دايماً
   [0,3].forEach(i=>{
     const tab=document.getElementById('phaseTab'+i);
     const countEl=document.getElementById('phaseCount'+i);
     if(!tab)return;
     if(countEl)countEl.textContent=counts[i];
-    tab.className='phase-tab'+(i===currentPhase?' active':counts[i]===0&&unlocked[i]?' done':!unlocked[i]?' locked':'');
+    tab.className='phase-tab'+(i===currentPhase?' active':counts[i]===0?' done':'');
   });
 }
 
 function switchPhase(p){
-  if(![0,3].includes(p))return; // صباحي وإضافي فقط
+  if(![0,3].includes(p))return;
   currentPhase=p;
   document.querySelectorAll('.next-phase-btn').forEach(el=>el.remove());
   const completeCard=document.getElementById('attCompleteCard');
   if(completeCard)completeCard.classList.remove('show');
+  const searchEl=document.getElementById('phaseSearch');
+  if(searchEl)searchEl.value='';
+  // إخفاء مربع الإضافي عند الرجوع للصباحي
+  const otPreview=document.getElementById('otCalcPreview');
+  if(otPreview)otPreview.classList.add('hidden');
+  const otRow=document.getElementById('otHoursRow');
+  if(otRow)otRow.style.display=p===3?'flex':'none';
   render();
 }
 
@@ -4362,6 +4366,7 @@ function recordPhase(){
 
   if(currentPhase===0){
     // صباحي — تسجيل جديد
+    _userRecordedToday=true;
     const newRec={workerId:w.id,date:today,status:'دوام',timeIn:curTime,timeMid:'',timeOut:'',totalHours:0,otHours:0,otPay:0};
     if(rec){const idx=attendance.indexOf(rec);attendance[idx]=newRec;}
     else attendance.push(newRec);
@@ -4400,6 +4405,7 @@ function recordPhase(){
 }
 
 function updateOTPreview(){
+  if(currentPhase!==3)return; // فقط في مرحلة الإضافي
   const id=(document.getElementById('currentWName')||{}).dataset.id;
   if(!id)return;
   const w=workers.find(x=>String(x.id)===String(id));
@@ -4513,7 +4519,7 @@ function phaseSearchWorker(){
       if(parts.length){tb.textContent=parts.join(' ');tb.style.display='';}
       else tb.style.display='none';
     }
-    if(currentPhase===3)updateOTPreview();
+    if(currentPhase===3){updateOTPreview();}else{const p=document.getElementById('otCalcPreview');if(p)p.classList.add('hidden');}
   } else {
     const cur=document.getElementById('currentWName');
     if(cur){cur.textContent='لا توجد نتائج';cur.dataset.id='';}
