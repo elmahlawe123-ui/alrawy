@@ -300,6 +300,12 @@ tbody tr.clickable:hover{background:var(--surface2);}
 .att-day:hover{transform:scale(1.1);opacity:.85;}
 .att-day.present{background:var(--green-bg);color:var(--green);border:1px solid rgba(16,185,129,.3);}
 .att-day.absent{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.3);}
+
+.att-day.friday{background:rgba(124,58,237,.12)!important;border:1px solid rgba(124,58,237,.3)!important;color:#a78bfa!important;}
+.att-day.friday.present{background:rgba(124,58,237,.15)!important;border-color:rgba(124,58,237,.4)!important;}
+.att-day.friday.absent{background:rgba(124,58,237,.06)!important;}
+
+.att-day.partial{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.3);}
 .att-edit-menu{position:absolute;top:110%;right:0;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:6px;z-index:200;display:none;gap:4px;flex-direction:column;min-width:100px;box-shadow:var(--shadow);}
 .att-edit-menu.show{display:flex;}
 .att-edit-menu button{border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:600;padding:6px 10px;border-radius:7px;cursor:pointer;text-align:right;color:var(--text2);transition:background .15s;}
@@ -513,6 +519,102 @@ tbody tr.clickable:hover{background:var(--surface2);}
   .print-btn{padding:7px 2px;}
 }
 
+
+/* ══ TIME ATTENDANCE MODAL ══ */
+.time-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:8700;display:flex;justify-content:center;align-items:center;padding:16px;}
+.time-modal-bg.hidden{display:none;}
+.time-modal{background:var(--surface);border:1px solid var(--border2);border-radius:22px;padding:24px 20px;width:100%;max-width:360px;box-shadow:0 0 50px rgba(0,0,0,.6);position:relative;}
+.time-modal-title{font-family:'Tajawal',sans-serif;font-size:18px;font-weight:900;color:var(--text);margin-bottom:4px;}
+.time-modal-sub{font-size:12px;color:var(--text3);margin-bottom:18px;}
+.time-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;}
+.time-row-icon{font-size:20px;flex-shrink:0;}
+.time-row-label{font-size:12px;font-weight:700;color:var(--text2);flex:1;}
+.time-row input[type=time]{width:100px;padding:6px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;font-weight:800;font-family:inherit;text-align:center;margin-bottom:0;}
+.time-row input[type=time]:focus{border-color:rgba(201,129,10,.5);outline:none;}
+.time-summary{background:var(--surface2);border-radius:12px;padding:12px 14px;margin:14px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.time-sum-item{text-align:center;}
+.time-sum-val{font-family:'Tajawal',sans-serif;font-size:20px;font-weight:900;color:var(--text);line-height:1;}
+.time-sum-label{font-size:10px;color:var(--text3);font-weight:700;margin-top:3px;}
+.time-sum-val.ot{color:var(--accent2);}
+.time-sum-val.pay{color:var(--green);}
+.ot-breakdown{font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.8;padding:8px 12px;background:var(--bg3);border-radius:8px;}
+.ot-row{display:flex;justify-content:space-between;}
+.ot-row span:last-child{color:var(--accent2);font-weight:700;}
+
+/* ══ ATTENDANCE STATUS BADGES ══ */
+.att-status-present{color:var(--green);}
+.att-status-overtime{color:var(--accent2);}
+.att-status-partial{color:#f59e0b;}
+.att-status-absent{color:var(--red);}
+.att-time-chip{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;margin-right:4px;}
+.att-time-chip.in{background:rgba(16,185,129,.12);color:var(--green);}
+.att-time-chip.mid{background:rgba(245,158,11,.12);color:#f59e0b;}
+.att-time-chip.out{background:rgba(239,68,68,.12);color:var(--red);}
+.att-time-chip.ot{background:rgba(201,129,10,.15);color:var(--accent2);}
+
+
+/* ══ ATTENDANCE PHASES ══ */
+.phase-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px;}
+.phase-tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border-radius:12px;border:2px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all .2s;font-family:inherit;position:relative;}
+.phase-tab.active{border-color:var(--accent);background:rgba(201,129,10,.12);}
+.phase-tab.done{border-color:var(--green);background:rgba(16,185,129,.08);}
+.phase-tab.locked{opacity:.4;pointer-events:none;}
+.phase-tab-icon{font-size:22px;line-height:1;}
+.phase-tab-label{font-size:9px;font-weight:800;color:var(--text3);letter-spacing:.5px;}
+.phase-tab.active .phase-tab-label{color:var(--accent2);}
+.phase-tab.done .phase-tab-label{color:var(--green);}
+.phase-tab-count{position:absolute;top:5px;left:5px;background:var(--accent);color:#fff;font-size:9px;font-weight:900;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1;}
+.phase-tab.done .phase-tab-count{background:var(--green);}
+.att-phase-btn{width:100%;padding:15px;font-size:16px;border-radius:14px;border:none;font-family:inherit;font-weight:900;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;}
+.att-phase-btn.morning{background:linear-gradient(135deg,#059669,#047857);color:#fff;box-shadow:0 4px 16px rgba(5,150,105,.4);}
+.att-phase-btn.mid{background:linear-gradient(135deg,#d97706,#b45309);color:#fff;box-shadow:0 4px 16px rgba(217,119,6,.4);}
+.att-phase-btn.end{background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;box-shadow:0 4px 16px rgba(220,38,38,.4);}
+.att-phase-btn.ot{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;box-shadow:0 4px 16px rgba(124,58,237,.4);}
+.att-phase-btn:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.att-phase-btn:active{transform:scale(.98);}
+.phase-worker-info{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.phase-worker-name{font-size:16px;font-weight:900;color:var(--text);}
+.phase-worker-meta{font-size:11px;color:var(--text3);}
+.phase-time-badge{font-size:12px;font-weight:800;color:var(--accent2);background:rgba(201,129,10,.1);border:1px solid rgba(201,129,10,.25);border-radius:8px;padding:3px 10px;}
+.phase-progress-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.att-phase-color-morning{background:linear-gradient(90deg,#059669,#34d399)!important;}
+.att-phase-color-mid{background:linear-gradient(90deg,#d97706,#fbbf24)!important;}
+.att-phase-color-end{background:linear-gradient(90deg,#dc2626,#f87171)!important;}
+.att-phase-color-ot{background:linear-gradient(90deg,#7c3aed,#a78bfa)!important;}
+.ot-hours-input{display:flex;align-items:center;gap:10px;margin-bottom:12px;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:10px 14px;}
+.ot-hours-input label{font-size:13px;font-weight:700;color:var(--text2);flex:1;}
+.ot-hours-input input{width:80px;padding:7px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:16px;font-weight:900;text-align:center;font-family:inherit;margin-bottom:0;}
+.ot-calc-preview{background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#a78bfa;}
+
+
+/* ══ PHASE ACTION AREA ══ */
+.phase-search-wrap{position:relative;margin-bottom:12px;}
+.phase-search-wrap input{padding-right:36px;margin-bottom:0;font-size:14px;}
+.phase-search-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none;}
+.phase-action-grid{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:10px;align-items:stretch;}
+.phase-skip-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:10px 12px;border-radius:14px;border:1px solid var(--border2);background:var(--surface2);color:var(--text3);font-family:inherit;cursor:pointer;transition:all .2s;font-size:11px;font-weight:700;white-space:nowrap;}
+.phase-skip-btn:hover{background:var(--bg3);color:var(--text);}
+.phase-skip-btn span:first-child{font-size:18px;}
+.phase-abs-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:10px 12px;border-radius:14px;border:1px solid rgba(239,68,68,.3);background:var(--red-bg);color:var(--red);font-family:inherit;cursor:pointer;transition:all .2s;font-size:11px;font-weight:700;white-space:nowrap;}
+.phase-abs-btn:hover{background:rgba(239,68,68,.2);}
+.phase-abs-btn span:first-child{font-size:18px;}
+
+
+/* ══ ID CARD PREVIEW ══ */
+.id-preview-section{margin-top:16px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.id-preview-header{padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.id-preview-title{font-size:13px;font-weight:700;color:var(--text2);display:flex;align-items:center;gap:6px;}
+.id-preview-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.id-preview-body{padding:14px;background:var(--bg3);}
+.id-preview-img{width:100%;max-height:320px;object-fit:contain;border-radius:10px;border:1px solid var(--border2);background:#000;display:block;cursor:zoom-in;}
+.id-preview-img:active{cursor:zoom-out;}
+.id-preview-empty{text-align:center;padding:36px;color:var(--text3);}
+.id-preview-empty-icon{font-size:40px;margin-bottom:10px;opacity:.4;}
+.id-link-input{display:flex;gap:8px;margin-top:10px;}
+.id-link-input input{flex:1;margin-bottom:0;font-size:12px;}
+.wa-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;background:#25d366;color:#fff;transition:all .2s;}
+.wa-btn:hover{background:#128c7e;transform:translateY(-1px);}
+
 /* ══ SCROLLBAR ══ */
 ::-webkit-scrollbar{width:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
@@ -627,6 +729,63 @@ tbody tr.clickable:hover{background:var(--surface2);}
   </div>
 </div>
 
+
+<!-- TIME ATTENDANCE MODAL -->
+<div class="time-modal-bg hidden" id="timeAttModal">
+  <div class="time-modal">
+    <button class="qr-close-btn" onclick="closeTimeModal()" style="position:absolute;top:14px;left:14px">✕</button>
+    <div class="time-modal-title" id="tmWorkerName">—</div>
+    <div class="time-modal-sub" id="tmWorkerJob">—</div>
+
+    <div class="time-row" id="tmRowIn">
+      <span class="time-row-icon">🟢</span>
+      <span class="time-row-label">بداية الدوام</span>
+      <input type="time" id="tmTimeIn">
+    </div>
+    <div class="time-row" id="tmRowMid" style="display:none">
+      <span class="time-row-icon">🟡</span>
+      <span class="time-row-label">وسطي (تأكيد)</span>
+      <input type="time" id="tmTimeMid">
+    </div>
+    <div class="time-row" id="tmRowOut" style="display:none">
+      <span class="time-row-icon">🔴</span>
+      <span class="time-row-label">نهاية الدوام</span>
+      <input type="time" id="tmTimeOut">
+    </div>
+
+    <div class="time-summary" id="tmSummary">
+      <div class="time-sum-item"><div class="time-sum-val" id="tmTotalHrs">—</div><div class="time-sum-label">إجمالي ساعات</div></div>
+      <div class="time-sum-item"><div class="time-sum-val ot" id="tmOTHrs">—</div><div class="time-sum-label">إضافي</div></div>
+      <div class="time-sum-item"><div class="time-sum-val pay" id="tmOTPay">—</div><div class="time-sum-label">قيمة الإضافي</div></div>
+    </div>
+    <div class="ot-breakdown hidden" id="tmOTBreakdown"></div>
+
+    <!-- حالة الغياب -->
+    <div id="tmAbsOptions" style="display:none;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">📋 حالة الدوام</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;cursor:pointer">
+          <input type="radio" name="tmStatus" value="دوام" checked style="accent-color:var(--green);width:15px;height:15px;margin:0">
+          <span style="font-size:13px;font-weight:700;color:var(--green)">✅ حاضر — تسجيل الوقت</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;cursor:pointer">
+          <input type="radio" name="tmStatus" value="غياب" style="accent-color:var(--red);width:15px;height:15px;margin:0">
+          <span style="font-size:13px;font-weight:700;color:var(--red)">❌ غائب — إلغاء الدوام</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;cursor:pointer">
+          <input type="radio" name="tmStatus" value="ناقص" style="accent-color:#f59e0b;width:15px;height:15px;margin:0">
+          <span style="font-size:13px;font-weight:700;color:#f59e0b">⚠️ حضور ناقص — أقل من 8 ساعات</span>
+        </label>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-primary" style="flex:1" onclick="confirmTimeAtt()">✅ تأكيد</button>
+      <button class="btn btn-ghost" onclick="closeTimeModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 <!-- PAYROLL / ID PRINT SHEETS -->
 <div id="payrollSheet" class="payroll-print-sheet" style="display:none"></div>
 <div class="id-card-print" id="idCardPrint"></div>
@@ -690,9 +849,14 @@ tbody tr.clickable:hover{background:var(--surface2);}
   <div class="modal">
     <div class="modal-title">✏️ تعديل بيانات العامل</div>
     <input id="editName" placeholder="الاسم الكامل">
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;color:var(--text3);font-weight:700;display:block;margin-bottom:4px">🪪 كود الشركة الأم <span style="color:var(--red)">*</span></label>
+      <input id="editCompanyCode" placeholder="كود الشركة الأم (إجباري)" style="border-color:rgba(201,129,10,.4)">
+    </div>
     <input id="editJob" placeholder="التخصص المهني">
-    <input id="editDaily" type="number" placeholder="اليومية (ج.م)">
+    <input id="editDaily" type="number" placeholder="الراتب الشهري (ج.م)">
     <input id="editPhone" type="tel" placeholder="رقم الهاتف (اختياري)">
+    <input id="editAddress" placeholder="السكن / العنوان (اختياري)">
     <div style="margin-bottom:12px">
       <label style="font-size:11px;color:var(--text3);font-weight:700;display:block;margin-bottom:4px">📅 تاريخ بداية العمل</label>
       <input id="editStartDate" type="date">
@@ -906,9 +1070,11 @@ tbody tr.clickable:hover{background:var(--surface2);}
       <div class="form-card" style="margin-bottom:0">
         <div class="form-row">
           <input id="wName" placeholder="الاسم الكامل">
+          <input id="wCompanyCode" placeholder="كود الشركة الأم (إجباري)" style="border-color:rgba(201,129,10,.4)">
           <input id="wJob" placeholder="التخصص المهني">
-          <input id="wDaily" type="number" placeholder="اليومية (ج.م)">
+          <input id="wDaily" type="number" placeholder="الراتب الشهري (ج.م)">
           <input id="wPhone" type="tel" placeholder="رقم الهاتف (اختياري)">
+          <input id="wAddress" placeholder="السكن / العنوان (اختياري)">
           <input id="wStartDate" type="date" title="تاريخ بداية العمل">
         </div>
         <button class="btn btn-primary" onclick="addWorker()">💾 حفظ في السجل</button>
@@ -934,26 +1100,86 @@ tbody tr.clickable:hover{background:var(--surface2);}
 <!-- ATTENDANCE -->
 <div id="attendance" class="page">
   <div class="proj-filter-bar" id="attendanceProjFilter" style="justify-content:center;margin-bottom:10px"></div>
+
+  <!-- Phase Tabs -->
+  <div class="phase-tabs" id="phaseTabs" style="grid-template-columns:repeat(2,1fr)">
+    <button class="phase-tab active" id="phaseTab0" onclick="switchPhase(0)">
+      <span class="phase-tab-icon">🌅</span>
+      <span class="phase-tab-label">الصباحي</span>
+      <span class="phase-tab-count" id="phaseCount0">0</span>
+    </button>
+    <button class="phase-tab locked" id="phaseTab3" onclick="switchPhase(3)">
+      <span class="phase-tab-icon">🔥</span>
+      <span class="phase-tab-label">الإضافي</span>
+      <span class="phase-tab-count" id="phaseCount3">0</span>
+    </button>
+  </div>
+
+  <!-- Main attendance card -->
   <div class="attendance-card" id="attInputCard">
-    <div class="att-progress-label"><span id="attProgressText">التحضير</span><span id="attProgressPct">0%</span></div>
-    <div class="att-progress-wrap"><div class="att-progress-fill" id="attProgressFill" style="width:0%"></div></div>
-    <div class="att-label">جاري تحضير</div>
-    <div class="att-name" id="currentWName">—</div>
-    <div class="att-btns">
-      <button class="btn btn-green" onclick="record('present')">✅ حاضر</button>
-      <button class="btn btn-red" onclick="record('absent')">❌ غائب</button>
+    <!-- Progress -->
+    <div class="phase-progress-row">
+      <span id="attProgressText" style="font-size:12px;color:var(--text3)">التحضير</span>
+      <span id="attProgressPct" style="font-size:12px;color:var(--text3)">0%</span>
     </div>
-    <div style="margin-top:12px">
-      <button class="qr-scan-btn btn-full" onclick="openQRScanner()" style="width:100%;justify-content:center">
-        📷 تحضير بالـ QR
+    <div class="att-progress-wrap" style="margin-bottom:16px">
+      <div class="att-progress-fill" id="attProgressFill" style="width:0%"></div>
+    </div>
+
+    <!-- Phase label -->
+    <div class="att-label" id="phaseLabel">جاري التحضير الصباحي</div>
+
+    <!-- Worker info -->
+    <div class="phase-worker-info" id="phaseWorkerInfo">
+      <div>
+        <div class="phase-worker-name" id="currentWName" data-id="">—</div>
+        <div class="phase-worker-meta" id="phaseWorkerMeta"></div>
+      </div>
+      <div class="phase-time-badge" id="phaseTimeBadge" style="display:none"></div>
+    </div>
+
+    <!-- Search -->
+    <div class="phase-search-wrap">
+      <span class="phase-search-icon">🔍</span>
+      <input id="phaseSearch" placeholder="بحث باسم أو كود العامل..." oninput="phaseSearchWorker()" autocomplete="off">
+    </div>
+
+    <!-- OT hours input (phase 3 only) -->
+    <div class="ot-hours-input" id="otHoursRow" style="display:none">
+      <label>⏱️ ساعات الإضافي</label>
+      <input type="number" id="otHoursInput" min="0.5" max="6" step="0.5" value="1" oninput="updateOTPreview()">
+    </div>
+    <div class="ot-calc-preview hidden" id="otCalcPreview"></div>
+
+    <!-- Action buttons grid: [main btn] [تخطي] [غياب] -->
+    <div class="phase-action-grid">
+      <button class="att-phase-btn morning" id="phaseActionBtn" onclick="recordPhase()" style="margin-bottom:0">
+        <span id="phaseActionIcon">🌅</span>
+        <span id="phaseActionLabel">تسجيل الحضور الصباحي</span>
+      </button>
+      <button class="phase-skip-btn" onclick="skipPhaseWorker()" title="تخطي هذا العامل والانتقال للتالي">
+        <span>⏭️</span>
+        <span>تخطي</span>
+      </button>
+      <button class="phase-abs-btn" id="phaseAbsBtn" onclick="recordAbsent()" title="تسجيل غياب">
+        <span>❌</span>
+        <span>غياب</span>
       </button>
     </div>
+
+    <!-- QR -->
+    <button class="qr-scan-btn btn-full" onclick="openQRScanner()" style="width:100%;justify-content:center;margin-bottom:10px">
+      📷 مسح QR
+    </button>
+
     <div class="att-divider"></div>
     <button class="btn btn-outline-red btn-full no-print" onclick="resetDay()">🗑️ تصفير كشف اليوم</button>
   </div>
+
+  <!-- Complete card -->
   <div class="attendance-card att-complete-card" id="attCompleteCard">
     <div class="att-complete-icon">🎉</div>
-    <div class="att-complete-title">اكتمل التحضير!</div>
+    <div class="att-complete-title" id="attCompleteTitle">اكتمل التحضير!</div>
     <div class="att-complete-sub" id="attCompleteSub">تم تحضير جميع العمال بنجاح</div>
     <div class="att-complete-actions">
       <button class="btn btn-primary btn-lg" onclick="showPage('dashboard')">📊 الإحصائيات</button>
@@ -962,6 +1188,7 @@ tbody tr.clickable:hover{background:var(--surface2);}
     <div class="att-divider" style="margin-top:24px"></div>
     <button class="btn btn-outline-red btn-full no-print" onclick="resetDay()">🗑️ تصفير كشف اليوم</button>
   </div>
+
   <div style="margin-top:24px">
     <div class="section-header">
       <div class="section-title" style="font-size:18px">📋 كشف اليوم</div>
@@ -1022,8 +1249,12 @@ tbody tr.clickable:hover{background:var(--surface2);}
             <span id="pProjectBadge"></span>
           </div>
           <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <span id="pCompanyCode" style="font-size:11px;font-weight:700;color:var(--accent2);background:rgba(201,129,10,.1);border:1px solid rgba(201,129,10,.25);border-radius:5px;padding:1px 7px"></span>
             <span id="pPhone" style="font-size:12px;color:var(--text3)"></span>
+          </div>
+          <div style="margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
             <span id="pStartDate" style="font-size:12px;color:var(--text3)"></span>
+            <span id="pAddress" style="font-size:12px;color:var(--text3)"></span>
           </div>
         </div>
       </div>
@@ -1033,18 +1264,53 @@ tbody tr.clickable:hover{background:var(--surface2);}
       </div>
     </div>
     <div class="profile-body">
-      <div class="profile-stats">
-        <div class="profile-stat"><div class="profile-stat-label">اليومية</div><div class="profile-stat-val" id="pDaily" style="color:var(--accent2)">0</div></div>
+      <div class="profile-stats" style="grid-template-columns:repeat(2,1fr)">
+        <div class="profile-stat"><div class="profile-stat-label">الراتب الشهري</div><div class="profile-stat-val" id="pDaily" style="color:var(--accent2)">0</div></div>
         <div class="profile-stat"><div class="profile-stat-label" id="pDaysLabel">أيام الحضور</div><div class="profile-stat-val" id="pDays">0</div></div>
-        <div class="profile-stat"><div class="profile-stat-label" id="pLoansLabel">السلف</div><div class="profile-stat-val" id="pLoansAmt" style="color:var(--red);font-size:15px">0</div></div>
         <div class="profile-stat">
+          <div class="profile-stat-label" id="pOTLabel">إضافي</div>
+          <div class="profile-stat-val" id="pOTAmt" style="color:var(--accent2);font-size:16px">0</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px"><span id="pOTHrs" style="color:var(--accent2)">0</span> ساعة</div>
+        </div>
+        <div class="profile-stat"><div class="profile-stat-label" id="pLoansLabel">السلف</div><div class="profile-stat-val" id="pLoansAmt" style="color:var(--red);font-size:15px">0</div></div>
+        <div class="profile-stat" style="grid-column:1/-1">
           <div class="profile-stat-label" id="pNetLabel">الصافي المستحق</div>
-          <div class="profile-stat-val" id="pNet" style="color:var(--green);font-size:16px">0</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:4px">من إجمالي: <span id="pGross" style="color:var(--blue)">0</span></div>
+          <div class="profile-stat-val" id="pNet" style="color:var(--green);font-size:20px">0</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:6px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
+            <span>أساسي: <span id="pGross" style="color:var(--blue);font-weight:700">0</span></span>
+            <span>+ إضافي: <span id="pGrossOT" style="color:var(--accent2);font-weight:700">0</span></span>
+            <span>— سلف: <span id="pGrossLns" style="color:var(--red);font-weight:700">0</span></span>
+          </div>
         </div>
       </div>
       <div class="att-history"><div class="att-history-title">📅 سجل الحضور</div><div class="att-calendar" id="pAttCalendar"></div></div>
+      <div id="pOTSection" class="p-loans-section" style="margin-bottom:12px"></div>
       <div class="p-loans-section"><div class="p-loans-title">💸 سجل السلفيات</div><div id="pLoansHistory"></div></div>
+
+      <!-- بطاقة الهوية -->
+      <div class="id-preview-section no-print">
+        <div class="id-preview-header">
+          <div class="id-preview-title">🪪 صورة بطاقة الهوية</div>
+          <div class="id-preview-actions">
+            <button id="pWABtn" class="wa-btn" onclick="sendIDviaWhatsApp()" style="display:none">📲 واتساب</button>
+            <button id="pIDDownloadBtn" class="btn btn-ghost btn-sm" onclick="downloadIDCard()" style="display:none">📥 تحميل</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleIDLinkInput()">✏️ تعديل</button>
+          </div>
+        </div>
+        <div class="id-preview-body">
+          <div id="pIDPreview">
+            <div class="id-preview-empty">
+              <div class="id-preview-empty-icon">🪪</div>
+              <div>لا توجد صورة بطاقة مرفوعة</div>
+            </div>
+          </div>
+          <div id="pIDLinkRow" class="id-link-input" style="display:none">
+            <input id="pIDLinkInput" placeholder="رابط Google Drive للبطاقة..." type="url">
+            <button class="btn btn-primary btn-sm" onclick="saveIDLink()">💾 حفظ</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleIDLinkInput()">إلغاء</button>
+          </div>
+        </div>
+      </div>
       <div style="margin-top:24px" class="no-print">
         <div class="profile-actions">
           <button id="pToggleBtn" class="btn btn-lg" onclick="toggleStatus()"></button>
@@ -1506,7 +1772,7 @@ function render(){
   if(alertsEl){
     const alerts=[];
     if(pending>0)alerts.push(`<div class="alert-banner warn">⚠️ ${pending} عامل لم يُحضَّر اليوم</div>`);
-    const overLoanW=workers.filter(w=>{const t=loans.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+l.amt,0);const net=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length*w.daily;return t>net&&net>0;});
+    const overLoanW=workers.filter(w=>{const t=loans.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+l.amt,0);const {basePay}=calcWorkerSalary(w,attendance);return t>basePay&&basePay>0;});
     if(overLoanW.length)alerts.push(`<div class="alert-banner danger">🚨 ${overLoanW.length} عامل تجاوزت سلفتهم الراتب</div>`);
     alertsEl.innerHTML=alerts.join('');
   }
@@ -1602,7 +1868,7 @@ function renderWorkers(){
 
   const wt=document.getElementById("workersTable");
   let hth=`<th>الكود</th><th>العامـل</th><th>المشروع</th>`;
-  if(colVis.daily)hth+=`<th>اليومية</th>`;
+  if(colVis.daily)hth+=`<th>الراتب الشهري</th>`;
   if(colVis.days)hth+=`<th>حضور ${monthLabel}</th>`;
   if(colVis.abs)hth+=`<th>غياب</th>`;
   if(colVis.salary)hth+=`<th>الراتب</th>`;
@@ -1612,10 +1878,12 @@ function renderWorkers(){
   if(!list.length){wb.innerHTML=`<tr class="empty-row"><td colspan="9">لا توجد نتائج</td></tr>`;return;}
 
   list.forEach(w=>{
-    const days=curAtt.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
+    const days=curAtt.filter(a=>String(a.workerId)===String(w.id)&&(a.status==='دوام'||a.status==='ناقص')).length;
+  // salary calc using calcWorkerSalary (defined later when called)
     const abs=curAtt.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
     const lns=curLoans.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+Number(l.amt),0);
-    const salary=days*w.daily-lns;
+    const _sal=calcWorkerSalary(w,curAtt);
+  const salary=_sal.basePay+_sal.otPay-lns;
     const todayRec=attendance.find(a=>String(a.workerId)===String(w.id)&&a.date===today);
     const todayBadge=todayRec
       ?`<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;margin-right:5px;vertical-align:middle;background:${todayRec.status==='دوام'?'rgba(16,185,129,.15)'  :'rgba(239,68,68,.15)'};color:${todayRec.status==='دوام'?'var(--green)'  :'var(--red)'}">${todayRec.status==='دوام'?'✅'  :'❌'}</span>`
@@ -1624,7 +1892,8 @@ function renderWorkers(){
     tr.onclick=e=>{if(!e.target.closest('button'))openP(w.id);};
     const hasPhone=w.phone&&w.phone.trim();
     const wProj=projects.find(p=>String(p.id)===String(w.projectId));
-    let td=`<td><span class="worker-code">#${w.wCode||'----'}</span></td>`;
+    const dispCode = w.companyCode||w.wCode||'----';
+    let td=`<td><span class="worker-code">${dispCode}</span></td>`;
     td+=`<td><div style="display:flex;align-items:center;gap:2px">${todayBadge}<span class="td-name" style="font-size:13px">${w.name}</span>${!hasPhone?'<span title="بدون رقم هاتف" style="font-size:10px;opacity:.4;margin-right:4px">📵</span>':''}</div><div style="font-size:10px;color:var(--text3);padding-right:22px;margin-top:1px">${w.job}</div></td>`;
     td+=`<td style="font-size:11px;color:var(--text3)">${wProj?'<span style="font-size:10px;font-weight:700;color:var(--accent2)">🏗️ '+wProj.name+'</span>':'—'}</td>`;
     if(colVis.daily)td+=`<td style="color:var(--accent2);font-weight:700;white-space:nowrap">${w.daily.toLocaleString('ar-EG')} ج.م</td>`;
@@ -1657,47 +1926,32 @@ function renderWorkers(){
 
 /* ══ ATTENDANCE ══ */
 function renderAttendance(today,activeW){
-  // Project filter chips for attendance
+  // Project filter chips
   renderProjectFilterChips('attendanceProjFilter','setProjectFilter');
-  // Filter activeW by project
   const filteredW=activeProjectFilter===null?activeW:activeW.filter(w=>String(w.projectId)===String(activeProjectFilter));
-  const total=filteredW.length,done=attendance.filter(a=>a.date===today&&filteredW.some(w=>String(w.id)===String(a.workerId))).length;
-  const pct=total?Math.round((done/total)*100):0;
-  (document.getElementById('attProgressFill')||{}).style.width=pct+'%';
-  (document.getElementById('attProgressText')||{}).textContent=`تم تحضير ${done} من ${total}`;
-  (document.getElementById('attProgressPct')||{}).textContent=pct+'%';
-  const pending=filteredW.filter(w=>!attendance.some(a=>String(a.workerId)===String(w.id)&&a.date===today));
-  const cur=document.getElementById("currentWName");
-  const inputCard=document.getElementById('attInputCard');
-  const completeCard=document.getElementById('attCompleteCard');
-  if(pending.length){
-    cur.textContent=pending[0].name;cur.dataset.id=pending[0].id;
-    if(inputCard)inputCard.style.display='';
-    if(completeCard)completeCard.classList.remove('show');
-  } else {
-    cur.textContent='';cur.dataset.id='';
-    if(inputCard)inputCard.style.display='none';
-    if(completeCard){
-      completeCard.classList.add('show');
-      const sub=document.getElementById('attCompleteSub');
-      if(sub){
-        const presCount=attendance.filter(a=>a.date===today&&a.status==='دوام').length;
-        const absCount=attendance.filter(a=>a.date===today&&a.status==='غياب').length;
-        sub.textContent=`✅ حاضر: ${presCount} · ❌ غائب: ${absCount} · إجمالي: ${total}`;
-      }
-    }
-  }
+  // Delegate to phase system
+  updatePhaseUI(today,filteredW);
+  // Daily report grid
   const rg=document.getElementById('dailyReportGrid');if(!rg)return;
   const todayAtt=attendance.filter(a=>a.date===today);
-  const presL=todayAtt.filter(a=>a.status==='دوام').map(a=>workers.find(w=>String(w.id)===String(a.workerId))).filter(Boolean);
+  const presL=todayAtt.filter(a=>a.status==='دوام'||a.status==='ناقص').map(a=>workers.find(w=>String(w.id)===String(a.workerId))).filter(Boolean);
   const absL=todayAtt.filter(a=>a.status==='غياب').map(a=>workers.find(w=>String(w.id)===String(a.workerId))).filter(Boolean);
   rg.innerHTML=`
-    <div class="report-list"><div class="report-list-header present">✅ الحاضرون (${presL.length})</div>${presL.length?presL.map(w=>`<div class="report-list-item"><span class="worker-code" style="font-size:10px">#${w.wCode}</span>${w.name}</div>`).join(''):'<div class="report-list-item" style="color:var(--text3)">لا يوجد</div>'}</div>
+    <div class="report-list"><div class="report-list-header present">✅ الحاضرون (${presL.length})</div>${presL.length?presL.map(w=>{
+    const rec=todayAtt.find(a=>String(a.workerId)===String(w.id));
+    const timeInfo=rec&&rec.timeIn?`<span class="att-time-chip in">🟢${rec.timeIn}</span>${rec.timeMid?`<span class="att-time-chip mid">🟡${rec.timeMid}</span>`:''  }${rec.timeOut?`<span class="att-time-chip out">🔴${rec.timeOut}</span>`:''  }${rec.otPay>0?`<span class="att-time-chip ot">+${rec.otPay.toLocaleString('ar-EG')} ج.م</span>`:''}`:''  ;
+    const statusIcon=rec&&rec.status==='ناقص'?'⚠️':'✅';
+    return `<div class="report-list-item" style="flex-wrap:wrap;gap:4px"><span class="worker-code" style="font-size:10px">#${w.wCode}</span><span>${statusIcon} ${w.name}</span>${timeInfo}</div>`;
+  }).join(''):'<div class="report-list-item" style="color:var(--text3)">لا يوجد</div>'}</div>
     <div class="report-list"><div class="report-list-header absent">❌ الغائبون (${absL.length})</div>${absL.length?absL.map(w=>`<div class="report-list-item"><span class="worker-code" style="font-size:10px">#${w.wCode}</span>${w.name}</div>`).join(''):'<div class="report-list-item" style="color:var(--text3)">لا يوجد</div>'}</div>`;
 }
 
 /* ══ LOANS ══ */
-function workerNet(w){return attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length*w.daily;}
+function workerOT(wid){return attendance.filter(a=>String(a.workerId)===String(wid)).reduce((s,a)=>s+Number(a.otPay||0),0);}
+function workerNet(w){
+  const {basePay,otPay}=calcWorkerSalary(w,attendance);
+  return basePay+otPay;
+}
 function workerTotalLoan(wid){return loans.filter(l=>String(l.workerId)===String(wid)).reduce((s,l)=>s+l.amt,0);}
 
 function renderLoans(){
@@ -2012,23 +2266,7 @@ function toggleColsBar(){
   if(arrow)arrow.style.transform=isOpen?'':'rotate(180deg)';
 }
 
-function record(stat){
-  const id=(document.getElementById('currentWName')||{}).dataset.id;if(!id)return;
-  const w=workers.find(x=>String(x.id)===String(id));
-  if(!w)return;
-  attendance.push({workerId:w.id,status:stat==='present'?'دوام':'غياب',date:todayStr()});
-  save();render();
-  toast(stat==='present'?'✅ '+w.name+' — دوام':'❌ '+w.name+' — غياب',stat==='present'?'success':'error');
-  // هل انتهى التحضير؟
-  const today=todayStr();
-  const activeW=workers.filter(x=>x.active==='نشط');
-  const pending=activeW.filter(x=>!attendance.some(a=>String(a.workerId)===String(x.id)&&a.date===today));
-  if(pending.length===0){
-    const presCount=attendance.filter(a=>a.date===today&&a.status==='دوام').length;
-    const absCount=attendance.filter(a=>a.date===today&&a.status==='غياب').length;
-    setTimeout(()=>showCompletionModal(presCount,absCount,activeW.length),400);
-  }
-}
+// record() replaced by recordPhase() + recordAbsent()
 
 function resetDay(){
   const today=todayStr();
@@ -2036,6 +2274,7 @@ function resetDay(){
   if(!count){toast('لا يوجد تحضير اليوم','info');return;}
   showConfirmModal('🗑️ تصفير كشف اليوم',`سيتم حذف ${count} سجل حضور ليوم اليوم`,()=>{
     attendance=attendance.filter(a=>a.date!==today);
+    _completionShownDate=''; // إعادة تفعيل شاشة الاكتمال
     save();render();toast('🗑️ تم تصفير كشف اليوم','info');
   });
 }
@@ -2113,6 +2352,8 @@ function openP(id){
   document.getElementById("pJob").textContent=w.job;
   document.getElementById("pCode").textContent='#'+(w.wCode||'----');
   const phEl=document.getElementById('pPhone');if(phEl)phEl.innerHTML=w.phone?`📞 ${w.phone}`:'';
+  const pCCEl=document.getElementById('pCompanyCode');if(pCCEl)pCCEl.textContent=w.companyCode?`🪪 ${w.companyCode}`:'';
+  const pAddrEl=document.getElementById('pAddress');if(pAddrEl)pAddrEl.textContent=w.address?`🏠 ${w.address}`:'';
   const pProj=projects.find(p=>String(p.id)===String(w.projectId));
   const pProjEl=document.getElementById('pProjectBadge');
   if(pProjEl)pProjEl.innerHTML=pProj?`<span style="font-size:11px;font-weight:700;color:var(--accent2);background:rgba(201,129,10,.1);border:1px solid rgba(201,129,10,.25);border-radius:6px;padding:2px 9px;display:inline-flex;align-items:center;gap:4px">🏗️ ${pProj.name}</span>`:'';
@@ -2128,17 +2369,27 @@ function openP(id){
   const _pCurLoans=loans.filter(l=>_pIsCM(l.date));
   const MONTHS_P=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
   const _pMonthLabel=MONTHS_P[_pNow.getMonth()]+' '+_pCY;
-  const days=_pCurAtt.filter(a=>String(a.workerId)===String(id)&&a.status==='دوام').length;
+  const _pSal=calcWorkerSalary(w,_pCurAtt);
+  const days=_pSal.totalDays;
+  const otPay=_pSal.otPay;
+  const otHrs=_pCurAtt.filter(a=>String(a.workerId)===String(id)).reduce((s,a)=>s+Number(a.otHours||0),0);
   const lns=_pCurLoans.filter(l=>String(l.workerId)===String(id)).reduce((s,l)=>s+Number(l.amt),0);
-  const net=days*w.daily-lns,gross=days*w.daily;
-  // تحديث label إحصائيات الشهر
+  const gross=_pSal.basePay;
+  const net=gross+otPay-lns;
+  // تحديث labels
   const pDaysLbl=document.getElementById('pDaysLabel');if(pDaysLbl)pDaysLbl.textContent='حضور '+_pMonthLabel;
   const pLoansLbl=document.getElementById('pLoansLabel');if(pLoansLbl)pLoansLbl.textContent='سلف '+_pMonthLabel;
   const pNetLbl=document.getElementById('pNetLabel');if(pNetLbl)pNetLbl.textContent='الصافي '+_pMonthLabel;
+  const pOTLbl=document.getElementById('pOTLabel');if(pOTLbl)pOTLbl.textContent='إضافي '+_pMonthLabel;
   document.getElementById("pDays").textContent=days;
-  const pGrossEl=document.getElementById("pGross");if(pGrossEl)pGrossEl.textContent=gross.toLocaleString('ar-EG')+' ج.م';
+  // OT
+  const pOTEl=document.getElementById("pOTAmt");if(pOTEl)pOTEl.textContent=otPay>0?otPay.toLocaleString('ar-EG')+' ج.م':'—';
+  const pOTHrsEl=document.getElementById("pOTHrs");if(pOTHrsEl)pOTHrsEl.textContent=otHrs>0?otHrs.toFixed(1):'0';
   document.getElementById("pLoansAmt").textContent=lns.toLocaleString('ar-EG')+' ج.م';
   document.getElementById("pNet").textContent=net.toLocaleString('ar-EG')+' ج.م';
+  const pGrossEl=document.getElementById("pGross");if(pGrossEl)pGrossEl.textContent=gross.toLocaleString('ar-EG')+' ج.م';
+  const pGrossOTEl=document.getElementById("pGrossOT");if(pGrossOTEl)pGrossOTEl.textContent=otPay>0?otPay.toLocaleString('ar-EG')+' ج.م':'0';
+  const pGrossLnsEl=document.getElementById("pGrossLns");if(pGrossLnsEl)pGrossLnsEl.textContent=lns.toLocaleString('ar-EG')+' ج.م';
   const badge=document.getElementById("pStatus");
   badge.textContent=w.active==='نشط'?'نشط':'موقوف';badge.className='badge '+(w.active==='نشط'?'badge-active':'badge-inactive');
   const btn=document.getElementById("pToggleBtn");
@@ -2148,9 +2399,10 @@ function openP(id){
   if(recs.length){
     calEl.innerHTML=recs.map((a,i)=>`
       <div class="att-day-wrap">
-        <div class="att-day ${a.status==='دوام'?'present':'absent'}" onclick="toggleAttEdit(event,${i},${id})">
-          <span style="font-size:12px">${a.status==='دوام'?'✅':'❌'}</span>
+        <div class="att-day ${a.status==='دوام'?'present':a.status==='ناقص'?'partial':'absent'}${isFriday(a.date)?' friday':''}" onclick="toggleAttEdit(event,${i},${id})" title="${isFriday(a.date)?'🕌 جمعة — ':''} ${a.timeIn?'🟢'+a.timeIn:''} ${a.otHours>0?'🔥'+a.otHours+'س':''}">
+          <span style="font-size:12px">${a.status==='دوام'?(a.otHours>0?'🔥':isFriday(a.date)?'🕌':'✅'):a.status==='ناقص'?'⚠️':'❌'}</span>
           <span style="font-size:9px">${(function(ds){const p=ds.split('/');return p.length===3?p[0]+'/'+p[1]:ds;})(a.date)}</span>
+          ${a.timeIn?`<span style="font-size:8px;opacity:.7">${a.timeIn}</span>`:''}
         </div>
         <div class="att-edit-menu" id="attMenu_${i}_${id}">
           <button onclick="editAttRecord(${id},'${a.date}','دوام')">✅ حاضر</button>
@@ -2161,6 +2413,8 @@ function openP(id){
   } else {
     calEl.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:8px 0">لا توجد سجلات</div>`;
   }
+  // معاينة البطاقة
+  renderIDPreview(w);
   const wLoans=loans.filter(l=>String(l.workerId)===String(id)).slice().reverse();
   // سجل السلفيات كاملاً (كل الأشهر) للعرض فقط
   const allWLoans=loans.filter(l=>String(l.workerId)===String(id)).slice().reverse();
@@ -2189,9 +2443,11 @@ function doConfirmModal(){closeModal('confirmModal');if(_confirmCb){_confirmCb()
 function openEditModal(){
   const w=workers.find(x=>String(x.id)===String(selID));if(!w)return;
   document.getElementById('editName').value=w.name;
+  const ecc=document.getElementById('editCompanyCode');if(ecc)ecc.value=w.companyCode||'';
   document.getElementById('editJob').value=w.job;
   document.getElementById('editDaily').value=w.daily;
   const ep=document.getElementById('editPhone');if(ep)ep.value=w.phone||'';
+  const ead=document.getElementById('editAddress');if(ead)ead.value=w.address||'';
   const es=document.getElementById('editStartDate');if(es)es.value=w.startDate||'';
   // Fill project dropdown
   const epj=document.getElementById('editProject');
@@ -2207,7 +2463,16 @@ function saveEdit(){
   const n=document.getElementById('editName').value.trim(),j=document.getElementById('editJob').value.trim(),d=Number(document.getElementById('editDaily').value);
   if(!n||!d){toast('⚠️ أكمل البيانات','error');return;}
   w.name=n;w.job=j||w.job;w.daily=d;
+  const ecc2=document.getElementById('editCompanyCode');
+  if(ecc2){
+    const newCC=ecc2.value.trim();
+    if(!newCC){toast('⚠️ كود الشركة الأم مطلوب','error');return;}
+    const dup=workers.find(x=>x.companyCode===newCC&&String(x.id)!==String(selID));
+    if(dup){toast('⚠️ هذا الكود مستخدم مع عامل آخر','error');return;}
+    w.companyCode=newCC;
+  }
   const ep=document.getElementById('editPhone');if(ep)w.phone=ep.value.trim();
+  const ead2=document.getElementById('editAddress');if(ead2)w.address=ead2.value.trim();
   const es=document.getElementById('editStartDate');if(es)w.startDate=es.value;
   const epj=document.getElementById('editProject');if(epj)w.projectId=epj.value||null;
   save();closeModal('editModal');openP(selID);render();toast('✅ تم التحديث','success');
@@ -2316,16 +2581,20 @@ function pushHistory(){try{history.pushState({},'',location.href);}catch(e){}}
 /* ══ PRINT PAYROLL ══ */
 function printPayroll(){
   const today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
-  let grandEarned=0,grandLoan=0,grandNet=0;
+  let grandEarned=0,grandLoan=0,grandNet=0,grandOT=0;
   workers.forEach(w=>{
-    const earned=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length*w.daily;
+    const _s=calcWorkerSalary(w,attendance);
+    const earned=_s.basePay+_s.otPay;
     const lns=loans.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+l.amt,0);
-    grandEarned+=earned;grandLoan+=lns;grandNet+=(earned-lns);
+    grandEarned+=earned;grandOT+=_s.otPay;grandLoan+=lns;grandNet+=(earned-lns);
   });
   const rows=workers.map((w,idx)=>{
-    const days=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
+    const days=attendance.filter(a=>String(a.workerId)===String(w.id)&&(a.status==='دوام'||a.status==='ناقص')).length;
     const abs=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
-    const earned=days*w.daily,lns=loans.filter(l=>String(l.workerId)===String(w.id));
+    const basePay=days*w.daily;
+    const otPay=attendance.filter(a=>String(a.workerId)===String(w.id)).reduce((s,a)=>s+Number(a.otPay||0),0);
+    const earned=basePay+otPay;
+    const lns=loans.filter(l=>String(l.workerId)===String(w.id));
     const totalLoan=lns.reduce((s,l)=>s+l.amt,0),net=earned-totalLoan;
     const netColor=net>=0?'#047857':'#b91c1c';
     const loanTags=lns.map(l=>'<span style="font-size:8px;background:#fee2e2;color:#dc2626;border-radius:3px;padding:1px 5px;margin-left:3px">'+l.date.split('/').slice(0,2).join('/')+(l.note?'-'+l.note.slice(0,8):'')+': '+Number(l.amt).toLocaleString('ar-EG')+'</span>').join('');
@@ -2334,18 +2603,19 @@ function printPayroll(){
       +'<td style="padding:5px 6px;font-size:9px;font-family:monospace;color:#64748b">#'+w.wCode+'</td>'
       +'<td style="padding:5px 6px;font-weight:700;font-size:12px;color:#0f172a">'+w.name+(loanTags?'<div style="margin-top:2px">'+loanTags+'</div>':'')+'</td>'
       +'<td style="padding:5px 6px;font-size:10px;color:#64748b">'+w.job+'</td>'
-      +'<td style="padding:5px 6px;text-align:center;font-weight:900;font-size:13px;color:#15803d;background:#f0fdf4">'+days+'</td>'
+      +'<td style="padding:5px 6px;text-align:center;font-weight:900;font-size:13px;color:#15803d;background:#f0fdf4">'+(days-friDays)+(friDays>0?'<div style="font-size:8px;color:#7c3aed;font-weight:700">+'+friDays+'🕌</div>':'')+'</td>'
       +'<td style="padding:5px 6px;text-align:center;font-weight:700;font-size:12px;color:#b91c1c;background:#fef2f2">'+abs+'</td>'
-      +'<td style="padding:5px 6px;text-align:center;font-size:11px;color:#0f172a">'+earned.toLocaleString('ar-EG')+'</td>'
+      +'<td style="padding:5px 6px;text-align:center;font-size:11px;color:#0f172a">'+basePay.toLocaleString('ar-EG')+'</td>'
+      +'<td style="padding:5px 6px;text-align:center;font-size:11px;color:#c9810a;font-weight:700">'+(otPay>0?otPay.toLocaleString('ar-EG'):'—')+'</td>'
       +'<td style="padding:5px 6px;text-align:center;font-size:11px;color:#c2410c">'+(totalLoan>0?totalLoan.toLocaleString('ar-EG'):'—')+'</td>'
       +'<td style="padding:5px 6px;text-align:center;font-weight:900;font-size:13px;color:'+netColor+';background:'+(net>=0?'#f0fdf4':'#fef2f2')+'">'+net.toLocaleString('ar-EG')+'</td>'
-      +'<td style="padding:5px 8px;border-right:1px dashed #cbd5e1;min-width:90px;width:90px"></td>'
+      +'<td style="padding:5px 8px;border-right:1px dashed #cbd5e1;min-width:80px;width:80px"></td>'
       +'</tr>';
   }).join('');
   const sigFooter='<div class="sig-footer"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding:12px 8px 8px;border-top:2px solid #e2e8f0"><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">مُعِدّ الكشف</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">مراجعة المشرف</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div><div style="text-align:center"><div style="font-size:12px;font-weight:900;color:#0f172a;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid #0f172a">اعتماد المدير</div><div style="height:65px;border-bottom:2px solid #94a3b8;margin-bottom:7px"></div><div style="font-size:10px;color:#64748b">الاسم والتوقيع</div></div></div></div>';
   const css='*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"Tajawal",sans-serif;background:#fff;direction:rtl;font-size:11px;}@media print{@page{size:A4;margin:6mm 6mm 48mm 6mm;}body{padding:0;}.sig-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}table{width:100%;border-collapse:collapse;}thead tr{background:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact;}thead th{padding:6px;color:#fff;font-weight:700;font-size:10px;text-align:center;}.summary-row td{background:#0f172a!important;color:#fff!important;font-weight:900;-webkit-print-color-adjust:exact;print-color-adjust:exact;}';
   const header='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 8px;background:#0f172a;color:#fff;margin-bottom:8px;border-radius:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div><div style="font-size:16px;font-weight:900">الراوي الإداري</div><div style="font-size:10px;color:#94a3b8">كشف الرواتب الشهري (v5.1)</div></div><div style="text-align:left;font-size:10px;color:#94a3b8">'+today+'<br>عدد العمال: '+workers.length+'</div></div>';
-  const table='<table><thead><tr><th style="width:28px">#</th><th style="width:44px">الكود</th><th>الاسم</th><th style="width:80px">التخصص</th><th style="width:36px">حضور</th><th style="width:36px">غياب</th><th style="width:60px">الأجر</th><th style="width:60px">السلف</th><th style="width:65px">الصافي</th><th style="width:90px">توقيع</th></tr></thead><tbody>'+rows+'<tr class="summary-row"><td colspan="6" style="padding:6px 8px;font-size:11px;text-align:right;color:#94a3b8">الإجمالي</td><td style="padding:6px;text-align:center;color:#fff">'+grandEarned.toLocaleString('ar-EG')+'</td><td style="padding:6px;text-align:center;color:#fca5a5">'+grandLoan.toLocaleString('ar-EG')+'</td><td style="padding:6px;text-align:center;color:#34d399">'+grandNet.toLocaleString('ar-EG')+'</td><td></td></tr></tbody></table>';
+  const table='<table><thead><tr><th style="width:28px">#</th><th style="width:44px">الكود</th><th>الاسم</th><th style="width:70px">التخصص</th><th style="width:32px">حضور</th><th style="width:32px">غياب</th><th style="width:55px">الأساسي</th><th style="width:50px">الإضافي</th><th style="width:50px">السلف</th><th style="width:58px">الصافي</th><th style="width:80px">توقيع</th></tr></thead><tbody>'+rows+'<tr class="summary-row"><td colspan="6" style="padding:6px 8px;font-size:11px;text-align:right;color:#94a3b8">الإجمالي</td><td style="padding:6px;text-align:center;color:#fff">'+grandEarned.toLocaleString('ar-EG')+'</td><td style="padding:6px;text-align:center;color:#fde68a">'+grandOT.toLocaleString('ar-EG')+'</td><td style="padding:6px;text-align:center;color:#fca5a5">'+grandLoan.toLocaleString('ar-EG')+'</td><td style="padding:6px;text-align:center;color:#34d399">'+grandNet.toLocaleString('ar-EG')+'</td><td></td></tr></tbody></table>';
   const footer='<div style="text-align:center;font-size:9px;color:#94a3b8;margin-top:8px;padding-top:6px;border-top:1px solid #e2e8f0">الراوي الإداري · '+today+'</div>';
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة','error');return;}
@@ -2360,7 +2630,7 @@ function printWorkerPayslip(){
   const abs=attendance.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
   const earned=days*w.daily,lns=loans.filter(l=>String(l.workerId)===String(w.id));
   const totalLoan=lns.reduce((s,l)=>s+l.amt,0),net=earned-totalLoan;
-  const html='<div style="border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;max-width:700px;margin:0 auto"><div style="background:#0f172a;color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div><div style="font-size:18px;font-weight:900">الراوي الإداري</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">كشف الراتب</div></div><div style="text-align:left;font-size:11px;color:#94a3b8">'+today+'<br><span style="font-family:monospace">#'+w.wCode+'</span></div></div><div style="padding:20px 24px"><div style="font-size:20px;font-weight:900;color:#0f172a;margin-bottom:2px">'+w.name+'</div><div style="font-size:12px;color:#64748b;margin-bottom:16px">'+w.job+' · اليومية: '+w.daily.toLocaleString('ar-EG')+' ج.م</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px"><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;margin-bottom:5px">أيام الحضور</div><div style="font-size:18px;font-weight:900;color:#059669">'+days+'</div></div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;margin-bottom:5px">أيام الغياب</div><div style="font-size:18px;font-weight:900;color:#dc2626">'+abs+'</div></div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;margin-bottom:5px">إجمالي الأجر</div><div style="font-size:18px;font-weight:900;color:#0f172a">'+earned.toLocaleString('ar-EG')+' ج.م</div></div></div>'+(lns.length?'<div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px;padding-top:12px;border-top:1px solid #e2e8f0">💸 السلفيات ('+lns.length+')</div>'+lns.map(l=>'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px"><span>'+l.date+(l.note?' — '+l.note:'')+'</span><span style="color:#ef4444;font-weight:700">'+Number(l.amt).toLocaleString('ar-EG')+' ج.م</span></div>').join(''):'')+'<div style="background:#0f172a;color:#fff;border-radius:10px;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:16px;-webkit-print-color-adjust:exact;print-color-adjust:exact"><span style="font-size:12px;color:#94a3b8">الصافي المستحق</span><span style="font-size:20px;font-weight:900;color:#10b981">'+net.toLocaleString('ar-EG')+' ج.م</span></div><div style="text-align:center;font-size:10px;color:#94a3b8;padding:12px;border-top:1px solid #e2e8f0;margin-top:12px">الراوي الإداري · '+today+'</div></div></div>';
+  const html='<div style="border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;max-width:700px;margin:0 auto"><div style="background:#0f172a;color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact"><div><div style="font-size:18px;font-weight:900">الراوي الإداري</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">كشف الراتب</div></div><div style="text-align:left;font-size:11px;color:#94a3b8">'+today+'<br><span style="font-family:monospace">#'+w.wCode+'</span></div></div><div style="padding:20px 24px"><div style="font-size:20px;font-weight:900;color:#0f172a;margin-bottom:2px">'+w.name+'</div><div style="font-size:12px;color:#64748b;margin-bottom:16px">'+w.job+' · الراتب: '+w.daily.toLocaleString('ar-EG')+' ج.م</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px"><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;margin-bottom:5px">أيام الحضور</div><div style="font-size:18px;font-weight:900;color:#059669">'+days+'</div></div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;margin-bottom:5px">أيام الغياب</div><div style="font-size:18px;font-weight:900;color:#dc2626">'+abs+'</div></div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 14px"><div style="font-size:9px;color:#64748b;font-weight:700;margin-bottom:5px">إجمالي الأجر</div><div style="font-size:18px;font-weight:900;color:#0f172a">'+earned.toLocaleString('ar-EG')+' ج.م</div></div></div>'+(lns.length?'<div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px;padding-top:12px;border-top:1px solid #e2e8f0">💸 السلفيات ('+lns.length+')</div>'+lns.map(l=>'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px"><span>'+l.date+(l.note?' — '+l.note:'')+'</span><span style="color:#ef4444;font-weight:700">'+Number(l.amt).toLocaleString('ar-EG')+' ج.م</span></div>').join(''):'')+'<div style="background:#0f172a;color:#fff;border-radius:10px;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:16px;-webkit-print-color-adjust:exact;print-color-adjust:exact"><span style="font-size:12px;color:#94a3b8">الصافي المستحق</span><span style="font-size:20px;font-weight:900;color:#10b981">'+net.toLocaleString('ar-EG')+' ج.م</span></div><div style="text-align:center;font-size:10px;color:#94a3b8;padding:12px;border-top:1px solid #e2e8f0;margin-top:12px">الراوي الإداري · '+today+'</div></div></div>';
   const win=window.open('','_blank','width=800,height=600');
   if(!win){toast('⚠️ يرجى السماح بالنوافذ المنبثقة','error');return;}
   win.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كشف راتب '+w.name+'</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Tajawal,sans-serif;background:#fff;padding:20px;direction:rtl;}</style></head><body>'+html+'</body></html>');
@@ -2398,7 +2668,7 @@ async function printIDCard(){
       <div class="id-card-job">${w.job}</div>
       <div class="id-card-row">
         <div><div class="id-card-field">كود العامل</div><div class="id-card-val">#${w.wCode}</div></div>
-        <div><div class="id-card-field">اليومية</div><div class="id-card-val">${w.daily.toLocaleString('ar-EG')} ج.م</div></div>
+        <div><div class="id-card-field">الراتب الشهري</div><div class="id-card-val">${w.daily.toLocaleString('ar-EG')} ج.م</div></div>
         <div><div class="id-card-field">أيام الحضور</div><div class="id-card-val">${days}</div></div>
       </div>
       ${w.phone?`<div style="margin-top:10px;font-size:11px;color:rgba(255,255,255,.6)">📞 ${w.phone}</div>`:''}
@@ -2414,7 +2684,7 @@ function printTodayAttendance(){
   const today=todayStr();
   const todayAR=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const todayAtt=attendance.filter(a=>a.date===today);
-  const presL=todayAtt.filter(a=>a.status==='دوام').map(a=>workers.find(w=>String(w.id)===String(a.workerId))).filter(Boolean);
+  const presL=todayAtt.filter(a=>a.status==='دوام'||a.status==='ناقص').map(a=>workers.find(w=>String(w.id)===String(a.workerId))).filter(Boolean);
   const absL=todayAtt.filter(a=>a.status==='غياب').map(a=>workers.find(w=>String(w.id)===String(a.workerId))).filter(Boolean);
   const pending=workers.filter(w=>w.active==='نشط'&&!todayAtt.some(a=>String(a.workerId)===String(w.id)));
   const total=presL.length+absL.length;
@@ -2638,9 +2908,13 @@ async function printPayrollCards(){
     const _now2=new Date(),_cm2=_now2.getMonth()+1,_cy2=_now2.getFullYear();
     const _curAtt2=attendance.filter(a=>isInMonth(a.date,_cm2,_cy2));
     const _curLns2=loans.filter(l=>isInMonth(l.date,_cm2,_cy2));
-    const wDays=_curAtt2.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
+    const _ws=calcWorkerSalary(w,_curAtt2);
+    const wDays=_ws.totalDays, wAbsDays=_curAtt2.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
+    const wOTPay=_ws.otPay;
+    const wOTHrs=_curAtt2.filter(a=>String(a.workerId)===String(w.id)).reduce((s,a)=>s+Number(a.otHours||0),0);
     const wLns=_curLns2.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+Number(l.amt),0);
-    const wNet=wDays*w.daily-wLns;
+    const wLnsList=_curLns2.filter(l=>String(l.workerId)===String(w.id));
+    const wNet=_ws.basePay+wOTPay-wLns;
     const projName = proj ? proj.name : '—';
     const startLabel = w.startDate
       ? new Date(w.startDate).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'})
@@ -2684,7 +2958,7 @@ async function printPayrollCards(){
         <div class="card-row">
           <span class="card-row-icon">🪪</span>
           <span class="card-row-label">الكود</span>
-          <span class="card-row-val code">#${w.wCode}</span>
+          <span class="card-row-val code">${w.companyCode||w.wCode}</span>
         </div>
         ${w.phone ? `
         <div class="card-row">
@@ -2697,16 +2971,26 @@ async function printPayrollCards(){
           <span class="card-row-label">منذ</span>
           <span class="card-row-val">${startLabel}</span>
         </div>
-        <div class="card-row">
-          <span class="card-row-icon">●</span>
-          <span class="card-row-label">الحالة</span>
-          <span class="card-row-val" style="color:${statusColor};background:${statusBg};padding:1px 7px;border-radius:5px;font-weight:800">${w.active}</span>
+      </div>
+      <!-- دوام وغياب -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px;margin-bottom:2px">
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px;padding:5px 8px;text-align:center">
+          <div style="font-size:16px;font-weight:900;color:#15803d;font-family:Tajawal,sans-serif">${wDays}</div>
+          <div style="font-size:8px;font-weight:700;color:#16a34a;margin-top:1px">✅ يوم دوام</div>
+        </div>
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:7px;padding:5px 8px;text-align:center">
+          <div style="font-size:16px;font-weight:900;color:#b91c1c;font-family:Tajawal,sans-serif">${wAbsDays}</div>
+          <div style="font-size:8px;font-weight:700;color:#dc2626;margin-top:1px">❌ يوم غياب</div>
         </div>
       </div>
+      <!-- إضافي إن وجد -->
+      ${wOTPay>0?`<div style="margin-top:5px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:4px 8px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:9px;color:#92400e;font-weight:700">🔥 إضافي (${wOTHrs.toFixed(1)}س)</span><span style="font-size:11px;font-weight:900;color:#c9810a">${wOTPay.toLocaleString('ar-EG')} ج.م</span></div>`:''}
+      <!-- سلف إن وجدت -->
+      ${wLnsList.length>0?`<div style="margin-top:5px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:4px 8px"><div style="font-size:9px;color:#b91c1c;font-weight:700;margin-bottom:2px">💸 السلف</div>${wLnsList.map(l=>`<div style="display:flex;justify-content:space-between;font-size:9px;color:#dc2626"><span>${l.date}${l.note?' · '+l.note:''}</span><span>${Number(l.amt).toLocaleString('ar-EG')} ج.م</span></div>`).join('')}</div>`:''}
       <!-- صافي الراتب -->
-      <div style="margin-top:7px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:5px 8px;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:9px;color:#065f46;font-weight:700">الصافي المستحق</span>
-        <span style="font-size:13px;font-weight:900;color:#047857;font-family:Tajawal,sans-serif">${wNet.toLocaleString('ar-EG')} ج.م</span>
+      <div style="margin-top:5px;background:${wNet>=0?'#f0fdf4':'#fef2f2'};border:1px solid ${wNet>=0?'#bbf7d0':'#fecaca'};border-radius:6px;padding:5px 8px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:9px;color:${wNet>=0?'#065f46':'#b91c1c'};font-weight:700">الصافي المستحق</span>
+        <span style="font-size:13px;font-weight:900;color:${wNet>=0?'#047857':'#dc2626'};font-family:Tajawal,sans-serif">${wNet.toLocaleString('ar-EG')} ج.م</span>
       </div>
       <!-- خط توقيع -->
       <div style="margin-top:6px;border-bottom:1.5px solid #94a3b8;padding-bottom:14px;font-size:8px;color:#94a3b8;text-align:center">التوقيع</div>
@@ -2955,6 +3239,10 @@ window.addEventListener('DOMContentLoaded',()=>{
 function showCompletionModal(presCount,absCount,total){
   const modal=document.getElementById('completionModal');
   if(!modal)return;
+  // لا تظهر إلا مرة واحدة عند اكتمال التحضير الصباحي
+  const _today=todayStr();
+  if(_completionShownDate===_today)return;
+  _completionShownDate=_today;
   // Fill stats
   document.getElementById('cmPresent').textContent=presCount;
   document.getElementById('cmAbsent').textContent=absCount;
@@ -3131,7 +3419,7 @@ function renderProjWorkersList(pid){
     return;
   }
   const rows=ws.map((w,i)=>{
-    const days=curAtt.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
+    const days=curAtt.filter(a=>String(a.workerId)===String(w.id)&&(a.status==='دوام'||a.status==='ناقص')).length;
     const abs=curAtt.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
     const lns=curLns.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+Number(l.amt),0);
     const net=days*w.daily-lns;
@@ -3276,7 +3564,7 @@ function printProjReport(){
   const monthLabel=MONTHS_PRINT[now.getMonth()]+' '+curY;
   let gEarned=0,gLoan=0,gNet=0;
   const rows=ws.map((w,i)=>{
-    const days=curAtt.filter(a=>String(a.workerId)===String(w.id)&&a.status==='دوام').length;
+    const days=curAtt.filter(a=>String(a.workerId)===String(w.id)&&(a.status==='دوام'||a.status==='ناقص')).length;
     const abs=curAtt.filter(a=>String(a.workerId)===String(w.id)&&a.status==='غياب').length;
     const lns=curLns.filter(l=>String(l.workerId)===String(w.id)).reduce((s,l)=>s+Number(l.amt),0);
     const earn=days*w.daily,net=earn-lns;
@@ -3461,9 +3749,9 @@ document.addEventListener('DOMContentLoaded', () => {
     {id:'p_proj1', name:'مشروع 1', startDate:'2026-01-01', status:'active'},
     {id:'p_proj2', name:'مشروع 2', startDate:'2026-02-01', status:'active'}
   ];
-  const demoWorkers  = [{"id": 1, "wCode": "1001", "name": "أحمد محمود علي", "job": "معلم بنا", "daily": 250, "active": "نشط", "phone": "01012345678", "startDate": "2024-01-01", "projectId": "p_proj1"}, {"id": 2, "wCode": "1002", "name": "إبراهيم حسن سعد", "job": "نجار مسلح", "daily": 300, "active": "نشط", "phone": "01112345678", "startDate": "2024-02-01", "projectId": "p_proj1"}, {"id": 3, "wCode": "1003", "name": "محمود الصاوي", "job": "حداد مسلح", "daily": 280, "active": "نشط", "phone": "01212345678", "startDate": "2024-03-01", "projectId": "p_proj1"}, {"id": 4, "wCode": "1004", "name": "سيد جاد الحق", "job": "عامل عادي", "daily": 150, "active": "نشط", "phone": "01512345678", "startDate": "2024-01-15", "projectId": "p_proj1"}, {"id": 5, "wCode": "1005", "name": "عبدالله الشربيني", "job": "كهربائي", "daily": 350, "active": "نشط", "phone": "01001234567", "startDate": "2024-04-01", "projectId": "p_proj1"}, {"id": 6, "wCode": "1006", "name": "رمضان صبحي", "job": "بناء", "daily": 200, "active": "نشط", "phone": "01154321098", "startDate": "2024-05-10", "projectId": "p_proj1"}, {"id": 7, "wCode": "1007", "name": "طارق منصور", "job": "دهان", "daily": 230, "active": "نشط", "phone": "01287654321", "startDate": "2024-06-01", "projectId": "p_proj1"}, {"id": 8, "wCode": "1008", "name": "عادل سعيد", "job": "نجار", "daily": 260, "active": "نشط", "phone": "01534567890", "startDate": "2024-07-01", "projectId": "p_proj1"}, {"id": 9, "wCode": "1009", "name": "حسام زيدان", "job": "كهرباء", "daily": 310, "active": "نشط", "phone": "01098765432", "startDate": "2024-08-15", "projectId": "p_proj1"}, {"id": 10, "wCode": "1010", "name": "مجدي فرحات", "job": "سباكة", "daily": 290, "active": "نشط", "phone": "01145678901", "startDate": "2024-09-01", "projectId": "p_proj1"}, {"id": 11, "wCode": "1011", "name": "مصطفى قاسم", "job": "سباك", "daily": 320, "active": "نشط", "phone": "01101234567", "startDate": "2024-02-10", "projectId": "p_proj2"}, {"id": 12, "wCode": "1012", "name": "ياسر عبد ربه", "job": "نقاش", "daily": 220, "active": "نشط", "phone": "01201234567", "startDate": "2024-05-01", "projectId": "p_proj2"}, {"id": 13, "wCode": "1013", "name": "كرم جابر", "job": "سيراميك", "daily": 270, "active": "نشط", "phone": "01501234567", "startDate": "2024-03-20", "projectId": "p_proj2"}, {"id": 14, "wCode": "1014", "name": "شريف الهواري", "job": "سائق لودر", "daily": 400, "active": "نشط", "phone": "01091234567", "startDate": "2024-06-01", "projectId": "p_proj2"}, {"id": 15, "wCode": "1015", "name": "خالد مرسي", "job": "نجار مسلح", "daily": 300, "active": "نشط", "phone": "01156789012", "startDate": "2024-04-05", "projectId": "p_proj2"}, {"id": 16, "wCode": "1016", "name": "وائل درويش", "job": "حداد", "daily": 275, "active": "نشط", "phone": "01267890123", "startDate": "2024-07-20", "projectId": "p_proj2"}, {"id": 17, "wCode": "1017", "name": "هاني رمزي", "job": "سائق نقل", "daily": 350, "active": "نشط", "phone": "01523456789", "startDate": "2024-08-01", "projectId": "p_proj2"}, {"id": 18, "wCode": "1018", "name": "أيمن سالم", "job": "معلم بلاط", "daily": 265, "active": "نشط", "phone": "01034567890", "startDate": "2024-09-10", "projectId": "p_proj2"}, {"id": 19, "wCode": "1019", "name": "بلال طه", "job": "عامل عادي", "daily": 160, "active": "نشط", "phone": "01145670123", "startDate": "2024-10-01", "projectId": "p_proj2"}, {"id": 20, "wCode": "1020", "name": "فارس غنيم", "job": "مقاول أنفار", "daily": 500, "active": "نشط", "phone": "01256781234", "startDate": "2024-11-01", "projectId": "p_proj2"}];
-  const demoAtt      = [{"workerId": 1, "status": "دوام", "date": "1/3/2026"}, {"workerId": 1, "status": "دوام", "date": "2/3/2026"}, {"workerId": 1, "status": "دوام", "date": "3/3/2026"}, {"workerId": 1, "status": "دوام", "date": "4/3/2026"}, {"workerId": 1, "status": "دوام", "date": "5/3/2026"}, {"workerId": 1, "status": "دوام", "date": "7/3/2026"}, {"workerId": 1, "status": "غياب", "date": "8/3/2026"}, {"workerId": 1, "status": "دوام", "date": "9/3/2026"}, {"workerId": 1, "status": "دوام", "date": "10/3/2026"}, {"workerId": 1, "status": "دوام", "date": "11/3/2026"}, {"workerId": 1, "status": "دوام", "date": "12/3/2026"}, {"workerId": 1, "status": "دوام", "date": "14/3/2026"}, {"workerId": 1, "status": "دوام", "date": "15/3/2026"}, {"workerId": 1, "status": "دوام", "date": "16/3/2026"}, {"workerId": 1, "status": "دوام", "date": "17/3/2026"}, {"workerId": 1, "status": "دوام", "date": "18/3/2026"}, {"workerId": 1, "status": "دوام", "date": "19/3/2026"}, {"workerId": 1, "status": "دوام", "date": "21/3/2026"}, {"workerId": 1, "status": "دوام", "date": "22/3/2026"}, {"workerId": 2, "status": "دوام", "date": "1/3/2026"}, {"workerId": 2, "status": "دوام", "date": "2/3/2026"}, {"workerId": 2, "status": "دوام", "date": "3/3/2026"}, {"workerId": 2, "status": "دوام", "date": "4/3/2026"}, {"workerId": 2, "status": "دوام", "date": "5/3/2026"}, {"workerId": 2, "status": "غياب", "date": "7/3/2026"}, {"workerId": 2, "status": "دوام", "date": "8/3/2026"}, {"workerId": 2, "status": "دوام", "date": "9/3/2026"}, {"workerId": 2, "status": "دوام", "date": "10/3/2026"}, {"workerId": 2, "status": "دوام", "date": "11/3/2026"}, {"workerId": 2, "status": "دوام", "date": "12/3/2026"}, {"workerId": 2, "status": "دوام", "date": "14/3/2026"}, {"workerId": 2, "status": "دوام", "date": "15/3/2026"}, {"workerId": 2, "status": "دوام", "date": "16/3/2026"}, {"workerId": 2, "status": "غياب", "date": "17/3/2026"}, {"workerId": 2, "status": "دوام", "date": "18/3/2026"}, {"workerId": 2, "status": "دوام", "date": "19/3/2026"}, {"workerId": 2, "status": "دوام", "date": "21/3/2026"}, {"workerId": 2, "status": "دوام", "date": "22/3/2026"}, {"workerId": 3, "status": "دوام", "date": "1/3/2026"}, {"workerId": 3, "status": "دوام", "date": "2/3/2026"}, {"workerId": 3, "status": "دوام", "date": "3/3/2026"}, {"workerId": 3, "status": "دوام", "date": "4/3/2026"}, {"workerId": 3, "status": "دوام", "date": "5/3/2026"}, {"workerId": 3, "status": "دوام", "date": "7/3/2026"}, {"workerId": 3, "status": "دوام", "date": "8/3/2026"}, {"workerId": 3, "status": "دوام", "date": "9/3/2026"}, {"workerId": 3, "status": "دوام", "date": "10/3/2026"}, {"workerId": 3, "status": "دوام", "date": "11/3/2026"}, {"workerId": 3, "status": "دوام", "date": "12/3/2026"}, {"workerId": 3, "status": "دوام", "date": "14/3/2026"}, {"workerId": 3, "status": "دوام", "date": "15/3/2026"}, {"workerId": 3, "status": "دوام", "date": "16/3/2026"}, {"workerId": 3, "status": "دوام", "date": "17/3/2026"}, {"workerId": 3, "status": "غياب", "date": "18/3/2026"}, {"workerId": 3, "status": "دوام", "date": "19/3/2026"}, {"workerId": 3, "status": "دوام", "date": "21/3/2026"}, {"workerId": 3, "status": "دوام", "date": "22/3/2026"}, {"workerId": 4, "status": "دوام", "date": "1/3/2026"}, {"workerId": 4, "status": "دوام", "date": "2/3/2026"}, {"workerId": 4, "status": "دوام", "date": "3/3/2026"}, {"workerId": 4, "status": "غياب", "date": "4/3/2026"}, {"workerId": 4, "status": "دوام", "date": "5/3/2026"}, {"workerId": 4, "status": "دوام", "date": "7/3/2026"}, {"workerId": 4, "status": "دوام", "date": "8/3/2026"}, {"workerId": 4, "status": "دوام", "date": "9/3/2026"}, {"workerId": 4, "status": "دوام", "date": "10/3/2026"}, {"workerId": 4, "status": "دوام", "date": "11/3/2026"}, {"workerId": 4, "status": "دوام", "date": "12/3/2026"}, {"workerId": 4, "status": "دوام", "date": "14/3/2026"}, {"workerId": 4, "status": "دوام", "date": "15/3/2026"}, {"workerId": 4, "status": "دوام", "date": "16/3/2026"}, {"workerId": 4, "status": "غياب", "date": "17/3/2026"}, {"workerId": 4, "status": "غياب", "date": "18/3/2026"}, {"workerId": 4, "status": "دوام", "date": "19/3/2026"}, {"workerId": 4, "status": "دوام", "date": "21/3/2026"}, {"workerId": 4, "status": "دوام", "date": "22/3/2026"}, {"workerId": 5, "status": "غياب", "date": "1/3/2026"}, {"workerId": 5, "status": "دوام", "date": "2/3/2026"}, {"workerId": 5, "status": "دوام", "date": "3/3/2026"}, {"workerId": 5, "status": "دوام", "date": "4/3/2026"}, {"workerId": 5, "status": "دوام", "date": "5/3/2026"}, {"workerId": 5, "status": "دوام", "date": "7/3/2026"}, {"workerId": 5, "status": "دوام", "date": "8/3/2026"}, {"workerId": 5, "status": "غياب", "date": "9/3/2026"}, {"workerId": 5, "status": "دوام", "date": "10/3/2026"}, {"workerId": 5, "status": "دوام", "date": "11/3/2026"}, {"workerId": 5, "status": "غياب", "date": "12/3/2026"}, {"workerId": 5, "status": "دوام", "date": "14/3/2026"}, {"workerId": 5, "status": "دوام", "date": "15/3/2026"}, {"workerId": 5, "status": "دوام", "date": "16/3/2026"}, {"workerId": 5, "status": "دوام", "date": "17/3/2026"}, {"workerId": 5, "status": "دوام", "date": "18/3/2026"}, {"workerId": 5, "status": "دوام", "date": "19/3/2026"}, {"workerId": 5, "status": "دوام", "date": "21/3/2026"}, {"workerId": 5, "status": "دوام", "date": "22/3/2026"}, {"workerId": 6, "status": "دوام", "date": "1/3/2026"}, {"workerId": 6, "status": "غياب", "date": "2/3/2026"}, {"workerId": 6, "status": "دوام", "date": "3/3/2026"}, {"workerId": 6, "status": "غياب", "date": "4/3/2026"}, {"workerId": 6, "status": "دوام", "date": "5/3/2026"}, {"workerId": 6, "status": "دوام", "date": "7/3/2026"}, {"workerId": 6, "status": "دوام", "date": "8/3/2026"}, {"workerId": 6, "status": "دوام", "date": "9/3/2026"}, {"workerId": 6, "status": "دوام", "date": "10/3/2026"}, {"workerId": 6, "status": "دوام", "date": "11/3/2026"}, {"workerId": 6, "status": "دوام", "date": "12/3/2026"}, {"workerId": 6, "status": "دوام", "date": "14/3/2026"}, {"workerId": 6, "status": "دوام", "date": "15/3/2026"}, {"workerId": 6, "status": "دوام", "date": "16/3/2026"}, {"workerId": 6, "status": "غياب", "date": "17/3/2026"}, {"workerId": 6, "status": "غياب", "date": "18/3/2026"}, {"workerId": 6, "status": "دوام", "date": "19/3/2026"}, {"workerId": 6, "status": "دوام", "date": "21/3/2026"}, {"workerId": 6, "status": "دوام", "date": "22/3/2026"}, {"workerId": 7, "status": "غياب", "date": "1/3/2026"}, {"workerId": 7, "status": "غياب", "date": "2/3/2026"}, {"workerId": 7, "status": "دوام", "date": "3/3/2026"}, {"workerId": 7, "status": "دوام", "date": "4/3/2026"}, {"workerId": 7, "status": "دوام", "date": "5/3/2026"}, {"workerId": 7, "status": "دوام", "date": "7/3/2026"}, {"workerId": 7, "status": "دوام", "date": "8/3/2026"}, {"workerId": 7, "status": "دوام", "date": "9/3/2026"}, {"workerId": 7, "status": "دوام", "date": "10/3/2026"}, {"workerId": 7, "status": "دوام", "date": "11/3/2026"}, {"workerId": 7, "status": "دوام", "date": "12/3/2026"}, {"workerId": 7, "status": "دوام", "date": "14/3/2026"}, {"workerId": 7, "status": "دوام", "date": "15/3/2026"}, {"workerId": 7, "status": "غياب", "date": "16/3/2026"}, {"workerId": 7, "status": "غياب", "date": "17/3/2026"}, {"workerId": 7, "status": "دوام", "date": "18/3/2026"}, {"workerId": 7, "status": "دوام", "date": "19/3/2026"}, {"workerId": 7, "status": "دوام", "date": "21/3/2026"}, {"workerId": 7, "status": "غياب", "date": "22/3/2026"}, {"workerId": 8, "status": "غياب", "date": "1/3/2026"}, {"workerId": 8, "status": "دوام", "date": "2/3/2026"}, {"workerId": 8, "status": "دوام", "date": "3/3/2026"}, {"workerId": 8, "status": "دوام", "date": "4/3/2026"}, {"workerId": 8, "status": "دوام", "date": "5/3/2026"}, {"workerId": 8, "status": "دوام", "date": "7/3/2026"}, {"workerId": 8, "status": "دوام", "date": "8/3/2026"}, {"workerId": 8, "status": "دوام", "date": "9/3/2026"}, {"workerId": 8, "status": "دوام", "date": "10/3/2026"}, {"workerId": 8, "status": "دوام", "date": "11/3/2026"}, {"workerId": 8, "status": "غياب", "date": "12/3/2026"}, {"workerId": 8, "status": "دوام", "date": "14/3/2026"}, {"workerId": 8, "status": "دوام", "date": "15/3/2026"}, {"workerId": 8, "status": "دوام", "date": "16/3/2026"}, {"workerId": 8, "status": "دوام", "date": "17/3/2026"}, {"workerId": 8, "status": "دوام", "date": "18/3/2026"}, {"workerId": 8, "status": "دوام", "date": "19/3/2026"}, {"workerId": 8, "status": "غياب", "date": "21/3/2026"}, {"workerId": 8, "status": "دوام", "date": "22/3/2026"}, {"workerId": 9, "status": "دوام", "date": "1/3/2026"}, {"workerId": 9, "status": "دوام", "date": "2/3/2026"}, {"workerId": 9, "status": "دوام", "date": "3/3/2026"}, {"workerId": 9, "status": "دوام", "date": "4/3/2026"}, {"workerId": 9, "status": "دوام", "date": "5/3/2026"}, {"workerId": 9, "status": "دوام", "date": "7/3/2026"}, {"workerId": 9, "status": "دوام", "date": "8/3/2026"}, {"workerId": 9, "status": "دوام", "date": "9/3/2026"}, {"workerId": 9, "status": "دوام", "date": "10/3/2026"}, {"workerId": 9, "status": "دوام", "date": "11/3/2026"}, {"workerId": 9, "status": "دوام", "date": "12/3/2026"}, {"workerId": 9, "status": "غياب", "date": "14/3/2026"}, {"workerId": 9, "status": "دوام", "date": "15/3/2026"}, {"workerId": 9, "status": "دوام", "date": "16/3/2026"}, {"workerId": 9, "status": "دوام", "date": "17/3/2026"}, {"workerId": 9, "status": "دوام", "date": "18/3/2026"}, {"workerId": 9, "status": "دوام", "date": "19/3/2026"}, {"workerId": 9, "status": "دوام", "date": "21/3/2026"}, {"workerId": 9, "status": "غياب", "date": "22/3/2026"}, {"workerId": 10, "status": "دوام", "date": "1/3/2026"}, {"workerId": 10, "status": "دوام", "date": "2/3/2026"}, {"workerId": 10, "status": "دوام", "date": "3/3/2026"}, {"workerId": 10, "status": "دوام", "date": "4/3/2026"}, {"workerId": 10, "status": "دوام", "date": "5/3/2026"}, {"workerId": 10, "status": "دوام", "date": "7/3/2026"}, {"workerId": 10, "status": "دوام", "date": "8/3/2026"}, {"workerId": 10, "status": "دوام", "date": "9/3/2026"}, {"workerId": 10, "status": "دوام", "date": "10/3/2026"}, {"workerId": 10, "status": "دوام", "date": "11/3/2026"}, {"workerId": 10, "status": "دوام", "date": "12/3/2026"}, {"workerId": 10, "status": "غياب", "date": "14/3/2026"}, {"workerId": 10, "status": "دوام", "date": "15/3/2026"}, {"workerId": 10, "status": "دوام", "date": "16/3/2026"}, {"workerId": 10, "status": "دوام", "date": "17/3/2026"}, {"workerId": 10, "status": "دوام", "date": "18/3/2026"}, {"workerId": 10, "status": "دوام", "date": "19/3/2026"}, {"workerId": 10, "status": "دوام", "date": "21/3/2026"}, {"workerId": 10, "status": "دوام", "date": "22/3/2026"}, {"workerId": 11, "status": "دوام", "date": "1/3/2026"}, {"workerId": 11, "status": "دوام", "date": "2/3/2026"}, {"workerId": 11, "status": "دوام", "date": "3/3/2026"}, {"workerId": 11, "status": "غياب", "date": "4/3/2026"}, {"workerId": 11, "status": "دوام", "date": "5/3/2026"}, {"workerId": 11, "status": "دوام", "date": "7/3/2026"}, {"workerId": 11, "status": "دوام", "date": "8/3/2026"}, {"workerId": 11, "status": "دوام", "date": "9/3/2026"}, {"workerId": 11, "status": "غياب", "date": "10/3/2026"}, {"workerId": 11, "status": "دوام", "date": "11/3/2026"}, {"workerId": 11, "status": "غياب", "date": "12/3/2026"}, {"workerId": 11, "status": "غياب", "date": "14/3/2026"}, {"workerId": 11, "status": "دوام", "date": "15/3/2026"}, {"workerId": 11, "status": "دوام", "date": "16/3/2026"}, {"workerId": 11, "status": "دوام", "date": "17/3/2026"}, {"workerId": 11, "status": "دوام", "date": "18/3/2026"}, {"workerId": 11, "status": "دوام", "date": "19/3/2026"}, {"workerId": 11, "status": "دوام", "date": "21/3/2026"}, {"workerId": 11, "status": "دوام", "date": "22/3/2026"}, {"workerId": 12, "status": "غياب", "date": "1/3/2026"}, {"workerId": 12, "status": "دوام", "date": "2/3/2026"}, {"workerId": 12, "status": "دوام", "date": "3/3/2026"}, {"workerId": 12, "status": "دوام", "date": "4/3/2026"}, {"workerId": 12, "status": "دوام", "date": "5/3/2026"}, {"workerId": 12, "status": "غياب", "date": "7/3/2026"}, {"workerId": 12, "status": "غياب", "date": "8/3/2026"}, {"workerId": 12, "status": "دوام", "date": "9/3/2026"}, {"workerId": 12, "status": "دوام", "date": "10/3/2026"}, {"workerId": 12, "status": "دوام", "date": "11/3/2026"}, {"workerId": 12, "status": "دوام", "date": "12/3/2026"}, {"workerId": 12, "status": "غياب", "date": "14/3/2026"}, {"workerId": 12, "status": "دوام", "date": "15/3/2026"}, {"workerId": 12, "status": "دوام", "date": "16/3/2026"}, {"workerId": 12, "status": "دوام", "date": "17/3/2026"}, {"workerId": 12, "status": "دوام", "date": "18/3/2026"}, {"workerId": 12, "status": "دوام", "date": "19/3/2026"}, {"workerId": 12, "status": "دوام", "date": "21/3/2026"}, {"workerId": 12, "status": "دوام", "date": "22/3/2026"}, {"workerId": 13, "status": "دوام", "date": "1/3/2026"}, {"workerId": 13, "status": "غياب", "date": "2/3/2026"}, {"workerId": 13, "status": "دوام", "date": "3/3/2026"}, {"workerId": 13, "status": "دوام", "date": "4/3/2026"}, {"workerId": 13, "status": "دوام", "date": "5/3/2026"}, {"workerId": 13, "status": "دوام", "date": "7/3/2026"}, {"workerId": 13, "status": "دوام", "date": "8/3/2026"}, {"workerId": 13, "status": "دوام", "date": "9/3/2026"}, {"workerId": 13, "status": "غياب", "date": "10/3/2026"}, {"workerId": 13, "status": "دوام", "date": "11/3/2026"}, {"workerId": 13, "status": "دوام", "date": "12/3/2026"}, {"workerId": 13, "status": "دوام", "date": "14/3/2026"}, {"workerId": 13, "status": "دوام", "date": "15/3/2026"}, {"workerId": 13, "status": "دوام", "date": "16/3/2026"}, {"workerId": 13, "status": "دوام", "date": "17/3/2026"}, {"workerId": 13, "status": "غياب", "date": "18/3/2026"}, {"workerId": 13, "status": "دوام", "date": "19/3/2026"}, {"workerId": 13, "status": "دوام", "date": "21/3/2026"}, {"workerId": 13, "status": "دوام", "date": "22/3/2026"}, {"workerId": 14, "status": "دوام", "date": "1/3/2026"}, {"workerId": 14, "status": "دوام", "date": "2/3/2026"}, {"workerId": 14, "status": "دوام", "date": "3/3/2026"}, {"workerId": 14, "status": "دوام", "date": "4/3/2026"}, {"workerId": 14, "status": "دوام", "date": "5/3/2026"}, {"workerId": 14, "status": "دوام", "date": "7/3/2026"}, {"workerId": 14, "status": "دوام", "date": "8/3/2026"}, {"workerId": 14, "status": "غياب", "date": "9/3/2026"}, {"workerId": 14, "status": "غياب", "date": "10/3/2026"}, {"workerId": 14, "status": "دوام", "date": "11/3/2026"}, {"workerId": 14, "status": "دوام", "date": "12/3/2026"}, {"workerId": 14, "status": "دوام", "date": "14/3/2026"}, {"workerId": 14, "status": "غياب", "date": "15/3/2026"}, {"workerId": 14, "status": "غياب", "date": "16/3/2026"}, {"workerId": 14, "status": "غياب", "date": "17/3/2026"}, {"workerId": 14, "status": "دوام", "date": "18/3/2026"}, {"workerId": 14, "status": "دوام", "date": "19/3/2026"}, {"workerId": 14, "status": "دوام", "date": "21/3/2026"}, {"workerId": 14, "status": "دوام", "date": "22/3/2026"}, {"workerId": 15, "status": "دوام", "date": "1/3/2026"}, {"workerId": 15, "status": "غياب", "date": "2/3/2026"}, {"workerId": 15, "status": "دوام", "date": "3/3/2026"}, {"workerId": 15, "status": "دوام", "date": "4/3/2026"}, {"workerId": 15, "status": "دوام", "date": "5/3/2026"}, {"workerId": 15, "status": "دوام", "date": "7/3/2026"}, {"workerId": 15, "status": "دوام", "date": "8/3/2026"}, {"workerId": 15, "status": "غياب", "date": "9/3/2026"}, {"workerId": 15, "status": "دوام", "date": "10/3/2026"}, {"workerId": 15, "status": "دوام", "date": "11/3/2026"}, {"workerId": 15, "status": "دوام", "date": "12/3/2026"}, {"workerId": 15, "status": "دوام", "date": "14/3/2026"}, {"workerId": 15, "status": "دوام", "date": "15/3/2026"}, {"workerId": 15, "status": "دوام", "date": "16/3/2026"}, {"workerId": 15, "status": "دوام", "date": "17/3/2026"}, {"workerId": 15, "status": "دوام", "date": "18/3/2026"}, {"workerId": 15, "status": "دوام", "date": "19/3/2026"}, {"workerId": 15, "status": "دوام", "date": "21/3/2026"}, {"workerId": 15, "status": "دوام", "date": "22/3/2026"}, {"workerId": 16, "status": "غياب", "date": "1/3/2026"}, {"workerId": 16, "status": "دوام", "date": "2/3/2026"}, {"workerId": 16, "status": "دوام", "date": "3/3/2026"}, {"workerId": 16, "status": "دوام", "date": "4/3/2026"}, {"workerId": 16, "status": "دوام", "date": "5/3/2026"}, {"workerId": 16, "status": "دوام", "date": "7/3/2026"}, {"workerId": 16, "status": "دوام", "date": "8/3/2026"}, {"workerId": 16, "status": "دوام", "date": "9/3/2026"}, {"workerId": 16, "status": "دوام", "date": "10/3/2026"}, {"workerId": 16, "status": "دوام", "date": "11/3/2026"}, {"workerId": 16, "status": "دوام", "date": "12/3/2026"}, {"workerId": 16, "status": "دوام", "date": "14/3/2026"}, {"workerId": 16, "status": "دوام", "date": "15/3/2026"}, {"workerId": 16, "status": "دوام", "date": "16/3/2026"}, {"workerId": 16, "status": "غياب", "date": "17/3/2026"}, {"workerId": 16, "status": "غياب", "date": "18/3/2026"}, {"workerId": 16, "status": "دوام", "date": "19/3/2026"}, {"workerId": 16, "status": "دوام", "date": "21/3/2026"}, {"workerId": 16, "status": "دوام", "date": "22/3/2026"}, {"workerId": 17, "status": "دوام", "date": "1/3/2026"}, {"workerId": 17, "status": "دوام", "date": "2/3/2026"}, {"workerId": 17, "status": "دوام", "date": "3/3/2026"}, {"workerId": 17, "status": "غياب", "date": "4/3/2026"}, {"workerId": 17, "status": "دوام", "date": "5/3/2026"}, {"workerId": 17, "status": "دوام", "date": "7/3/2026"}, {"workerId": 17, "status": "غياب", "date": "8/3/2026"}, {"workerId": 17, "status": "دوام", "date": "9/3/2026"}, {"workerId": 17, "status": "دوام", "date": "10/3/2026"}, {"workerId": 17, "status": "دوام", "date": "11/3/2026"}, {"workerId": 17, "status": "دوام", "date": "12/3/2026"}, {"workerId": 17, "status": "غياب", "date": "14/3/2026"}, {"workerId": 17, "status": "دوام", "date": "15/3/2026"}, {"workerId": 17, "status": "دوام", "date": "16/3/2026"}, {"workerId": 17, "status": "دوام", "date": "17/3/2026"}, {"workerId": 17, "status": "غياب", "date": "18/3/2026"}, {"workerId": 17, "status": "دوام", "date": "19/3/2026"}, {"workerId": 17, "status": "غياب", "date": "21/3/2026"}, {"workerId": 17, "status": "دوام", "date": "22/3/2026"}, {"workerId": 18, "status": "غياب", "date": "1/3/2026"}, {"workerId": 18, "status": "دوام", "date": "2/3/2026"}, {"workerId": 18, "status": "دوام", "date": "3/3/2026"}, {"workerId": 18, "status": "دوام", "date": "4/3/2026"}, {"workerId": 18, "status": "غياب", "date": "5/3/2026"}, {"workerId": 18, "status": "دوام", "date": "7/3/2026"}, {"workerId": 18, "status": "دوام", "date": "8/3/2026"}, {"workerId": 18, "status": "دوام", "date": "9/3/2026"}, {"workerId": 18, "status": "دوام", "date": "10/3/2026"}, {"workerId": 18, "status": "دوام", "date": "11/3/2026"}, {"workerId": 18, "status": "دوام", "date": "12/3/2026"}, {"workerId": 18, "status": "غياب", "date": "14/3/2026"}, {"workerId": 18, "status": "دوام", "date": "15/3/2026"}, {"workerId": 18, "status": "دوام", "date": "16/3/2026"}, {"workerId": 18, "status": "دوام", "date": "17/3/2026"}, {"workerId": 18, "status": "دوام", "date": "18/3/2026"}, {"workerId": 18, "status": "دوام", "date": "19/3/2026"}, {"workerId": 18, "status": "دوام", "date": "21/3/2026"}, {"workerId": 18, "status": "دوام", "date": "22/3/2026"}, {"workerId": 19, "status": "دوام", "date": "1/3/2026"}, {"workerId": 19, "status": "دوام", "date": "2/3/2026"}, {"workerId": 19, "status": "دوام", "date": "3/3/2026"}, {"workerId": 19, "status": "دوام", "date": "4/3/2026"}, {"workerId": 19, "status": "غياب", "date": "5/3/2026"}, {"workerId": 19, "status": "دوام", "date": "7/3/2026"}, {"workerId": 19, "status": "دوام", "date": "8/3/2026"}, {"workerId": 19, "status": "دوام", "date": "9/3/2026"}, {"workerId": 19, "status": "غياب", "date": "10/3/2026"}, {"workerId": 19, "status": "دوام", "date": "11/3/2026"}, {"workerId": 19, "status": "غياب", "date": "12/3/2026"}, {"workerId": 19, "status": "دوام", "date": "14/3/2026"}, {"workerId": 19, "status": "غياب", "date": "15/3/2026"}, {"workerId": 19, "status": "دوام", "date": "16/3/2026"}, {"workerId": 19, "status": "غياب", "date": "17/3/2026"}, {"workerId": 19, "status": "دوام", "date": "18/3/2026"}, {"workerId": 19, "status": "دوام", "date": "19/3/2026"}, {"workerId": 19, "status": "دوام", "date": "21/3/2026"}, {"workerId": 19, "status": "دوام", "date": "22/3/2026"}, {"workerId": 20, "status": "دوام", "date": "1/3/2026"}, {"workerId": 20, "status": "دوام", "date": "2/3/2026"}, {"workerId": 20, "status": "دوام", "date": "3/3/2026"}, {"workerId": 20, "status": "دوام", "date": "4/3/2026"}, {"workerId": 20, "status": "دوام", "date": "5/3/2026"}, {"workerId": 20, "status": "دوام", "date": "7/3/2026"}, {"workerId": 20, "status": "دوام", "date": "8/3/2026"}, {"workerId": 20, "status": "دوام", "date": "9/3/2026"}, {"workerId": 20, "status": "غياب", "date": "10/3/2026"}, {"workerId": 20, "status": "دوام", "date": "11/3/2026"}, {"workerId": 20, "status": "دوام", "date": "12/3/2026"}, {"workerId": 20, "status": "دوام", "date": "14/3/2026"}, {"workerId": 20, "status": "دوام", "date": "15/3/2026"}, {"workerId": 20, "status": "دوام", "date": "16/3/2026"}, {"workerId": 20, "status": "دوام", "date": "17/3/2026"}, {"workerId": 20, "status": "دوام", "date": "18/3/2026"}, {"workerId": 20, "status": "دوام", "date": "19/3/2026"}, {"workerId": 20, "status": "دوام", "date": "21/3/2026"}, {"workerId": 20, "status": "دوام", "date": "22/3/2026"}];
-  const demoLoans    = [{"workerId": 2, "amt": 400, "date": "19/3/2026", "note": "مصاريف"}, {"workerId": 3, "amt": 400, "date": "10/3/2026", "note": "سلفة"}, {"workerId": 4, "amt": 500, "date": "10/3/2026", "note": "مصاريف"}, {"workerId": 5, "amt": 200, "date": "15/3/2026", "note": "مصاريف"}, {"workerId": 6, "amt": 400, "date": "19/3/2026", "note": "دواء"}, {"workerId": 7, "amt": 300, "date": "19/3/2026", "note": "سلفة"}, {"workerId": 9, "amt": 400, "date": "5/3/2026", "note": "سلفة"}, {"workerId": 11, "amt": 300, "date": "10/3/2026", "note": ""}, {"workerId": 12, "amt": 500, "date": "5/3/2026", "note": "دواء"}, {"workerId": 13, "amt": 300, "date": "19/3/2026", "note": "دواء"}, {"workerId": 14, "amt": 300, "date": "5/3/2026", "note": ""}, {"workerId": 16, "amt": 500, "date": "5/3/2026", "note": "سلفة"}, {"workerId": 18, "amt": 300, "date": "19/3/2026", "note": "مصاريف"}];
+  const demoWorkers  = [{"id": 1, "wCode": "1001", "name": "عامل مشروع 1 - 01", "job": "سائق نقل", "daily": 310, "active": "نشط", "phone": "", "startDate": "2026-01-01", "projectId": "p_proj1", "companyCode": "P1-001", "address": ""}, {"id": 2, "wCode": "1002", "name": "عامل مشروع 1 - 02", "job": "نقاش", "daily": 250, "active": "نشط", "phone": "", "startDate": "2026-01-01", "projectId": "p_proj1", "companyCode": "P1-002", "address": ""}, {"id": 3, "wCode": "1003", "name": "عامل مشروع 1 - 03", "job": "سيراميك", "daily": 270, "active": "نشط", "phone": "", "startDate": "2026-01-01", "projectId": "p_proj1", "companyCode": "P1-003", "address": ""}, {"id": 4, "wCode": "1004", "name": "عامل مشروع 1 - 04", "job": "كهربائي", "daily": 200, "active": "نشط", "phone": "", "startDate": "2026-01-01", "projectId": "p_proj1", "companyCode": "P1-004", "address": ""}, {"id": 5, "wCode": "1005", "name": "عامل مشروع 1 - 05", "job": "سائق لودر", "daily": 310, "active": "نشط", "phone": "", "startDate": "2026-01-01", "projectId": "p_proj1", "companyCode": "P1-005", "address": ""}, {"id": 6, "wCode": "1006", "name": "عامل مشروع 1 - 06", "job": "فني رخام", "daily": 450, "active": "نشط", "phone": "", "startDate": "2026-01-01", "projectId": "p_proj1", "companyCode": "P1-006", "address": ""}, {"id": 7, "wCode": "1007", "name": "عامل مشروع 1 - 07", "job": "حداد مسلح", "daily": 380, "active": "نشط", "phone": "", "startDate": "2026-01-01", "projectId": "p_proj1", "companyCode": "P1-007", "address": ""}, {"id": 8, "wCode": "1008", "name": "عامل مشروع 1 - 08", "job": "نقاش", "daily": 320, "active": "نشط", "phone": "", "startDate": "2026-01-01", "projectId": "p_proj1", "companyCode": "P1-008", "address": ""}, {"id": 9, "wCode": "1009", "name": "عامل مشروع 1 - 09", "job": "نقاش", "daily": 300, "active": "نشط", "phone": "", "startDate": "2026-01-01", "projectId": "p_proj1", "companyCode": "P1-009", "address": ""}, {"id": 10, "wCode": "1010", "name": "عامل مشروع 1 - 10", "job": "سائق نقل", "daily": 260, "active": "نشط", "phone": "", "startDate": "2026-01-01", "projectId": "p_proj1", "companyCode": "P1-010", "address": ""}, {"id": 101, "wCode": "1101", "name": "عامل مشروع 2 - 01", "job": "كهربائي", "daily": 350, "active": "نشط", "phone": "", "startDate": "2026-02-01", "projectId": "p_proj2", "companyCode": "P2-001", "address": ""}, {"id": 102, "wCode": "1102", "name": "عامل مشروع 2 - 02", "job": "سباك", "daily": 500, "active": "نشط", "phone": "", "startDate": "2026-02-01", "projectId": "p_proj2", "companyCode": "P2-002", "address": ""}, {"id": 103, "wCode": "1103", "name": "عامل مشروع 2 - 03", "job": "بناء", "daily": 200, "active": "نشط", "phone": "", "startDate": "2026-02-01", "projectId": "p_proj2", "companyCode": "P2-003", "address": ""}, {"id": 104, "wCode": "1104", "name": "عامل مشروع 2 - 04", "job": "فني رخام", "daily": 200, "active": "نشط", "phone": "", "startDate": "2026-02-01", "projectId": "p_proj2", "companyCode": "P2-004", "address": ""}, {"id": 105, "wCode": "1105", "name": "عامل مشروع 2 - 05", "job": "مبيض محارة", "daily": 290, "active": "نشط", "phone": "", "startDate": "2026-02-01", "projectId": "p_proj2", "companyCode": "P2-005", "address": ""}, {"id": 106, "wCode": "1106", "name": "عامل مشروع 2 - 06", "job": "سائق نقل", "daily": 160, "active": "نشط", "phone": "", "startDate": "2026-02-01", "projectId": "p_proj2", "companyCode": "P2-006", "address": ""}, {"id": 107, "wCode": "1107", "name": "عامل مشروع 2 - 07", "job": "سائق لودر", "daily": 450, "active": "نشط", "phone": "", "startDate": "2026-02-01", "projectId": "p_proj2", "companyCode": "P2-007", "address": ""}, {"id": 108, "wCode": "1108", "name": "عامل مشروع 2 - 08", "job": "معلم بنا", "daily": 320, "active": "نشط", "phone": "", "startDate": "2026-02-01", "projectId": "p_proj2", "companyCode": "P2-008", "address": ""}, {"id": 109, "wCode": "1109", "name": "عامل مشروع 2 - 09", "job": "نقاش", "daily": 300, "active": "نشط", "phone": "", "startDate": "2026-02-01", "projectId": "p_proj2", "companyCode": "P2-009", "address": ""}, {"id": 110, "wCode": "1110", "name": "عامل مشروع 2 - 10", "job": "مقاول أنفار", "daily": 200, "active": "نشط", "phone": "", "startDate": "2026-02-01", "projectId": "p_proj2", "companyCode": "P2-010", "address": ""}];
+  const demoAtt      = [{"workerId": 1, "date": "1/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "2/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "3/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "4/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "17:45", "totalHours": 9, "otHours": 1, "otPay": 52}, {"workerId": 1, "date": "5/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "7/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "8/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "15:45", "totalHours": 9, "otHours": 1, "otPay": 52}, {"workerId": 1, "date": "9/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "10/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "11/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "12/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "14/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "15/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "16/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "17/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "16:30", "totalHours": 9, "otHours": 1, "otPay": 52}, {"workerId": 1, "date": "18/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "19/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "18:15", "totalHours": 10, "otHours": 2, "otPay": 118}, {"workerId": 1, "date": "21/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "22/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 1, "date": "23/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "16:30", "totalHours": 9, "otHours": 1, "otPay": 52}, {"workerId": 2, "date": "1/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "2/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "15:30", "totalHours": 9, "otHours": 1, "otPay": 42}, {"workerId": 2, "date": "3/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "4/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "5/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "7/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "8/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "9/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "10/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "11/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "12/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "14/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "17:30", "totalHours": 10, "otHours": 2, "otPay": 95}, {"workerId": 2, "date": "15/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "16/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "17/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "18/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "19/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "21/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "22/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 2, "date": "23/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "1/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "2/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "3/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "4/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "5/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "7/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "15:15", "totalHours": 9, "otHours": 1, "otPay": 46}, {"workerId": 3, "date": "8/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "9/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "10/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "11/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "12/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "17:45", "totalHours": 11, "otHours": 3, "otPay": 170}, {"workerId": 3, "date": "14/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "16:00", "totalHours": 10, "otHours": 2, "otPay": 103}, {"workerId": 3, "date": "15/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "16/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "17:00", "totalHours": 9, "otHours": 1, "otPay": 46}, {"workerId": 3, "date": "17/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "17:15", "totalHours": 11, "otHours": 3, "otPay": 170}, {"workerId": 3, "date": "18/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "19/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "21/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "22/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 3, "date": "23/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "1/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "2/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "3/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "4/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "5/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "7/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "8/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "17:45", "totalHours": 9, "otHours": 1, "otPay": 34}, {"workerId": 4, "date": "9/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "10/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "11/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "12/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "14/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "15/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "16/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "17/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "18/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "18:30", "totalHours": 10, "otHours": 2, "otPay": 76}, {"workerId": 4, "date": "19/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "21/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "22/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 4, "date": "23/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "1/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "2/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "3/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "4/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "5/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "7/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "8/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "9/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "10/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "11/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "12/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "14/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "15/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "16/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "17/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "18/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "19/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "21/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "22/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 5, "date": "23/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "17:45", "totalHours": 11, "otHours": 3, "otPay": 196}, {"workerId": 6, "date": "1/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "2/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "3/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "4/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "16:00", "totalHours": 9, "otHours": 1, "otPay": 76}, {"workerId": 6, "date": "5/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "17:00", "totalHours": 10, "otHours": 2, "otPay": 172}, {"workerId": 6, "date": "7/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "8/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "17:15", "totalHours": 10, "otHours": 2, "otPay": 172}, {"workerId": 6, "date": "9/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "10/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "11/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "12/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "14/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "15/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "16/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "17/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "18/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "19/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "21/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "17:00", "totalHours": 9, "otHours": 1, "otPay": 76}, {"workerId": 6, "date": "22/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 6, "date": "23/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "1/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "2/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "3/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "4/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "5/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "7/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "8/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "9/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "10/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "11/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "12/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "14/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "15/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "16/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "17/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "18/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "19/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "21/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 7, "date": "22/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "17:45", "totalHours": 10, "otHours": 2, "otPay": 145}, {"workerId": 7, "date": "23/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "1/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "16:45", "totalHours": 9, "otHours": 1, "otPay": 54}, {"workerId": 8, "date": "2/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "3/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "4/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "5/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "7/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "8/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "9/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "17:00", "totalHours": 10, "otHours": 2, "otPay": 122}, {"workerId": 8, "date": "10/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "17:15", "totalHours": 10, "otHours": 2, "otPay": 122}, {"workerId": 8, "date": "11/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "12/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "14/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "15/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "16/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "17/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "18/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "19/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "21/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "22/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 8, "date": "23/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "1/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "2/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "17:15", "totalHours": 9, "otHours": 1, "otPay": 51}, {"workerId": 9, "date": "3/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "4/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "5/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "7/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "16:45", "totalHours": 9, "otHours": 1, "otPay": 51}, {"workerId": 9, "date": "8/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "9/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "10/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "11/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "12/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "14/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "15/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "16/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "17/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "16:30", "totalHours": 9, "otHours": 1, "otPay": 51}, {"workerId": 9, "date": "18/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "18:15", "totalHours": 10, "otHours": 2, "otPay": 114}, {"workerId": 9, "date": "19/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "21/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "16:00", "totalHours": 10, "otHours": 2, "otPay": 114}, {"workerId": 9, "date": "22/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 9, "date": "23/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "1/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "2/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "19:15", "totalHours": 11, "otHours": 3, "otPay": 164}, {"workerId": 10, "date": "3/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "4/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "5/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "7/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "8/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "9/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "10/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "11/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "15:00", "totalHours": 9, "otHours": 1, "otPay": 44}, {"workerId": 10, "date": "12/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "14/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "15/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "16/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "17/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "18/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "19/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "16:00", "totalHours": 10, "otHours": 2, "otPay": 99}, {"workerId": 10, "date": "21/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "22/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 10, "date": "23/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "1/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "2/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "3/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "15:00", "totalHours": 9, "otHours": 1, "otPay": 59}, {"workerId": 101, "date": "4/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "5/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "7/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "8/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "9/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "10/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "11/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "12/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "14/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "15/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "16/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "17/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "18/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "18:45", "totalHours": 10, "otHours": 2, "otPay": 133}, {"workerId": 101, "date": "19/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "21/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "22/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 101, "date": "23/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "16:00", "totalHours": 9, "otHours": 1, "otPay": 59}, {"workerId": 102, "date": "1/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "2/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "3/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "4/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "5/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "7/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "8/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "9/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "10/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "11/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "12/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "14/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "15/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "16/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "17/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "18/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "19/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "21/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "22/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 102, "date": "23/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "1/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "2/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "3/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "17:15", "totalHours": 9, "otHours": 1, "otPay": 34}, {"workerId": 103, "date": "4/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "5/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "7/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "8/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "9/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "10/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "11/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "12/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "14/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "15/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "15:45", "totalHours": 9, "otHours": 1, "otPay": 34}, {"workerId": 103, "date": "16/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "17/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "18/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "19/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "16:15", "totalHours": 10, "otHours": 2, "otPay": 76}, {"workerId": 103, "date": "21/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "22/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 103, "date": "23/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "1/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "2/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "3/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "17:45", "totalHours": 10, "otHours": 2, "otPay": 76}, {"workerId": 104, "date": "4/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "5/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "7/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "8/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "9/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "10/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "11/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "12/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "16:45", "totalHours": 9, "otHours": 1, "otPay": 34}, {"workerId": 104, "date": "14/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "15/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "16/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "17/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "18/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "19/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "21/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "22/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 104, "date": "23/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "1/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "2/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "3/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "4/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "5/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "7/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "8/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "9/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "10/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "11/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "12/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "14/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "15/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "16/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "17/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "18/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "19/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "21/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "22/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 105, "date": "23/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "1/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "2/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "3/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "4/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "5/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "7/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "8/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "9/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "10/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "11/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "12/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "15:00", "totalHours": 9, "otHours": 1, "otPay": 27}, {"workerId": 106, "date": "14/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "15/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "16/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "17/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "18/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "19/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "21/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "22/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 106, "date": "23/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "1/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "2/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "3/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "4/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "5/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "7/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "8/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "17:30", "totalHours": 9, "otHours": 1, "otPay": 76}, {"workerId": 107, "date": "9/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "10/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "11/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "12/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "14/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "15/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "16/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "17/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "18/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "18:00", "totalHours": 11, "otHours": 3, "otPay": 284}, {"workerId": 107, "date": "19/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "21/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 107, "date": "22/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "18:30", "totalHours": 11, "otHours": 3, "otPay": 284}, {"workerId": 107, "date": "23/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "1/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "2/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "3/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "4/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "15:45", "totalHours": 9, "otHours": 1, "otPay": 54}, {"workerId": 108, "date": "5/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "7/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "8/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "9/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "10/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "11/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "12/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "14/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "15:15", "totalHours": 9, "otHours": 1, "otPay": 54}, {"workerId": 108, "date": "15/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "16/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "17/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "18/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "19/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "21/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "17:45", "totalHours": 11, "otHours": 3, "otPay": 202}, {"workerId": 108, "date": "22/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 108, "date": "23/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "16:45", "totalHours": 9, "otHours": 1, "otPay": 54}, {"workerId": 109, "date": "1/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "2/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "3/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "4/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "5/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "7/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "8/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "9/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "10/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "11/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "16:30", "totalHours": 10, "otHours": 2, "otPay": 114}, {"workerId": 109, "date": "12/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "14/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "15/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "16/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "17/3/2026", "status": "دوام", "timeIn": "08:00", "timeMid": "12:00", "timeOut": "16:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "18/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "19/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "21/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "15:15", "totalHours": 9, "otHours": 1, "otPay": 51}, {"workerId": 109, "date": "22/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 109, "date": "23/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "1/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "2/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "3/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "4/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "5/3/2026", "status": "دوام", "timeIn": "07:15", "timeMid": "11:15", "timeOut": "15:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "7/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "8/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "9/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "10/3/2026", "status": "دوام", "timeIn": "06:15", "timeMid": "10:15", "timeOut": "14:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "11/3/2026", "status": "دوام", "timeIn": "07:00", "timeMid": "11:00", "timeOut": "15:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "12/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "14/3/2026", "status": "دوام", "timeIn": "06:00", "timeMid": "10:00", "timeOut": "14:00", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "15/3/2026", "status": "دوام", "timeIn": "08:15", "timeMid": "12:15", "timeOut": "16:15", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "16/3/2026", "status": "دوام", "timeIn": "06:45", "timeMid": "10:45", "timeOut": "14:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "17/3/2026", "status": "غياب", "timeIn": "", "timeMid": "", "timeOut": "", "totalHours": 0, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "18/3/2026", "status": "دوام", "timeIn": "07:30", "timeMid": "11:30", "timeOut": "15:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "19/3/2026", "status": "دوام", "timeIn": "06:30", "timeMid": "10:30", "timeOut": "14:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "21/3/2026", "status": "دوام", "timeIn": "08:30", "timeMid": "12:30", "timeOut": "16:30", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "22/3/2026", "status": "دوام", "timeIn": "07:45", "timeMid": "11:45", "timeOut": "15:45", "totalHours": 8, "otHours": 0, "otPay": 0}, {"workerId": 110, "date": "23/3/2026", "status": "دوام", "timeIn": "08:45", "timeMid": "12:45", "timeOut": "16:45", "totalHours": 8, "otHours": 0, "otPay": 0}];
+  const demoLoans    = [{"workerId": 2, "amt": 250, "date": "10/3/2026", "note": "سلفة"}, {"workerId": 3, "amt": 400, "date": "10/3/2026", "note": "مصاريف"}, {"workerId": 4, "amt": 500, "date": "5/3/2026", "note": "دواء"}, {"workerId": 5, "amt": 350, "date": "10/3/2026", "note": "مصاريف"}, {"workerId": 6, "amt": 350, "date": "10/3/2026", "note": "دواء"}, {"workerId": 7, "amt": 200, "date": "15/3/2026", "note": ""}, {"workerId": 8, "amt": 250, "date": "10/3/2026", "note": "سلفة"}, {"workerId": 9, "amt": 250, "date": "20/3/2026", "note": ""}, {"workerId": 101, "amt": 500, "date": "10/3/2026", "note": "دواء"}, {"workerId": 103, "amt": 350, "date": "5/3/2026", "note": ""}, {"workerId": 105, "amt": 500, "date": "5/3/2026", "note": "دواء"}, {"workerId": 107, "amt": 350, "date": "10/3/2026", "note": "مصاريف"}, {"workerId": 108, "amt": 350, "date": "10/3/2026", "note": "إيجار"}, {"workerId": 109, "amt": 200, "date": "5/3/2026", "note": "إيجار"}];
 
   localStorage.setItem('rawy_v3_projects', JSON.stringify(demoProjects));
   localStorage.setItem('rawy_v3_workers',  JSON.stringify(demoWorkers));
@@ -3474,7 +3762,7 @@ document.addEventListener('DOMContentLoaded', () => {
   workers    = demoWorkers;
   attendance = demoAtt;
   loans      = demoLoans;
-  console.log('✅ Demo data injected: 20 workers / 2 projects');
+  console.log('✅ Demo: 20 workers / 2 projects / 400 att / 14 loans / 49 OT');
 })();
 
 /* ══ ATTENDANCE ID CARDS ══ */
@@ -3621,6 +3909,781 @@ body{font-family:'Tajawal',sans-serif;direction:rtl;background:#f1f5f9;padding:6
   win.document.write(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>كروت التحضير · ${today}</title><style>${css}</style></head><body>${pageHeader}<div class="cards-grid">${cards}</div></body></html>`);
   win.document.close();
   setTimeout(()=>{win.print();},700);
+}
+
+/* ══ TIME ATTENDANCE SYSTEM ══ */
+
+// حساب الإضافي
+
+/* ══ SALARY CALCULATION ══ */
+
+// هل التاريخ يوم جمعة؟
+function isFriday(dateStr){
+  const p=dateStr.split('/');
+  if(p.length!==3)return false;
+  return new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0])).getDay()===5;
+}
+
+// حساب راتب عامل من سجلات الحضور
+function calcWorkerSalary(w, attList){
+  const salary = w.daily; // الحقل daily = الراتب الشهري
+  const wAtt = attList.filter(a=>String(a.workerId)===String(w.id)&&(a.status==='دوام'||a.status==='ناقص'));
+  let normalDays=0, friDays=0;
+  wAtt.forEach(a=>{
+    if(isFriday(a.date)) friDays++;
+    else normalDays++;
+  });
+  const normalPay  = Math.round((salary/26)*normalDays);
+  const fridayPay  = Math.round((salary/30)*friDays);
+  const basePay    = normalPay + fridayPay;
+  const otPay      = Math.round(attList.filter(a=>String(a.workerId)===String(w.id)).reduce((s,a)=>s+Number(a.otPay||0),0));
+  return {normalDays, friDays, basePay, normalPay, fridayPay, otPay, totalDays:normalDays+friDays};
+}
+
+// سعر ساعة الإضافي = راتب ÷ 30 ÷ 8
+function calcOvertime(totalHours, monthSalary){
+  const baseHours = 8;
+  if(totalHours <= baseHours) return {otHours:0, otPay:0, breakdown:[]};
+  const hourRate = monthSalary / 30 / baseHours;
+  const otHours = parseFloat((totalHours - baseHours).toFixed(2));
+  let rate, ratePct;
+  if(otHours < 2)     { rate=1.35; ratePct='135%'; }
+  else if(otHours < 3){ rate=1.70; ratePct='170%'; }
+  else                { rate=2.00; ratePct='200%'; }
+  const otPay = Math.round(hourRate * rate * otHours);
+  const breakdown = [{label:`${otHours.toFixed(1)} ساعة × ${ratePct}`, rate:ratePct, pay:otPay}];
+  return {otHours, otPay, breakdown};
+}
+
+
+// حساب الفرق بين وقتين (بالساعات)
+function timeDiff(t1, t2){
+  if(!t1||!t2) return 0;
+  const [h1,m1]=t1.split(':').map(Number);
+  const [h2,m2]=t2.split(':').map(Number);
+  let diff = (h2*60+m2) - (h1*60+m1);
+  if(diff < 0) diff += 24*60; // عبر منتصف الليل
+  return parseFloat((diff/60).toFixed(2));
+}
+
+// الوقت الحالي بتنسيق HH:MM
+function nowTime(){
+  const d=new Date();
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
+// ── فتح modal الوقت ──
+let tmWorkerId = null;
+let tmMode = 'new'; // 'new' | 'update'
+let tmExisting = null;
+
+function openTimeModal(wid){
+  // لو مش معطي wid، اخده من currentWName
+  const id = wid || (document.getElementById('currentWName')||{}).dataset.id;
+  if(!id) return;
+  const w = workers.find(x=>String(x.id)===String(id));
+  if(!w) return;
+
+  tmWorkerId = w.id;
+  const today = todayStr();
+  tmExisting = attendance.find(a=>String(a.workerId)===String(w.id)&&a.date===today);
+  tmMode = tmExisting ? 'update' : 'new';
+
+  document.getElementById('tmWorkerName').textContent = w.name;
+  document.getElementById('tmWorkerJob').textContent = w.job+' · #'+w.wCode;
+
+  const cur = nowTime();
+
+  if(tmMode === 'new'){
+    document.getElementById('tmTimeIn').value = cur;
+    document.getElementById('tmAbsOptions').style.display='none';
+    document.querySelectorAll('input[name="tmStatus"]').forEach(r=>{if(r.value==='دوام')r.checked=true;});
+  } else {
+    document.getElementById('tmTimeIn').value = tmExisting.timeIn||cur;
+    document.getElementById('tmAbsOptions').style.display='block';
+    document.querySelectorAll('input[name="tmStatus"]').forEach(r=>{
+      r.checked = r.value === (tmExisting.status||'دوام');
+    });
+  }
+
+  updateTimeSummary();
+  document.getElementById('timeAttModal').classList.remove('hidden');
+
+  // Real-time summary update
+  ['tmTimeIn','tmTimeMid','tmTimeOut'].forEach(id=>{
+    document.getElementById(id).oninput = updateTimeSummary;
+  });
+}
+
+function updateTimeSummary(){
+  const tIn  = document.getElementById('tmTimeIn').value;
+  const tOut = document.getElementById('tmTimeOut').value;
+  if(!tIn || !tOut){
+    document.getElementById('tmTotalHrs').textContent='—';
+    document.getElementById('tmOTHrs').textContent='—';
+    document.getElementById('tmOTPay').textContent='—';
+    document.getElementById('tmOTBreakdown').classList.add('hidden');
+    return;
+  }
+  const w = workers.find(x=>String(x.id)===String(tmWorkerId));
+  if(!w) return;
+  const total = timeDiff(tIn, tOut);
+  const {otHours, otPay, breakdown} = calcOvertime(total, w.daily);
+  document.getElementById('tmTotalHrs').textContent = total.toFixed(1)+' س';
+  document.getElementById('tmOTHrs').textContent = otHours>0?otHours.toFixed(1)+' س':'لا يوجد';
+  document.getElementById('tmOTPay').textContent = otPay>0?otPay.toLocaleString('ar-EG')+' ج.م':'—';
+  // Breakdown
+  const bdEl = document.getElementById('tmOTBreakdown');
+  if(breakdown.length){
+    bdEl.classList.remove('hidden');
+    bdEl.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">تفاصيل الإضافي:</div>'
+      +breakdown.map(b=>`<div class="ot-row"><span>${b.label}</span><span>${Math.round(b.pay).toLocaleString('ar-EG')} ج.م (${b.rate})</span></div>`).join('');
+  } else {
+    bdEl.classList.add('hidden');
+  }
+}
+
+function closeTimeModal(){
+  document.getElementById('timeAttModal').classList.add('hidden');
+  tmWorkerId=null;tmExisting=null;
+}
+
+function confirmTimeAtt(){
+  const w = workers.find(x=>String(x.id)===String(tmWorkerId));
+  if(!w){closeTimeModal();return;}
+  const today = todayStr();
+  const tIn  = document.getElementById('tmTimeIn').value;
+  const tMid = ''; // الوسطي ملغي
+  const tOut = ''; // النهاية ملغية — تُسجَّل في الإضافي
+
+  // حالة الدوام
+  let statusVal = 'دوام';
+  if(tmMode==='update'){
+    const sel = document.querySelector('input[name="tmStatus"]:checked');
+    if(sel) statusVal = sel.value;
+  }
+
+  const totalHours = (tIn&&tOut) ? timeDiff(tIn,tOut) : 0;
+  const {otHours,otPay} = (tIn&&tOut&&statusVal==='دوام')
+    ? calcOvertime(totalHours,w.daily)
+    : {otHours:0,otPay:0};
+
+  const rec = {
+    workerId: w.id,
+    date: today,
+    status: statusVal==='غياب'?'غياب':(statusVal==='ناقص'?'ناقص':'دوام'),
+    timeIn: tIn||'',
+    timeMid: tMid||'',
+    timeOut: tOut||'',
+    totalHours: parseFloat(totalHours.toFixed(2)),
+    otHours,
+    otPay
+  };
+
+  if(tmExisting){
+    const idx = attendance.indexOf(tmExisting);
+    if(idx>-1) attendance[idx]=rec;
+  } else {
+    attendance.push(rec);
+  }
+
+  save();render();
+  closeTimeModal();
+
+  const statusIcon = rec.status==='دوام'?'✅':rec.status==='ناقص'?'⚠️':'❌';
+  const otLabel = otPay>0?' · إضافي '+otPay.toLocaleString('ar-EG')+' ج.م':'';
+  toast(statusIcon+' '+w.name+(tIn?' · '+tIn:'')+otLabel, rec.status==='غياب'?'error':'success');
+
+  // Complete check
+  const activeW=workers.filter(x=>x.active==='نشط');
+  const filteredW=activeProjectFilter===null?activeW:activeW.filter(x=>String(x.projectId)===String(activeProjectFilter));
+  const pending=filteredW.filter(x=>!attendance.some(a=>String(a.workerId)===String(x.id)&&a.date===today));
+  if(pending.length===0){
+    const presCount=attendance.filter(a=>a.date===today&&(a.status==='دوام'||a.status==='ناقص')).length;
+    const absCount=attendance.filter(a=>a.date===today&&a.status==='غياب').length;
+    setTimeout(()=>showCompletionModal(presCount,absCount,filteredW.length),400);
+  }
+}
+
+// الغياب المباشر بدون modal
+function recordAbsent(){
+  const id=(document.getElementById('currentWName')||{}).dataset.id;if(!id)return;
+  const w=workers.find(x=>String(x.id)===String(id));if(!w)return;
+  const today=todayStr();
+  const existing=attendance.find(a=>String(a.workerId)===String(w.id)&&a.date===today);
+  const rec={workerId:w.id,date:today,status:'غياب',timeIn:'',timeMid:'',timeOut:'',totalHours:0,otHours:0,otPay:0};
+  if(existing){const idx=attendance.indexOf(existing);if(idx>-1)attendance[idx]=rec;}
+  else attendance.push(rec);
+  save();render();
+  toast('❌ '+w.name+' — غائب','error');
+  const activeW=workers.filter(x=>x.active==='نشط');
+  const filteredW=activeProjectFilter===null?activeW:activeW.filter(x=>String(x.projectId)===String(activeProjectFilter));
+  const pending=filteredW.filter(x=>!attendance.some(a=>String(a.workerId)===String(x.id)&&a.date===today));
+  if(pending.length===0){
+    const presCount=attendance.filter(a=>a.date===today&&(a.status==='دوام'||a.status==='ناقص')).length;
+    const absCount=attendance.filter(a=>a.date===today&&a.status==='غياب').length;
+    setTimeout(()=>showCompletionModal(presCount,absCount,filteredW.length),400);
+  }
+}
+
+// QR — فتح modal الوقت بدل التسجيل المباشر
+function onQRSuccess(code){
+  if(qrScanCooldown) return;
+  code=code.trim();
+  const w=workers.find(x=>x.wCode===code);
+  if(!w){setQRResult('error','❓ لا يوجد عامل بكود: '+code);flashCooldown(1200);return;}
+  const today=todayStr();
+  const existing=attendance.find(a=>String(a.workerId)===String(w.id)&&a.date===today);
+
+  if(existing && existing.status==='غياب'){
+    setQRResult('already','❌ مسجل غياب · '+w.name);flashCooldown(1500);return;
+  }
+  if(existing && existing.timeIn && existing.timeMid && existing.timeOut){
+    setQRResult('already','✅ اكتمل دوامه · '+w.name);flashCooldown(1500);return;
+  }
+
+  // Determine next step label
+  let stepLabel='';
+  if(!existing||!existing.timeIn) stepLabel='🟢 بداية الدوام';
+  else if(!existing.timeMid) stepLabel='🟡 وسطي';
+  else stepLabel='🔴 نهاية الدوام';
+
+  setQRResult('success',stepLabel+' · '+w.name);
+  playBeep();
+  flashCooldown(800);
+
+  // Open time modal after short delay
+  setTimeout(async()=>{
+    await closeQRScanner();
+    openTimeModal(w.id);
+  },600);
+}
+
+/* ══ ATTENDANCE PHASE SYSTEM ══ */
+let currentPhase = 0;
+let _completionShownDate = ''; // منع ظهور شاشة الاكتمال أكثر من مرة في اليوم // 0=صباحي 1=وسطي 2=نهاية 3=إضافي
+
+const PHASE_CONFIG = [
+  { key:'morning', icon:'🌅', label:'تسجيل الحضور الصباحي', btnClass:'morning', color:'att-phase-color-morning', phaseLabel:'جاري التحضير الصباحي', tabIcon:'🌅' },
+  { key:'mid',     icon:'🟡', label:'تسجيل الوسطي',          btnClass:'mid',     color:'att-phase-color-mid',     phaseLabel:'جاري تسجيل الوسطي',   tabIcon:'🟡' },
+  { key:'end',     icon:'🔴', label:'تسجيل نهاية الدوام',    btnClass:'end',     color:'att-phase-color-end',     phaseLabel:'جاري تسجيل النهاية',  tabIcon:'🔴' },
+  { key:'ot',      icon:'🔥', label:'تسجيل الإضافي',         btnClass:'ot',      color:'att-phase-color-ot',      phaseLabel:'تسجيل ساعات الإضافي', tabIcon:'🔥' },
+];
+// المراحل النشطة: صباحي(0) وإضافي(3) فقط
+const ACTIVE_PHASES = [0, 3];
+
+/* ── الحصول على العمال المتبقين في مرحلة ── */
+function getPhasePending(phase, today, filteredW){
+  const attToday = attendance.filter(a=>a.date===today);
+  switch(phase){
+    case 0: // الصباحي: لم يُسجَّل بعد
+      return filteredW.filter(w=>!attToday.some(a=>String(a.workerId)===String(w.id)));
+    case 1: // الوسطي: حاضر صباحاً ولم يُسجَّل وسطي
+      return filteredW.filter(w=>attToday.some(a=>String(a.workerId)===String(w.id)&&(a.status==='دوام'||a.status==='ناقص')&&!a.timeMid));
+    case 2: // النهاية: سجّل وسطي ولم يسجّل خروج
+      return filteredW.filter(w=>attToday.some(a=>String(a.workerId)===String(w.id)&&a.timeMid&&!a.timeOut));
+    case 3: // الإضافي: سجّل خروج ولم يسجّل إضافي
+      return filteredW.filter(w=>attToday.some(a=>String(a.workerId)===String(w.id)&&a.timeOut&&!(a.otHours>0)));
+    default: return [];
+  }
+}
+
+/* ── تحديث واجهة المرحلة ── */
+function updatePhaseUI(today, filteredW){
+  const cfg = PHASE_CONFIG[currentPhase];
+  const pending = getPhasePending(currentPhase, today, filteredW);
+
+  // Progress
+  let total=0, done=0;
+  if(currentPhase===0){
+    total=filteredW.length;
+    done=attendance.filter(a=>a.date===today&&filteredW.some(w=>String(w.id)===String(a.workerId))).length;
+  } else if(currentPhase===1){
+    const morningPresent=filteredW.filter(w=>attendance.some(a=>String(a.workerId)===String(w.id)&&a.date===today&&(a.status==='دوام'||a.status==='ناقص')));
+    total=morningPresent.length;
+    done=morningPresent.filter(w=>attendance.some(a=>String(a.workerId)===String(w.id)&&a.date===today&&a.timeMid)).length;
+  } else if(currentPhase===2){
+    const midDone=filteredW.filter(w=>attendance.some(a=>String(a.workerId)===String(w.id)&&a.date===today&&a.timeMid));
+    total=midDone.length;
+    done=midDone.filter(w=>attendance.some(a=>String(a.workerId)===String(w.id)&&a.date===today&&a.timeOut)).length;
+  } else {
+    const endDone=filteredW.filter(w=>attendance.some(a=>String(a.workerId)===String(w.id)&&a.date===today&&a.timeOut));
+    total=endDone.length;
+    done=endDone.filter(w=>attendance.some(a=>String(a.workerId)===String(w.id)&&a.date===today&&(a.otHours>0))).length;
+  }
+  const pct=total>0?Math.round((done/total)*100):0;
+
+  const pf=document.getElementById('attProgressFill');
+  if(pf){pf.className='att-progress-fill '+cfg.color;pf.style.width=pct+'%';}
+  const pt=document.getElementById('attProgressText');
+  if(pt)pt.textContent=`تم ${done} من ${total}`;
+  const pp=document.getElementById('attProgressPct');
+  if(pp)pp.textContent=pct+'%';
+
+  // Phase label
+  const pl=document.getElementById('phaseLabel');
+  if(pl)pl.textContent=cfg.phaseLabel;
+
+  // Action button
+  const ab=document.getElementById('phaseActionBtn');
+  const ai=document.getElementById('phaseActionIcon');
+  const al=document.getElementById('phaseActionLabel');
+  if(ab){ab.className='att-phase-btn '+cfg.btnClass;}
+  if(ai)ai.textContent=cfg.icon;
+  if(al)al.textContent=cfg.label;
+
+  // OT input
+  const otRow=document.getElementById('otHoursRow');
+  if(otRow)otRow.style.display=currentPhase===3?'flex':'none';
+  if(currentPhase===3)updateOTPreview();
+
+  // Worker info
+  const inputCard=document.getElementById('attInputCard');
+  const completeCard=document.getElementById('attCompleteCard');
+
+  if(pending.length>0){
+    const w=pending[0];
+    const cur=document.getElementById('currentWName');
+    if(cur){cur.textContent=w.name;cur.dataset.id=w.id;}
+    const wm=document.getElementById('phaseWorkerMeta');
+    if(wm)wm.textContent=w.job+' · #'+w.wCode;
+    // Show existing times
+    const rec=attendance.find(a=>String(a.workerId)===String(w.id)&&a.date===today);
+    const tb=document.getElementById('phaseTimeBadge');
+    if(tb&&rec){
+      const parts=[];
+      if(rec.timeIn)parts.push('🟢'+rec.timeIn);
+      if(rec.timeMid)parts.push('🟡'+rec.timeMid);
+      if(rec.timeOut)parts.push('🔴'+rec.timeOut);
+      if(parts.length){tb.textContent=parts.join(' ');tb.style.display='';}
+      else tb.style.display='none';
+    } else if(tb) tb.style.display='none';
+    if(inputCard)inputCard.style.display='';
+    if(completeCard)completeCard.classList.remove('show');
+  } else {
+    const cur=document.getElementById('currentWName');
+    if(cur){cur.textContent='';cur.dataset.id='';}
+    if(inputCard)inputCard.style.display='none';
+    if(completeCard){
+      completeCard.classList.add('show');
+      const phaseNames=['الصباحي','الوسطي','النهاية','الإضافي'];
+      const completeTitles=['🌅 اكتمل التحضير الصباحي!','🟡 اكتمل الوسطي!','🔴 اكتملت تسجيلات النهاية!','🔥 اكتملت ساعات الإضافي!'];
+      const ct=document.getElementById('attCompleteTitle');
+      if(ct)ct.textContent=completeTitles[currentPhase]||'اكتمل التحضير!';
+      const sub=document.getElementById('attCompleteSub');
+      if(sub){
+        const presCount=attendance.filter(a=>a.date===today&&(a.status==='دوام'||a.status==='ناقص')).length;
+        const absCount=attendance.filter(a=>a.date===today&&a.status==='غياب').length;
+        const otCount=attendance.filter(a=>a.date===today&&a.otHours>0).length;
+        sub.textContent=`✅ ${presCount} حاضر · ❌ ${absCount} غائب · 🔥 ${otCount} إضافي`;
+      }
+      // Show next phase button if available
+      if(currentPhase<3){
+        const nextPending=getPhasePending(currentPhase+1,today,filteredW);
+        if(nextPending.length>0){
+          const nextCfg=PHASE_CONFIG[currentPhase+1];
+          const actEl=document.querySelector('.att-complete-actions');
+          if(actEl&&!actEl.querySelector('.next-phase-btn')){
+            const nb=document.createElement('button');
+            nb.className='btn btn-lg next-phase-btn';
+            nb.style.cssText=`background:linear-gradient(135deg,var(--accent),#b8770a);color:#fff;box-shadow:0 4px 16px rgba(201,129,10,.3)`;
+            nb.textContent=nextCfg.icon+' الانتقال لـ'+['الوسطي','النهاية','الإضافي'][currentPhase];
+            nb.onclick=()=>switchPhase(currentPhase+1);
+            actEl.insertBefore(nb,actEl.firstChild);
+          }
+        }
+      }
+      // Trigger completion modal only for phase 0
+      if(currentPhase===0){
+        const presCount=attendance.filter(a=>a.date===today&&(a.status==='دوام'||a.status==='ناقص')).length;
+        const absCount=attendance.filter(a=>a.date===today&&a.status==='غياب').length;
+        setTimeout(()=>showCompletionModal(presCount,absCount,filteredW.length),400);
+      }
+    }
+  }
+
+  // Update tabs
+  updatePhaseTabs(today, filteredW);
+}
+
+function updatePhaseTabs(today, filteredW){
+  const counts=[
+    getPhasePending(0,today,filteredW).length,
+    0, 0, // phases 1,2 unused
+    getPhasePending(3,today,filteredW).length,
+  ];
+  const phase0Done=filteredW.some(w=>attendance.some(a=>String(a.workerId)===String(w.id)&&a.date===today));
+  const unlocked=[true,false,false,phase0Done];
+
+  [0,3].forEach(i=>{
+    const tab=document.getElementById('phaseTab'+i);
+    const countEl=document.getElementById('phaseCount'+i);
+    if(!tab)return;
+    if(countEl)countEl.textContent=counts[i];
+    tab.className='phase-tab'+(i===currentPhase?' active':counts[i]===0&&unlocked[i]?' done':!unlocked[i]?' locked':'');
+  });
+}
+
+function switchPhase(p){
+  if(![0,3].includes(p))return; // صباحي وإضافي فقط
+  currentPhase=p;
+  document.querySelectorAll('.next-phase-btn').forEach(el=>el.remove());
+  const completeCard=document.getElementById('attCompleteCard');
+  if(completeCard)completeCard.classList.remove('show');
+  render();
+}
+
+/* ── تسجيل المرحلة ── */
+function recordPhase(){
+  const id=(document.getElementById('currentWName')||{}).dataset.id;
+  if(!id)return;
+  const w=workers.find(x=>String(x.id)===String(id));
+  if(!w)return;
+  const today=todayStr();
+  const curTime=nowTime();
+  let rec=attendance.find(a=>String(a.workerId)===String(w.id)&&a.date===today);
+
+  if(currentPhase===0){
+    // صباحي — تسجيل جديد
+    const newRec={workerId:w.id,date:today,status:'دوام',timeIn:curTime,timeMid:'',timeOut:'',totalHours:0,otHours:0,otPay:0};
+    if(rec){const idx=attendance.indexOf(rec);attendance[idx]=newRec;}
+    else attendance.push(newRec);
+    toast('🌅 '+w.name+' · '+curTime,'success');
+
+  } else if(currentPhase===1){
+    // وسطي
+    if(!rec)return;
+    rec.timeMid=curTime;
+    toast('🟡 '+w.name+' · وسطي '+curTime,'info');
+
+  } else if(currentPhase===2){
+    // نهاية — حساب الساعات والإضافي
+    if(!rec)return;
+    rec.timeOut=curTime;
+    const total=timeDiff(rec.timeIn,curTime);
+    rec.totalHours=parseFloat(total.toFixed(2));
+    const {otHours,otPay}=calcOvertime(total,w.daily);
+    rec.otHours=otHours;
+    rec.otPay=otPay;
+    const otStr=otPay>0?' · إضافي '+otPay.toLocaleString('ar-EG')+' ج.م':'';
+    toast('🔴 '+w.name+' · نهاية '+curTime+' · '+total.toFixed(1)+'س'+otStr,'info');
+
+  } else if(currentPhase===3){
+    // إضافي — ساعات يدوية
+    if(!rec)return;
+    const hrs=parseFloat((document.getElementById('otHoursInput')||{value:'1'}).value)||1;
+    const{otHours,otPay}=calcOvertime(8+hrs,w.daily);
+    rec.otHours=(rec.otHours||0)+otHours;
+    rec.otPay=(rec.otPay||0)+otPay;
+    rec.totalHours=(rec.totalHours||8)+hrs;
+    toast('🔥 '+w.name+' · '+hrs+'س إضافي · '+otPay.toLocaleString('ar-EG')+' ج.م','info');
+  }
+
+  save();render();
+}
+
+function updateOTPreview(){
+  const id=(document.getElementById('currentWName')||{}).dataset.id;
+  if(!id)return;
+  const w=workers.find(x=>String(x.id)===String(id));
+  if(!w)return;
+  const hrs=parseFloat((document.getElementById('otHoursInput')||{value:'1'}).value)||1;
+  const{otHours,otPay,breakdown}=calcOvertime(8+hrs,w.daily);
+  const prev=document.getElementById('otCalcPreview');
+  if(!prev)return;
+  prev.classList.remove('hidden');
+  prev.innerHTML='💜 قيمة الإضافي: <strong>'+otPay.toLocaleString('ar-EG')+' ج.م</strong>'
+    +(breakdown.length?' · '+breakdown.map(b=>b.rate+': '+Math.round(b.pay).toLocaleString('ar-EG')).join(' | '):'');
+}
+
+// غائب مباشر (من أي مرحلة)
+function recordAbsent(){
+  const id=(document.getElementById('currentWName')||{}).dataset.id;if(!id)return;
+  const w=workers.find(x=>String(x.id)===String(id));if(!w)return;
+  const today=todayStr();
+  const rec={workerId:w.id,date:today,status:'غياب',timeIn:'',timeMid:'',timeOut:'',totalHours:0,otHours:0,otPay:0};
+  const existing=attendance.find(a=>String(a.workerId)===String(w.id)&&a.date===today);
+  if(existing){const idx=attendance.indexOf(existing);attendance[idx]=rec;}
+  else attendance.push(rec);
+  save();render();
+  toast('❌ '+w.name+' — غائب','error');
+  // Complete check
+  const activeW=workers.filter(x=>x.active==='نشط');
+  const filteredW=activeProjectFilter===null?activeW:activeW.filter(x=>String(x.projectId)===String(activeProjectFilter));
+  const pending=filteredW.filter(x=>!attendance.some(a=>String(a.workerId)===String(x.id)&&a.date===today));
+  if(pending.length===0&&currentPhase===0){
+    const presCount=attendance.filter(a=>a.date===today&&(a.status==='دوام'||a.status==='ناقص')).length;
+    const absCount=attendance.filter(a=>a.date===today&&a.status==='غياب').length;
+    setTimeout(()=>showCompletionModal(presCount,absCount,filteredW.length),400);
+  }
+}
+
+// QR — حسب المرحلة
+function onQRSuccess(code){
+  if(qrScanCooldown)return;
+  code=code.trim();
+  const w=workers.find(x=>x.wCode===code);
+  if(!w){setQRResult('error','❓ لا يوجد عامل بكود: '+code);flashCooldown(1200);return;}
+  const today=todayStr();
+  const rec=attendance.find(a=>String(a.workerId)===String(w.id)&&a.date===today);
+
+  // تحقق من صحة المسح للمرحلة الحالية
+  if(currentPhase===0&&rec){
+    setQRResult('already','⚠️ مسجل مسبقاً · '+w.name);flashCooldown(1500);return;
+  }
+  if(currentPhase===1&&(!rec||rec.status==='غياب')){
+    setQRResult('error','❌ غائب أو غير محضَّر · '+w.name);flashCooldown(1200);return;
+  }
+  if(currentPhase===1&&rec&&rec.timeMid){
+    setQRResult('already','⚠️ وسطي مسجل · '+w.name);flashCooldown(1500);return;
+  }
+  if(currentPhase===2&&(!rec||!rec.timeMid)){
+    setQRResult('error','⚠️ لم يسجل وسطي · '+w.name);flashCooldown(1200);return;
+  }
+  if(currentPhase===2&&rec&&rec.timeOut){
+    setQRResult('already','⚠️ نهاية مسجلة · '+w.name);flashCooldown(1500);return;
+  }
+
+  // تعيين العامل الحالي وتسجيل
+  const cur=document.getElementById('currentWName');
+  if(cur){cur.textContent=w.name;cur.dataset.id=w.id;}
+
+  const phaseLabels=['🌅 صباحي','🟡 وسطي','🔴 نهاية','🔥 إضافي'];
+  setQRResult('success',phaseLabels[currentPhase]+' · '+w.name);
+  playBeep();
+  flashCooldown(800);
+
+  setTimeout(async()=>{
+    recordPhase();
+    updateQRStats();
+  },300);
+}
+
+/* ══ PHASE SEARCH + SKIP ══ */
+
+// قائمة العمال المتخطَّين مؤقتاً في كل مرحلة
+let phaseSkipped = {0:new Set(), 1:new Set(), 2:new Set(), 3:new Set()};
+
+function phaseSearchWorker(){
+  const q = (document.getElementById('phaseSearch')||{value:''}).value.trim().toLowerCase();
+  if(!q){
+    // عُد للعامل الأول في القائمة
+    render();
+    return;
+  }
+  const today = todayStr();
+  const activeW = workers.filter(x=>x.active==='نشط');
+  const filteredW = activeProjectFilter===null?activeW:activeW.filter(x=>String(x.projectId)===String(activeProjectFilter));
+  const pending = getPhasePending(currentPhase, today, filteredW)
+    .filter(w=>!phaseSkipped[currentPhase].has(String(w.id)));
+  const found = pending.find(w=>
+    w.name.toLowerCase().includes(q)||
+    w.wCode.includes(q)||
+    w.job.toLowerCase().includes(q)
+  );
+  if(found){
+    const cur=document.getElementById('currentWName');
+    if(cur){cur.textContent=found.name;cur.dataset.id=found.id;}
+    const wm=document.getElementById('phaseWorkerMeta');
+    if(wm)wm.textContent=found.job+' · #'+found.wCode;
+    const rec=attendance.find(a=>String(a.workerId)===String(found.id)&&a.date===today);
+    const tb=document.getElementById('phaseTimeBadge');
+    if(tb&&rec){
+      const parts=[];
+      if(rec.timeIn)parts.push('🟢'+rec.timeIn);
+      if(rec.timeMid)parts.push('🟡'+rec.timeMid);
+      if(rec.timeOut)parts.push('🔴'+rec.timeOut);
+      if(parts.length){tb.textContent=parts.join(' ');tb.style.display='';}
+      else tb.style.display='none';
+    }
+    if(currentPhase===3)updateOTPreview();
+  } else {
+    const cur=document.getElementById('currentWName');
+    if(cur){cur.textContent='لا توجد نتائج';cur.dataset.id='';}
+    const wm=document.getElementById('phaseWorkerMeta');
+    if(wm)wm.textContent='';
+  }
+}
+
+function skipPhaseWorker(){
+  const id=(document.getElementById('currentWName')||{}).dataset.id;
+  if(!id)return;
+  const w=workers.find(x=>String(x.id)===String(id));
+  if(!w)return;
+  phaseSkipped[currentPhase].add(String(id));
+  // امسح البحث وانتقل للتالي
+  const searchEl=document.getElementById('phaseSearch');
+  if(searchEl)searchEl.value='';
+  toast('⏭️ تخطي '+w.name,'info');
+  // إيجاد التالي
+  const today=todayStr();
+  const activeW=workers.filter(x=>x.active==='نشط');
+  const filteredW=activeProjectFilter===null?activeW:activeW.filter(x=>String(x.projectId)===String(activeProjectFilter));
+  const pending=getPhasePending(currentPhase,today,filteredW)
+    .filter(w=>!phaseSkipped[currentPhase].has(String(w.id)));
+  if(pending.length){
+    const nw=pending[0];
+    const cur=document.getElementById('currentWName');
+    if(cur){cur.textContent=nw.name;cur.dataset.id=nw.id;}
+    const wm=document.getElementById('phaseWorkerMeta');
+    if(wm)wm.textContent=nw.job+' · #'+nw.wCode;
+    const rec=attendance.find(a=>String(a.workerId)===String(nw.id)&&a.date===today);
+    const tb=document.getElementById('phaseTimeBadge');
+    if(tb&&rec){
+      const parts=[];
+      if(rec.timeIn)parts.push('🟢'+rec.timeIn);
+      if(rec.timeMid)parts.push('🟡'+rec.timeMid);
+      if(rec.timeOut)parts.push('🔴'+rec.timeOut);
+      if(parts.length){tb.textContent=parts.join(' ');tb.style.display='';}
+      else tb.style.display='none';
+    } else if(tb)tb.style.display='none';
+  } else {
+    // كل المتبقين متخطَّين — اعرض خيار تسجيلهم جميعاً
+    const cur=document.getElementById('currentWName');
+    if(cur){cur.textContent='تم تخطي الكل';cur.dataset.id='';}
+    const wm=document.getElementById('phaseWorkerMeta');
+    if(wm)wm.innerHTML=`<button class="btn btn-ghost btn-sm" onclick="resetSkipped()" style="margin-top:4px">↩️ إلغاء التخطي</button>`;
+  }
+}
+
+function resetSkipped(){
+  phaseSkipped[currentPhase]=new Set();
+  const searchEl=document.getElementById('phaseSearch');
+  if(searchEl)searchEl.value='';
+  render();
+  toast('↩️ تم إلغاء التخطي','info');
+}
+
+// تعديل recordPhase + recordAbsent لمسح البحث بعد التسجيل
+const _origRecordPhase=recordPhase;
+recordPhase=function(){
+  _origRecordPhase();
+  phaseSkipped[currentPhase]=new Set(
+    [...phaseSkipped[currentPhase]].filter(id=>id!==(document.getElementById('currentWName')||{}).dataset.id)
+  );
+  const searchEl=document.getElementById('phaseSearch');
+  if(searchEl)searchEl.value='';
+};
+
+const _origRecordAbsent=recordAbsent;
+recordAbsent=function(){
+  const id=(document.getElementById('currentWName')||{}).dataset.id;
+  _origRecordAbsent();
+  phaseSkipped[currentPhase].delete(String(id));
+  const searchEl=document.getElementById('phaseSearch');
+  if(searchEl)searchEl.value='';
+};
+
+/* ══ ID CARD FUNCTIONS ══ */
+
+// تحويل رابط Drive لرابط مباشر للمعاينة
+function driveToThumb(url){
+  if(!url) return '';
+  // استخراج FILE_ID من أشكال مختلفة من روابط Drive
+  let id = '';
+  // https://drive.google.com/file/d/FILE_ID/view
+  let m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) id = m[1];
+  // https://drive.google.com/open?id=FILE_ID
+  if(!id){ m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/); if(m) id = m[1]; }
+  // لو مش Drive، ارجعه كما هو (صورة مباشرة)
+  if(!id) return url;
+  return `https://drive.google.com/thumbnail?id=${id}&sz=w800`;
+}
+
+function driveToDirectLink(url){
+  if(!url) return url;
+  let m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) return `https://drive.google.com/file/d/${m[1]}/view`;
+  return url;
+}
+
+function renderIDPreview(w){
+  const preview = document.getElementById('pIDPreview');
+  const openBtn = document.getElementById('pIDOpenBtn');
+  const waBtn   = document.getElementById('pWABtn');
+  if(!preview) return;
+  if(w && w.idCardUrl){
+    const thumbUrl = driveToThumb(w.idCardUrl);
+    const directUrl = driveToDirectLink(w.idCardUrl);
+    preview.innerHTML = `
+      <img src="${thumbUrl}" class="id-preview-img" alt="بطاقة الهوية"
+        onclick="window.open('${directUrl}','_blank')"
+        onerror="this.parentElement.innerHTML='<div class=\\"id-preview-empty\\"><div class=\\"id-preview-empty-icon\\">⚠️</div><div>تعذّر تحميل الصورة — تأكد من إعدادات مشاركة Drive</div><a href=\\"${directUrl}\\" target=\\"_blank\\" class=\\"btn btn-ghost btn-sm\\" style=\\"margin-top:10px\\">🔗 فتح في Drive</a></div>'"
+      >
+      <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">اضغط على الصورة للعرض الكامل</div>`;
+
+    if(waBtn)waBtn.style.display='';
+    const dlBtn=document.getElementById('pIDDownloadBtn');if(dlBtn)dlBtn.style.display='';
+  } else {
+    preview.innerHTML = `<div class="id-preview-empty"><div class="id-preview-empty-icon">🪪</div><div>لا توجد صورة بطاقة مرفوعة</div></div>`;
+
+    if(waBtn)waBtn.style.display='none';
+    const dlBtn2=document.getElementById('pIDDownloadBtn');if(dlBtn2)dlBtn2.style.display='none';
+  }
+  // إخفاء حقل الرابط
+  const lr = document.getElementById('pIDLinkRow');
+  if(lr) lr.style.display='none';
+}
+
+function toggleIDLinkInput(){
+  const row = document.getElementById('pIDLinkRow');
+  const inp = document.getElementById('pIDLinkInput');
+  if(!row) return;
+  const shown = row.style.display !== 'none';
+  row.style.display = shown ? 'none' : 'flex';
+  if(!shown && inp){
+    const w = workers.find(x=>String(x.id)===String(selID));
+    inp.value = w?.idCardUrl || '';
+    setTimeout(()=>inp.focus(), 100);
+  }
+}
+
+function saveIDLink(){
+  const inp = document.getElementById('pIDLinkInput');
+  if(!inp) return;
+  const url = inp.value.trim();
+  const w = workers.find(x=>String(x.id)===String(selID));
+  if(!w) return;
+  w.idCardUrl = url || '';
+  save();
+  renderIDPreview(w);
+  toast(url ? '✅ تم حفظ رابط البطاقة' : '🗑️ تم حذف رابط البطاقة', url ? 'success' : 'info');
+}
+
+function sendIDviaWhatsApp(){
+  const w = workers.find(x=>String(x.id)===String(selID));
+  if(!w || !w.idCardUrl) return;
+  const directUrl = driveToDirectLink(w.idCardUrl);
+  const msg = encodeURIComponent(`🪪 بطاقة هوية: ${w.name}\nالكود: ${w.companyCode||w.wCode}\n${directUrl}`);
+  window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
+
+function downloadIDCard(){
+  const w = workers.find(x=>String(x.id)===String(selID));
+  if(!w||!w.idCardUrl) return;
+  const thumbUrl = driveToThumb(w.idCardUrl);
+  // تحميل الصورة عبر fetch ثم إنشاء رابط تحميل
+  toast('⏳ جاري التحميل...','info');
+  fetch(thumbUrl)
+    .then(r=>{
+      if(!r.ok) throw new Error('fetch failed');
+      return r.blob();
+    })
+    .then(blob=>{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `بطاقة_${w.name||w.wCode}.jpg`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('✅ تم التحميل','success');
+    })
+    .catch(()=>{
+      // Drive CORS fallback — افتح الصورة في تاب جديد
+      window.open(driveToDirectLink(w.idCardUrl),'_blank');
+      toast('📥 افتح الصورة واحفظها يدوياً','info');
+    });
 }
 </script>
 
