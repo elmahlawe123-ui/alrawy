@@ -48,6 +48,12 @@ let _db = null;
 let _unsubscribe = null;
 let _isSyncing = false;
 let _lastLocalWrite = 0;
+/* معرّف فريد لهذا الجهاز */
+const _deviceId = localStorage.getItem('rawy_device_id') || (()=>{
+  const id = 'dev_' + Math.random().toString(36).slice(2,10);
+  localStorage.setItem('rawy_device_id', id);
+  return id;
+})();
 
 function _isConfigured(){
   const c = window.FIREBASE_CONFIG;
@@ -103,7 +109,8 @@ window.fbPush = async function(){
       attendance: JSON.stringify(window._appData.attendance || []),
       loans:      JSON.stringify(window._appData.loans      || []),
       archive:    JSON.stringify(window._appData.archive    || []),
-      updatedAt:  Date.now()
+      updatedAt:  Date.now(),
+      updatedBy:  _deviceId
     });
     _updateSyncIndicator('connected');
   } catch(err){
@@ -152,8 +159,9 @@ window.fbListen = function(){
     (snap) => {
       if(!snap.exists()) return;
       const d = snap.data();
-      /* تجاهل التحديثات الناتجة عن كتابتنا نحن */
-      if(Date.now() - _lastLocalWrite < 2000) return;
+      /* تجاهل التحديثات الناتجة عن كتابتنا نحن — بالمعرّف أولاً، والوقت ثانياً */
+      if(d.updatedBy === _deviceId) return;
+      if(Date.now() - _lastLocalWrite < 5000) return;
       _applyRemoteData(d);
       console.log('[Firebase] 🔄 مزامنة فورية من جهاز آخر');
       toast('🔄 تم تحديث البيانات من جهاز آخر', 'info');
